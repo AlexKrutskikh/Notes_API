@@ -86,7 +86,7 @@ class AllQuestionsByUser(APIView):
 
         serializer = QuestionSerializer(questions, many=True, context={'request': request})
 
-        return JsonResponse(serializer.data, status=200)
+        return JsonResponse(serializer.data, safe=False, status=200)
 
 
 """Api for answering questions on ID"""
