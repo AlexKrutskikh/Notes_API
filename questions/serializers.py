@@ -16,12 +16,15 @@ class QuestionFileSerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(serializers.ModelSerializer):
-    has_answers = Message.objects.exists(question_id=Question.Meta.question_id)
+    has_answer = serializers.SerializerMethodField()
     files = QuestionFileSerializer(many=True, read_only=True)  # Используем related_name 'files'
 
     class Meta:
         model = Question
         exclude = ['user_id']  # Исключаем поле user_id
+
+    def get_has_answer(self, obj):
+        return Message.objects.filter(question_id=obj.id, is_user=False).exists()
 
 
 
