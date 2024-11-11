@@ -1,5 +1,5 @@
 # Ignore virtual environment
-.venv/
+.idea
 
 # Ignore Python compiled files
 *.pyc
