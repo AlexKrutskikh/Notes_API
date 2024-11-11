@@ -29,3 +29,9 @@ class SMSVerificationSerializer(serializers.Serializer):
 
 class LoginSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=15)
+
+
+class ProfileViewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['name', 'photo', 'volunteer', 'shelterWorker', 'petOwner', 'pets', 'homelessAnimals']

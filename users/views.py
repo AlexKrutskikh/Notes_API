@@ -7,7 +7,8 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from .models import Profile
-from .serializers import RegisterSerializer, LoginSerializer, SMSVerificationSerializer, ProfileSerializer, UpdateVerifyCodeSerializer
+from .serializers import RegisterSerializer, LoginSerializer, SMSVerificationSerializer, ProfileSerializer, \
+    UpdateVerifyCodeSerializer, ProfileViewSerializer
 from .utils import send_sms
 from django.utils import timezone
 from datetime import timedelta
@@ -236,3 +237,11 @@ class VerifyCodeVetView(APIView):
             return Response({"message": "Verify code is correct."}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid verify code."}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProfileView(APIView):
+    def get(self, request, pk):
+        profile = Profile.objects.get(user_id=pk)
+        serializer = ProfileViewSerializer(profile, context={'request': request})
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
