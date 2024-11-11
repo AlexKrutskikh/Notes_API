@@ -16,6 +16,7 @@ class QuestionFileSerializer(serializers.ModelSerializer):
 
 
 class QuestionSerializer(serializers.ModelSerializer):
+    has_answers = Message.objects.exists(question_id=Question.Meta.question_id)
     files = QuestionFileSerializer(many=True, read_only=True)  # Используем related_name 'files'
 
     class Meta:
