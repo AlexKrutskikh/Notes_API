@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from .models import Question, QuestionFile, Message, MessageFile
+from .models import Question, QuestionFile, Message, MessageFile, QuestionReview
 import json
 from .serializers import QuestionSerializer, MessageSerializer
 from rest_framework.views import APIView
@@ -80,9 +80,9 @@ class AllQuestionsByUser(APIView):
     def get(self, request):
         user_id = request.query_params.get('user_id')
         if user_id is None:
-            return Response({"error": "User ID is required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        questions = Question.objects.filter(user_id=user_id).all()
+            questions = Question.objects.all()
+        else:
+            questions = Question.objects.filter(user_id=user_id).all()
 
         serializer = QuestionSerializer(questions, many=True, context={'request': request})
 
@@ -95,9 +95,26 @@ class AllQuestionsByUser(APIView):
 class QuestionView(APIView):
     def get(self, request, pk):
         question = Question.objects.get(pk=pk)
+        if question is None:
+            return Response({"error": "no question with given id"}, status=status.HTTP_404_NOT_FOUND)
+
         serializer = QuestionSerializer(question, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    def post(self, request, pk):
+        text = request.data.get('text')
+        score = request.data.get('score')
+
+        question = Question.objects.get(pk=pk)
+        if question is None:
+            return Response({"error": "no question with given id"}, status=status.HTTP_404_NOT_FOUND)
+
+        question.status = Question.Status.COMPLETED
+        question.save()
+
+        QuestionReview.objects.create(question=question, text=text, score=score)
+
+        return JsonResponse({'message': 'Question completed successfully'}, status=201)
 
 class AddMessageView(APIView):
 
@@ -112,7 +129,8 @@ class AddMessageView(APIView):
         message = Message.objects.create(
             text=text,
             is_user=is_user,
-            question_id=pk
+            question_id=pk,
+            user_id=user_id
         )
 
         files = request.FILES.getlist('files')

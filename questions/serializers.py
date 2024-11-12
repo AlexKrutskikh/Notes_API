@@ -21,7 +21,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Question
-        exclude = ['user_id']  # Исключаем поле user_id
+        fields = '__all__'
 
     def get_has_answer(self, obj):
         return Message.objects.filter(question_id=obj.id, is_user=False).exists()
