@@ -2,7 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
 from .views import add_question, update_question, QuestionView, AddMessageView, AllMessagesView, \
-    AllQuestionsByUser  # Импортируем функции
+    AllQuestionsByUser, BookQuestionView  # Импортируем функции
 
 
 """API for saving and updating questions"""
@@ -18,6 +18,8 @@ urlpatterns = [
     path('<pk>', QuestionView.as_view(), name='question'),
 
     path('<pk>/complete/', QuestionView.as_view(), name='complete'),
+
+    path('<pk>/book/', BookQuestionView.as_view(), name='book'),
 
     path('<pk>/message/', AddMessageView().as_view(), name='add_message_to_question'),
 

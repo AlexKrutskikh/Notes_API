@@ -90,6 +90,20 @@ class AllQuestionsByUser(APIView):
 
 
 """Api for answering questions on ID"""
+class BookQuestionView(APIView):
+    def post(self, request, pk):
+        question = Question.objects.get(pk=pk)
+        if question is None:
+            return Response({"error": "no question with given id"}, status=status.HTTP_404_NOT_FOUND)
+
+        user_id = request.data.get('user_id')
+        if user_id is None:
+            return Response({"error": "user_id required"}, status=status.HTTP_404_NOT_FOUND)
+
+        question.vet_user_id = user_id
+        question.save()
+
+        return JsonResponse({'message': 'question has booked for vet'}, status=status.HTTP_200_OK)
 
 
 class QuestionView(APIView):

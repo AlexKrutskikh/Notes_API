@@ -22,6 +22,7 @@ class Question(models.Model):
     is_homeless = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     user_id = models.CharField(max_length=100)
+    vet_user_id = models.CharField(max_length=100, null=True, blank=True)
 
     def __str__(self):
         return self.question
