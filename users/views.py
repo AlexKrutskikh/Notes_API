@@ -34,9 +34,11 @@ class UpdateProfileFieldsView(APIView):
         # Получаем user_id из запроса
         user_id = request.data.get('user_id')
         if user_id is None:
-            return Response(
-                {"detail": "Не заполнен параметр user_id."},
-                status=status.HTTP_400_BAD_REQUEST)
+            user_id = request.data.get('userId')
+            if user_id is None:
+                return Response(
+                    {"detail": "Не заполнен параметр user_id."},
+                    status=status.HTTP_400_BAD_REQUEST)
 
         # Ищем профиль с указанным user_id
         profile = get_object_or_404(Profile, user_id=user_id)
