@@ -169,10 +169,10 @@ class VerifyCodeView(generics.GenericAPIView):
             refresh = RefreshToken.for_user(profile.user)
 
             # Добавление URL для редиректа
-            if not profile.user.date_joined:
-                request.session['redirect_url'] = f'https://freevet.me/verification/role?user_id={profile.user.id}'
-            else:
-                request.session['redirect_url'] = f'https://freevet.me/main?user_id={profile.user.id}'
+            # if not profile.user.date_joined:
+            request.session['redirect_url'] = f'https://freevet.me/verification/role?user_id={profile.user.id}'
+            # else:
+            #     request.session['redirect_url'] = f'https://freevet.me/main?user_id={profile.user.id}'
             
             redirect_url = request.session['redirect_url']
 
