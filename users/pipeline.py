@@ -1,4 +1,4 @@
-"""Pipeline for creating a user profile in the database"""
+"""Pipeline for creating a user profile in the  database"""
 
 
 from .models import Profile
