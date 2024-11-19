@@ -5,7 +5,7 @@ from .views import add_question, update_question, QuestionView, AddMessageView, 
     AllQuestionsByUser, BookQuestionView  # Импортируем функции
 
 
-"""API for saving and updating questions"""
+"""API  for saving and updating questions"""
 
 urlpatterns = [
 
