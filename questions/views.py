@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from users.models import Profile
 
-"""Function for saving a question"""
+"""Function for saving a  question"""
 
 
 @csrf_exempt  # Для упрощения, но лучше использовать токены CSRF
