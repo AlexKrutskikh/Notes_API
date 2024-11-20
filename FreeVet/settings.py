@@ -62,6 +62,9 @@ INSTALLED_APPS = [
     'users',
     'vetbook',
     'questions',
+    'verification_codes',
+    'profiles',
+
 ]
 
 """social-auth"""
