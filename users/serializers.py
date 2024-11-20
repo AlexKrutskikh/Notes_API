@@ -8,10 +8,7 @@ class UpdateVerifyCodeSerializer(serializers.ModelSerializer):
         fields = ['phone', 'email', 'verify_code']
 
 
-class ProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        fields = ['homelessAnimals', 'pets', 'volunteer', 'shelterWorker', 'petOwner']
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     phone = serializers.CharField(max_length=20)
