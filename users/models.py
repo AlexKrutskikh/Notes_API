@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
-from django.utils import timezone
-import random
+
 
 
 
@@ -17,11 +16,9 @@ class Profile(models.Model):
     registration_time = models.DateTimeField(auto_now_add=True)                         # Время регистрации
     last_login_time = models.DateTimeField(auto_now=True)                               # Время последнего входа
     is_user = models.BooleanField(default=False)                                        # Роль
-
     last_name = models.CharField(max_length=30, blank=True, null=True)                  # Фамилия
-    phone = models.CharField(max_length=50, unique=True, blank=True, null=True)         # Номер телефона
     email = models.EmailField(unique=True, blank=True, null=True)                       # Почта
-    verify_code = models.CharField(max_length=6, blank=True, null=True)
+
 
 
 

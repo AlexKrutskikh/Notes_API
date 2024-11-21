@@ -14,7 +14,6 @@ urlpatterns = [
 
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 
-    path('update/', UpdateProfileFieldsView.as_view(), name='update-profile-fields'),
 
     path('social-auth/',
          include('social_django.urls', namespace='social')), #social-auth

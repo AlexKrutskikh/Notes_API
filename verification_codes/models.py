@@ -6,6 +6,8 @@ class Verify_code(models.Model):
 
     sms_code = models.CharField(max_length=6, blank=True, null=True)
     code_sent_time = models.DateTimeField(blank=True, null=True)
+    verify_code = models.CharField(max_length=6, blank=True, null=True)
+    phone = models.CharField(max_length=50, unique=True, blank=True, null=True)
 
     def generate_sms_code(self):
         self.sms_code = str(random.randint(100000, 999999))
@@ -14,4 +16,5 @@ class Verify_code(models.Model):
 
     def __str__(self):
         return self.name
+
 
