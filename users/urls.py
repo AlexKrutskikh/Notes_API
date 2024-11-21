@@ -29,10 +29,7 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
 
     path('verify/', VerifyCodeView.as_view(), name='verify_code'),
- 
-    path('update_verify_code/',UpdateVerifyCodeView.as_view(), name='Update_VerifyCode'),
 
-    path('verify_code_vet/', VerifyCodeVetView.as_view(), name='verify_code_vet'),
 
     path('profile/<pk>', ProfileView.as_view(), name='profile'),
 
