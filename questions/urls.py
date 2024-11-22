@@ -21,8 +21,5 @@ urlpatterns = [
 
     path('<pk>/book/', BookQuestionView.as_view(), name='book'),
 
-    path('<pk>/message/', AddMessageView().as_view(), name='add_message_to_question'),
-
-    path('<pk>/messages/', AllMessagesView.as_view(), name='all_messages_of_question')
 
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

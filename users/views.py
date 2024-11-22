@@ -7,14 +7,12 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
 from .models import Profile
-from .serializers import RegisterSerializer, LoginSerializer, SMSVerificationSerializer, ProfileSerializer, \
-    UpdateVerifyCodeSerializer, ProfileViewSerializer
-from .utils import send_sms
+from .serializers import LoginSerializer, SMSVerificationSerializer, ProfileViewSerializer
+from verification_codes.utils import send_sms
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
-from rest_framework.exceptions import APIException
 from twilio.base.exceptions import TwilioRestException
 from django.shortcuts import render
 
