@@ -65,6 +65,9 @@ INSTALLED_APPS = [
     'verification_codes',
     'profiles',
     'chats',
+    'specialist_info',
+
+
 
 
 
