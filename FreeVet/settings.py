@@ -43,6 +43,7 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+
     'corsheaders',
     'django_extensions',
     'django.contrib.admin',
@@ -66,10 +67,7 @@ INSTALLED_APPS = [
     'profiles',
     'chats',
     'specialist_info',
-
-
-
-
+     'animals',
 
 ]
 
