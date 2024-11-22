@@ -7,3 +7,4 @@ class Profile(models.Model):
     pets = models.BooleanField(default=False)             # Домашние животные
     volunteer = models.BooleanField(default=False)        # Волонтер
     shelterWorker = models.BooleanField(default=False)    # Работник приюта
+
