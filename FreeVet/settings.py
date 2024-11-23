@@ -43,7 +43,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-
     'corsheaders',
     'django_extensions',
     'django.contrib.admin',
@@ -70,6 +69,8 @@ INSTALLED_APPS = [
     'apps.animals',
 
 ]
+
+AUTH_USER_MODEL = "users.User"
 
 """social-auth"""
 
