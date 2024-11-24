@@ -43,7 +43,6 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-
     'corsheaders',
     'django_extensions',
     'django.contrib.admin',
@@ -60,16 +59,18 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',  # Token Authentication
     'modeltranslation',
 
-    'users',
-    'vetbook',
-    'questions',
-    'verification_codes',
-    'profiles',
-    'chats',
-    'specialist_info',
-     'animals',
+    'apps.users',
+    'apps.vetbooks',
+    'apps.questions',
+    'apps.verification_codes',
+    'apps.profiles',
+    'apps.chats',
+    'apps.specialist_info',
+    'apps.animals',
 
 ]
+
+AUTH_USER_MODEL = "users.User"
 
 """social-auth"""
 
@@ -171,7 +172,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+# STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Создаем папку media в корне проекта
