@@ -15,7 +15,7 @@ from django.shortcuts import render
 
 from apps.profiles.models import Profile
 from apps.profiles.serializers import ProfileViewSerializer
-from apps.users.serializers import LoginSerializer
+from apps.auth.serializers import LoginSerializer
 from apps.verification_codes.serializers import SMSVerificationSerializer
 from apps.verification_codes.utils import send_sms
 
