@@ -70,7 +70,7 @@ INSTALLED_APPS = [
 
 ]
 
-AUTH_USER_MODEL = "auth_users.CustomUser"
+AUTH_USER_MODEL = "auth_users.MyUser"
 
 """social-auth_users"""
 

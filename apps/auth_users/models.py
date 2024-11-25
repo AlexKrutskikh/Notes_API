@@ -1,5 +1,5 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.models import User, PermissionsMixin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -24,7 +24,7 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
-class CustomUser(AbstractBaseUser, PermissionsMixin):
+class MyUser(AbstractBaseUser, PermissionsMixin):
     class UserType(models.TextChoices):
         CLIENT = 'CL', _('Client')
         SPECIALIST = 'SP', _('Specialist')
