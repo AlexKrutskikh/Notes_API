@@ -2,7 +2,7 @@ from django.db import models
 from django.utils import timezone
 import random
 
-from apps.auth.models import User
+from apps.auth_users.models import User
 
 
 class SpecialistVerificationCode(models.Model):

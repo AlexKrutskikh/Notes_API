@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from apps.auth.models import User
+from apps.auth_users.models import User
 
 
 class Profile(models.Model):

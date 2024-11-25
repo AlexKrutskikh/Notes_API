@@ -52,14 +52,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',  # Required for django-allauth
-    'social_django',  # django-social-auth
+    'social_django',  # django-social-auth_users
     'drf_yasg',
 
     'rest_framework',
     'rest_framework.authtoken',  # Token Authentication
     'modeltranslation',
 
-    'apps.auth',
+    'apps.auth_users',
     'apps.vetbooks',
     'apps.questions',
     'apps.verification_codes',
@@ -70,9 +70,9 @@ INSTALLED_APPS = [
 
 ]
 
-AUTH_USER_MODEL = "auth.User"
+AUTH_USER_MODEL = "auth_users.CustomUser"
 
-"""social-auth"""
+"""social-auth_users"""
 
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.google.GoogleOAuth2',
@@ -97,12 +97,12 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_user',
     'social_core.pipeline.user.get_username',
     'social_core.pipeline.user.create_user',
-    'auth.pipeline.save_profile',  # Custom pipeline for creating a profile
+    'auth_users.pipeline.save_profile',  # Custom pipeline for creating a profile
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
 )
 
-"""End social-auth"""
+"""End social-auth_users"""
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -158,10 +158,10 @@ TWILIO_NUMBER = '+12513337680'
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
+    {'NAME': 'django.contrib.auth_users.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth_users.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth_users.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth_users.password_validation.NumericPasswordValidator'},
 ]
 
 # Internationalization

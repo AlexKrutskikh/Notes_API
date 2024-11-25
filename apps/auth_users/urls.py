@@ -16,7 +16,7 @@ urlpatterns = [
 
 
     path('social-auth/',
-         include('social_django.urls', namespace='social')), #social-auth
+         include('social_django.urls', namespace='social')), #social-auth_users
 
     path('redirect/', custom_login_redirect, name='custom_login_redirect'), #Redirect after registration and authorization
 
