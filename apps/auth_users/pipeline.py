@@ -1,40 +1,40 @@
-# """Pipeline for creating a user profile in the database"""
-#
-#
-# from .models import Profile
-#
-#
-# def save_profile(backend, user, response, *args, **kwargs):
-#
-#     profile, created = Profile.objects.get_or_create(user=user)
-#
-#     if backend.name == 'facebook':
-#         profile.auth_provider = 'Facebook'
-#         profile.name = response.get('first_name', '')
-#         profile.last_name = response.get('last_name', '')
-#         profile.email = response.get('email', '')
-#     elif backend.name == 'google-oauth2':
-#         profile.auth_provider = 'Google'
-#         profile.name = response.get('given_name', '')
-#         profile.last_name = response.get('family_name', '')
-#         profile.email = response.get('email', '')
-#     elif backend.name == 'apple':
-#         profile.auth_provider = 'Apple'
-#         profile.name = response.get('name', {}).get('firstName', '')
-#         profile.last_name = response.get('name', {}).get('lastName', '')
-#         profile.email = response.get('email', '')
-#
-#     profile.last_login_time = user.last_login  # Время последнего входа
-#     profile.registration_time = user.date_joined  # Время регистрации
-#
-#     profile.save()
-#
-#
-#
-#     if created:
-#
-#         kwargs['request'].session['redirect_url'] = f'https://freevet.me/verification/role?user_id={user.id}'
-#
-#     else:
-#
-#         kwargs['request'].session['redirect_url'] = f'https://freevet.me/main?user_id={user.id}'
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.http import JsonResponse
+from django.shortcuts import redirect
+
+
+def redirect_after_login(backend, user, response, *args, **kwargs):
+
+    if user.last_login == user.registration_time:
+        redirect_url = f'https://freevet.me/verification/role'
+
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+    else:
+        redirect_url = 'https://freevet.me/main'
+        access_token = None
+        refresh_token = None
+
+
+    request = kwargs.get('request')
+    if request:
+
+        if access_token and refresh_token:
+            response_data = {
+                'access_token': access_token,
+                'refresh_token': refresh_token,
+                'redirect_url': redirect_url
+            }
+            return JsonResponse(response_data)
+
+        request.session['redirect_url'] = redirect_url
+        return redirect(redirect_url)
+
+    return user
+
+
+def set_auth_provider(backend, user, *args, **kwargs):
+    if user:
+        user.auth_provider = backend.name  # 'google-oauth2', 'facebook', и т.д.
+        user.save()
