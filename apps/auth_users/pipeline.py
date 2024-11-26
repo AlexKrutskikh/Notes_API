@@ -1,13 +1,22 @@
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.http import JsonResponse
 from django.shortcuts import redirect
+from datetime import timedelta
+
+
+def round_to_minute(dt):
+    return dt.replace(second=0, microsecond=0)
 
 
 def redirect_after_login(backend, user, response, *args, **kwargs):
+    # Округляем время до минут
+    registration_time_rounded = round_to_minute(user.registration_time)
+    last_login_time_rounded = round_to_minute(user.last_login_time)
 
-    if user.last_login == user.registration_time:
+    if registration_time_rounded == last_login_time_rounded:
         redirect_url = f'https://freevet.me/verification/role'
 
+        # Генерация токенов
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
@@ -16,10 +25,9 @@ def redirect_after_login(backend, user, response, *args, **kwargs):
         access_token = None
         refresh_token = None
 
-
+    # Проверка запроса и установка редиректа или возвращение токенов
     request = kwargs.get('request')
     if request:
-
         if access_token and refresh_token:
             response_data = {
                 'access_token': access_token,
@@ -28,6 +36,7 @@ def redirect_after_login(backend, user, response, *args, **kwargs):
             }
             return JsonResponse(response_data)
 
+        # Сохраняем только редирект в сессии
         request.session['redirect_url'] = redirect_url
         return redirect(redirect_url)
 
