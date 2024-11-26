@@ -1,15 +1,14 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.models import User, PermissionsMixin
+from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 class CustomUserManager(BaseUserManager):
-    def create_user(self, email, password=None, **extra_fields):
+    def create_user(self, email, **extra_fields):
         if not email:
             raise ValueError("The Email field must be set")
         email = self.normalize_email(email)
         user = self.model(email=email, **extra_fields)
-        user.set_password(password)
         user.save(using=self._db)
         return user
 
@@ -24,11 +23,12 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
-class MyUser(AbstractBaseUser, PermissionsMixin):
+class CustomUser(AbstractBaseUser, PermissionsMixin):
     class UserType(models.TextChoices):
         CLIENT = 'CL', _('Client')
         SPECIALIST = 'SP', _('Specialist')
 
+    password = None
     auth_provider = models.CharField(max_length=50, default='Twilio')  # Социальная сеть
     registration_time = models.DateTimeField(auto_now_add=True)        # Время регистрации
     last_login_time = models.DateTimeField(auto_now=True)              # Время последнего входа
