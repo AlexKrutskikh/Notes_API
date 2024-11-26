@@ -29,6 +29,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         SPECIALIST = 'SP', _('Specialist')
 
     password = None
+    last_login = None
     auth_provider = models.CharField(max_length=50, default='Twilio')  # Социальная сеть
     registration_time = models.DateTimeField(auto_now_add=True)        # Время регистрации
     last_login_time = models.DateTimeField(auto_now=True)              # Время последнего входа
