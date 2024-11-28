@@ -70,7 +70,7 @@ INSTALLED_APPS = [
 
 ]
 
-AUTH_USER_MODEL = "auth_users.CustomUser"
+
 
 """social-auth_users"""
 
@@ -90,19 +90,17 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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' # Googl
 SOCIAL_AUTH_FACEBOOK_KEY='1186656015942216' #Facebook client ID
 SOCIAL_AUTH_FACEBOOK_SECRET='ad7c199b22dafe5e225bbe39af363b21' #Facebook client secret
 
+# Добавьте это в ваш пайплайн:
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
     'social_core.pipeline.social_auth.social_uid',
     'social_core.pipeline.social_auth.auth_allowed',
     'social_core.pipeline.social_auth.social_user',
     'social_core.pipeline.user.get_username',
-    'social_core.pipeline.user.create_user',
-    'apps.auth_users.pipeline.set_auth_provider',  # Вставка перед созданием пользователя
-    'apps.auth_users.pipeline.redirect_after_login',
+    'apps.auth_users.pipeline.create_user',  # Используем наш кастомный пайплайн
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
 )
-
 
 """End social-auth_users"""
 

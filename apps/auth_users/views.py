@@ -1,5 +1,5 @@
 from rest_framework_simplejwt.tokens import RefreshToken
-from apps.auth_users.models import CustomUser
+from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.conf import settings
 from django.http import HttpResponseRedirect
