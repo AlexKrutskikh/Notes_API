@@ -20,7 +20,7 @@ def generate_jwt(user):
 
 # Ваш кастомный пайплайн для создания пользователя
 def create_user(strategy, details, backend, user=None, *args, **kwargs):
-    print("kwargs:", kwargs)  # Печать всего содержимого kwargs
+
     # Получаем email пользователя
     email = kwargs.get('email', details.get('email'))
 
@@ -51,7 +51,6 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
     first_name = kwargs.get('response', {}).get('given_name', '')
     last_name = kwargs.get('response', {}).get('family_name', '')
 
-    print("kwargs:", kwargs)  # Печать всего содержимого kwargs
 
     # Заполнение данных для нового пользователя
     fields = {
