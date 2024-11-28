@@ -20,8 +20,7 @@ def generate_jwt(user):
 
 # Ваш кастомный пайплайн для создания пользователя
 def create_user(strategy, details, backend, user=None, *args, **kwargs):
-    print("Data received from social login:", kwargs)
-
+    print("kwargs:", kwargs)  # Печать всего содержимого kwargs
     # Получаем email пользователя
     email = kwargs.get('email', details.get('email'))
 
@@ -31,44 +30,46 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
 
     # Если пользователь существует, обновляем его last_login и сохраняем токены
     if existing_user:
-        # Обновляем поле last_login на дату регистрации пользователя
         existing_user.last_login = existing_user.date_joined
         existing_user.save()
 
-        # Генерация JWT токенов
         jwt_tokens = generate_jwt(existing_user)
 
-        # Сохраняем токены в сессии
         strategy.session_set('jwt_access_token', jwt_tokens['access'])
         strategy.session_set('jwt_refresh_token', jwt_tokens['refresh'])
 
-        # Редиректим на нужную страницу в зависимости от того, новый ли пользователь
         return HttpResponseRedirect('https://freevet.me/main/')
 
     # Если пользователя нет, создаем нового
     uid = kwargs.get('uid') or kwargs.get('response', {}).get('sub')
     if not uid:
-        raise AuthException("UID is missing.")  # Это поможет избежать ошибки, если uid не передан
+        raise AuthException("UID is missing.")
 
-    username = kwargs.get('username', email.split('@')[0])  # Используем email как username
+    username = kwargs.get('username', email.split('@')[0])
+
+    # Извлекаем first_name и last_name из response
+    first_name = kwargs.get('response', {}).get('given_name', '')
+    last_name = kwargs.get('response', {}).get('family_name', '')
+
+    print("kwargs:", kwargs)  # Печать всего содержимого kwargs
 
     # Заполнение данных для нового пользователя
     fields = {
         'username': username,
         'email': email,
-        'first_name': kwargs.get('given_name', details.get('given_name', '')),
-        'last_name': kwargs.get('family_name', details.get('family_name', '')),
+        'first_name': first_name,
+        'last_name': last_name,
     }
 
-    # Создание нового пользователя
-    user = strategy.create_user(**fields)
+    # Создание нового пользователя без пароля
+    user = User(**fields)
+    user.set_unusable_password()  # Устанавливаем недействительный пароль
+    user.save()
 
-    # Генерация JWT токенов для нового пользователя
     jwt_tokens = generate_jwt(user)
 
-    # Сохраняем JWT токены в сессии
     strategy.session_set('jwt_access_token', jwt_tokens['access'])
     strategy.session_set('jwt_refresh_token', jwt_tokens['refresh'])
 
-    # Редирект на страницу после успешного создания пользователя
     return HttpResponseRedirect('https://freevet.me/verification/role')
+
