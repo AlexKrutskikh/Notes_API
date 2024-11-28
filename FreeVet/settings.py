@@ -102,6 +102,9 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.load_extra_data',
 )
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # База данных для сессий
+SESSION_COOKIE_NAME = 'sessionid'
+
 """End social-auth_users"""
 
 REST_FRAMEWORK = {
