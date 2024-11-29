@@ -31,8 +31,8 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
         jwt_tokens = generate_jwt(existing_user)
 
         response = strategy.redirect('https://127.0.0.1:8000/api/auth_users/updatecode/')
-        response.session_set('jwt_access_token', jwt_tokens['access'], httponly=True, secure=True)
-        response.session_set('jwt_refresh_token', jwt_tokens['refresh'], httponly=True, secure=True)
+        response.set_cookie('jwt_access_token', jwt_tokens['access'], httponly=True, secure=True)
+        response.set_cookie('jwt_refresh_token', jwt_tokens['refresh'], httponly=True, secure=True)
 
         return response
 
