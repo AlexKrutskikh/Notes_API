@@ -1,6 +1,5 @@
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
-from django.shortcuts import redirect
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from rest_framework import generics, status
@@ -11,8 +10,6 @@ from datetime import timedelta
 from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
 from twilio.base.exceptions import TwilioRestException
-from django.shortcuts import render
-
 from apps.profiles.models import Profile
 from apps.profiles.serializers import ProfileViewSerializer
 from apps.auth_users.serializers import LoginSerializer
