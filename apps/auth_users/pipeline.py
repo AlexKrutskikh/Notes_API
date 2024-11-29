@@ -1,6 +1,5 @@
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
-from django.http import HttpResponseRedirect
 from social_core.exceptions import AuthException
 from datetime import datetime
 
@@ -20,13 +19,10 @@ def generate_jwt(user):
 
 def create_user(strategy, details, backend, user=None, *args, **kwargs):
 
-
     email = kwargs.get('email', details.get('email'))
-
 
     User = get_user_model()
     existing_user = User.objects.filter(email=email).first()
-
 
     if existing_user:
         existing_user.last_login = datetime.now()
@@ -34,20 +30,17 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
 
         jwt_tokens = generate_jwt(existing_user)
 
-        strategy.session_set('jwt_access_token', jwt_tokens['access'])
-        strategy.session_set('jwt_refresh_token', jwt_tokens['refresh'])
+        response = strategy.redirect('https://127.0.0.1:8000/api/auth_users/updatecode/')
+        response.session_set('jwt_access_token', jwt_tokens['access'], httponly=True, secure=True)
+        response.session_set('jwt_refresh_token', jwt_tokens['refresh'], httponly=True, secure=True)
 
-
-        return HttpResponseRedirect('https://127.0.0.1:8000/api/auth_users/updatecode/')
-
+        return response
 
     uid = kwargs.get('uid') or kwargs.get('response', {}).get('sub')
     if not uid:
         raise AuthException("UID is missing.")
 
     username = kwargs.get('username', email.split('@')[0])
-
-
     first_name = kwargs.get('response', {}).get('given_name', '')
     last_name = kwargs.get('response', {}).get('family_name', '')
 
@@ -69,5 +62,5 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
     strategy.session_set('jwt_access_token', jwt_tokens['access'])
     strategy.session_set('jwt_refresh_token', jwt_tokens['refresh'])
 
-    return HttpResponseRedirect('https://freevet.me/verification/role')
+    strategy.redirect('https://freevet.me/verification/role')
 

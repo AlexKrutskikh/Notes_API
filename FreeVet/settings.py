@@ -98,13 +98,13 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.auth_allowed',
     'social_core.pipeline.social_auth.social_user',
     'social_core.pipeline.user.get_username',
-    'apps.auth_users.pipeline.create_user',  # Используем наш кастомный пайплайн
+    'apps.auth_users.pipeline.create_user',
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
 )
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # База данных для сессий
-SESSION_COOKIE_NAME = 'sessionid'
+SOCIAL_AUTH_STRATEGY = 'social_django.strategy.DjangoStrategy'
+
 
 """End social-auth_users"""
 
@@ -117,7 +117,6 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.security.SecurityMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
