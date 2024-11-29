@@ -29,7 +29,6 @@ def generate_token_and_redirect(strategy, user, redirect_url):
 
     response.set_cookie('jwt_access_token', jwt_tokens['access'], httponly=True, secure=True,samesite=None)
     response.set_cookie('jwt_refresh_token', jwt_tokens['refresh'], httponly=True, secure=True,samesite=None)
-    response = strategy.redirect(redirect_url)
 
     return response
 
