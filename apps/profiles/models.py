@@ -1,7 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-from django.contrib.auth.models import User
+from apps.auth_users.models import CustomUser
 
 
 
@@ -17,7 +17,7 @@ class Profile(models.Model):
         DOG_HANDLER = 'DH', _('Dog Handler')
         ZOO_PSYCHOLOGIST = 'ZP', _('Zoopsychologist')
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=False, blank=False)
     name = models.CharField(max_length=50)                                              # Имя
     last_name = models.CharField(max_length=30, blank=True, null=True)                  # Фамилия
     photo = models.ImageField(upload_to='profile_pics/', blank=True, null=True)         # Фото
