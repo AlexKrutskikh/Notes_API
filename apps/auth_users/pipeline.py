@@ -48,7 +48,8 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
         existing_user.last_login = datetime.now()
         existing_user.save()
 
-        return generate_token_and_redirect(strategy, existing_user, redirect_url=f"https://freevet.me/main/")
+        return generate_token_and_redirect(existing_user, redirect_url = f"{settings.BASE_URL}/main/")
+
 
     uid = kwargs.get('uid') or kwargs.get('response', {}).get('sub')
     if not uid:
@@ -69,4 +70,5 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
     user = User(**fields)
     user.save()
 
-    return generate_token_and_redirect(strategy,user, redirect_url=f"https://freevet.me/verification/role/")
+    return generate_token_and_redirect(user, redirect_url=f"{settings.BASE_URL}/verification/role/")
+
