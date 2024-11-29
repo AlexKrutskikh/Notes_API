@@ -19,22 +19,9 @@ from apps.auth_users.serializers import LoginSerializer
 from apps.verification_codes.serializers import SMSVerificationSerializer
 from apps.verification_codes.utils import send_sms
 
-"""Render HTML"""
 
 
-def updatecode_view(request):
-    return render(request, 'updatecode.html')
-
-
-
-
-"""Redirect after registration and authorization"""
-def custom_login_redirect(request):
-    redirect_url = request.session.get('redirect_url', '/default-url')
-    return redirect(redirect_url)
-
-
-"""Redirect for creating an API for authorization"""
+"""API для авторизации и регистрации через социальные сети"""
 
 def google_oauth_redirect(request):
     redirect_url = f"{settings.BASE_URL}/api/auth_users/social-auth/login/google-oauth2/"

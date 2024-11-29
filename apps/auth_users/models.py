@@ -29,7 +29,7 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
- """Кастомная модель пользователя.
+"""Кастомная модель пользователя.
     Модель наследует от AbstractBaseUser для использования кастомной логики аутентификации и 
     PermissionsMixin для поддержки разрешений и групп в Django"""
 
