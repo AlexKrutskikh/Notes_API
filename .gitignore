@@ -15,5 +15,6 @@ __pycache__/
 # Ignore Django secret key and environment variables
 .env
 
-# Ignore other system files
-.DS_Store
+# Ignore SQLite database in database directory
+database/db.sqlite3
+
