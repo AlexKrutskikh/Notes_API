@@ -1,20 +1,37 @@
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from social_core.exceptions import AuthException
+from django.http import HttpResponseRedirect
 from datetime import datetime
+from FreeVet import settings
 
 
-def generate_jwt(user):
+def generate_token_and_redirect(user, redirect_url):
+
+    """
+    Генерирует JWT-токены, устанавливает их в cookies и перенаправляет на заданный URL.
+
+    :param user: Объект пользователя, для которого нужно сгенерировать токены.
+    :param redirect_url: URL для переадресации.
+    :return: HttpResponseRedirect с установленными cookies.
+    """
 
     if user is None:
-        raise AuthException("User does not exist or was not found.")  # Выбросить исключение, если user равен None
+        raise AuthException("User does not exist or was not found.")
 
     refresh = RefreshToken.for_user(user)
     access_token = refresh.access_token
-    return {
+    jwt_tokens = {
         'access': str(access_token),
         'refresh': str(refresh)
     }
+
+    response = HttpResponseRedirect(redirect_url)
+
+    response.set_cookie('jwt_access_token', jwt_tokens['access'], httponly=True, secure=True)
+    response.set_cookie('jwt_refresh_token', jwt_tokens['refresh'], httponly=True, secure=True)
+
+    return response
 
 
 def create_user(strategy, details, backend, user=None, *args, **kwargs):
@@ -28,13 +45,7 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
         existing_user.last_login = datetime.now()
         existing_user.save()
 
-        jwt_tokens = generate_jwt(existing_user)
-
-        response = strategy.redirect('https://127.0.0.1:8000/api/auth_users/updatecode/')
-        response.set_cookie('jwt_access_token', jwt_tokens['access'], httponly=True, secure=True)
-        response.set_cookie('jwt_refresh_token', jwt_tokens['refresh'], httponly=True, secure=True)
-
-        return response
+        response = generate_token_and_redirect(existing_user, redirect_url = f"{settings.BASE_URL}/main/")
 
     uid = kwargs.get('uid') or kwargs.get('response', {}).get('sub')
     if not uid:
@@ -44,7 +55,6 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
     first_name = kwargs.get('response', {}).get('given_name', '')
     last_name = kwargs.get('response', {}).get('family_name', '')
 
-
     fields = {
         'username': username,
         'email': email,
@@ -53,14 +63,8 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
         'auth_provider': backend.name
     }
 
-
     user = User(**fields)
     user.save()
 
-    jwt_tokens = generate_jwt(user)
-
-    strategy.session_set('jwt_access_token', jwt_tokens['access'])
-    strategy.session_set('jwt_refresh_token', jwt_tokens['refresh'])
-
-    strategy.redirect('https://freevet.me/verification/role')
+    response = generate_token_and_redirect(user, redirect_url=f"{settings.BASE_URL}/verification/role/")
 
