@@ -16,7 +16,7 @@ __pycache__/
 .env
 
 # Ignore SQLite database in database directory
-database/db.sqlite3
+db.sqlite3
 
 # Ignore certificate files
 cert.crt
