@@ -90,7 +90,8 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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' # Googl
 SOCIAL_AUTH_FACEBOOK_KEY='1186656015942216' #Facebook client ID
 SOCIAL_AUTH_FACEBOOK_SECRET='ad7c199b22dafe5e225bbe39af363b21' #Facebook client secret
 
-# Добавьте это в ваш пайплайн:
+AUTH_USER_MODEL = 'apps.auth_users.CustomUser'
+
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
     'social_core.pipeline.social_auth.social_uid',

@@ -5,11 +5,11 @@ from social_core.exceptions import AuthException
 from datetime import datetime
 
 
-
+# Функция для генерации JWT токенов
 def generate_jwt(user):
-
+    # Проверяем, существует ли пользователь перед генерацией токенов
     if user is None:
-        raise AuthException("User does not exist or was not found.")
+        raise AuthException("User does not exist or was not found.")  # Выбросить исключение, если user равен None
 
     refresh = RefreshToken.for_user(user)
     access_token = refresh.access_token
@@ -21,7 +21,6 @@ def generate_jwt(user):
 
 def create_user(strategy, details, backend, user=None, *args, **kwargs):
 
-    print(details)
 
     email = kwargs.get('email', details.get('email'))
 
