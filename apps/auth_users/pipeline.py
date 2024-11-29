@@ -35,7 +35,6 @@ def generate_token_and_redirect(strategy, user, redirect_url):
 """ Создаёт или обновляет пользователя на основе данных, полученных от провайдера социальной аутентификации.
     Генерирует JWT-токены для пользователя и перенаправляет его на указанный URL"""
 
-
 def create_user(strategy, details, backend, user=None, *args, **kwargs):
 
     email = kwargs.get('email', details.get('email'))
