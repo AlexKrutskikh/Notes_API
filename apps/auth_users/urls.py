@@ -19,7 +19,7 @@ urlpatterns = [
 
     path('login/google/', google_oauth_redirect, name='google-login-shortcut'),       # регистрация и авторизация google
 
-    path('login/facebook/', facebook_oauth_redirect, name='facebook-login-shortcut'), # регистрация и авторизация google facebook
+    path('login/facebook/', facebook_oauth_redirect, name='facebook-login-shortcut'), # регистрация и авторизация facebook
 
 
     path('register/', RegisterView.as_view(), name='register'),
