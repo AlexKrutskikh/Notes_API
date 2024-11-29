@@ -3,6 +3,12 @@ from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+"""Кастомный менеджер пользователей для модели CustomUser. 
+    Позволяет создавать пользователей и суперпользователей.
+
+    Этот менеджер переопределяет стандартные методы создания пользователя и суперпользователя, 
+    чтобы использовать email в качестве уникального идентификатора и автоматически нормализовать email """
+
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, **extra_fields):
         if not email:
@@ -23,6 +29,10 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+ """Кастомная модель пользователя.
+    Модель наследует от AbstractBaseUser для использования кастомной логики аутентификации и 
+    PermissionsMixin для поддержки разрешений и групп в Django"""
+
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     class UserType(models.TextChoices):
         CLIENT = 'CL', _('Client')
@@ -41,8 +51,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         default=UserType.CLIENT,
     )
 
-    is_active = models.BooleanField(default=True)  # Поле активности пользователя
-    is_staff = models.BooleanField(default=False)  # Поле персонала
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
 
     objects = CustomUserManager()
 

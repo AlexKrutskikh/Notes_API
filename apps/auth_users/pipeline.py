@@ -1,12 +1,11 @@
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from social_core.exceptions import AuthException
-from django.http import HttpResponseRedirect
 from datetime import datetime
 from FreeVet import settings
 
 
-def generate_token_and_redirect(user, redirect_url):
+def generate_token_and_redirect(strategy, user, redirect_url):
 
     """
     Генерирует JWT-токены, устанавливает их в cookies и перенаправляет на заданный URL.
@@ -26,12 +25,16 @@ def generate_token_and_redirect(user, redirect_url):
         'refresh': str(refresh)
     }
 
-    response = HttpResponseRedirect(redirect_url)
+    response = strategy.redirect(redirect_url)
 
-    response.set_cookie('jwt_access_token', jwt_tokens['access'], httponly=True, secure=True)
-    response.set_cookie('jwt_refresh_token', jwt_tokens['refresh'], httponly=True, secure=True)
+    response.set_cookie('jwt_access_token', jwt_tokens['access'], httponly=True, secure=True,samesite=None)
+    response.set_cookie('jwt_refresh_token', jwt_tokens['refresh'], httponly=True, secure=True,samesite=None)
+    response = strategy.redirect(redirect_url)
 
     return response
+
+""" Создаёт или обновляет пользователя на основе данных, полученных от провайдера социальной аутентификации.
+    Генерирует JWT-токены для пользователя и перенаправляет его на указанный URL"""
 
 
 def create_user(strategy, details, backend, user=None, *args, **kwargs):
@@ -45,7 +48,7 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
         existing_user.last_login = datetime.now()
         existing_user.save()
 
-        response = generate_token_and_redirect(existing_user, redirect_url = f"{settings.BASE_URL}/main/")
+        return generate_token_and_redirect(strategy, existing_user, redirect_url=f"https://freevet.me/main/")
 
     uid = kwargs.get('uid') or kwargs.get('response', {}).get('sub')
     if not uid:
@@ -66,5 +69,4 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
     user = User(**fields)
     user.save()
 
-    response = generate_token_and_redirect(user, redirect_url=f"{settings.BASE_URL}/verification/role/")
-
+    return generate_token_and_redirect(strategy,user, redirect_url=f"https://freevet.me/verification/role/")
