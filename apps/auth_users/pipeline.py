@@ -7,13 +7,7 @@ from FreeVet import settings
 
 def generate_token_and_redirect(strategy, user, redirect_url):
 
-    """
-    Генерирует JWT-токены, устанавливает их в cookies и перенаправляет на заданный URL.
-
-    :param user: Объект пользователя, для которого нужно сгенерировать токены.
-    :param redirect_url: URL для переадресации.
-    :return: HttpResponseRedirect с установленными cookies.
-    """
+    """Генерирует JWT-токены, устанавливает их в cookies и перенаправляет на заданный URL"""
 
     if user is None:
         raise AuthException("User does not exist or was not found.")
