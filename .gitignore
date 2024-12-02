@@ -1,4 +1,4 @@
-nore virtual environment
+# Ignore virtual environment
 venv/
 
 # Ignore IDE settings
@@ -16,8 +16,7 @@ __pycache__/
 .env
 
 # Ignore SQLite database in database directory
-db.sqlite3
+db.*
 
 # Ignore certificate files
-cert.crt
-cert.key
+cert.*
