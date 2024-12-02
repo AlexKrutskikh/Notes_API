@@ -12,7 +12,7 @@ from rest_framework.views import APIView
 from twilio.base.exceptions import TwilioRestException
 from apps.profiles.models import Profile
 from apps.profiles.serializers import ProfileViewSerializer
-from apps.auth_users.serializers import LoginSerializer
+from apps.auth.serializers import LoginSerializer
 from apps.verification_codes.serializers import SMSVerificationSerializer
 from apps.verification_codes.utils import send_sms
 
@@ -21,11 +21,11 @@ from apps.verification_codes.utils import send_sms
 """API для авторизации и регистрации через социальные сети"""
 
 def google_oauth_redirect(request):
-    redirect_url = f"{settings.BASE_URL}/api/auth_users/social-auth/login/google-oauth2/"
+    redirect_url = f"{settings.BASE_URL}/api/auth/social-auth/login/google-oauth2/"
     return HttpResponseRedirect(redirect_url)
 
 def facebook_oauth_redirect(request):
-    redirect_url = f"{settings.BASE_URL}/api/auth_users/social-auth/login/facebook/"
+    redirect_url = f"{settings.BASE_URL}/api/auth/social-auth/login/facebook/"
     return HttpResponseRedirect(redirect_url)
 
 

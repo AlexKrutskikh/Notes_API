@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
     Этот менеджер переопределяет стандартные методы создания пользователя и суперпользователя, 
     чтобы использовать email в качестве уникального идентификатора и автоматически нормализовать email """
 
-class CustomUserManager(BaseUserManager):
+class UserManager(BaseUserManager):
     def create_user(self, email, **extra_fields):
         if not email:
             raise ValueError("The Email field must be set")
@@ -32,7 +32,7 @@ class CustomUserManager(BaseUserManager):
     Модель наследует от AbstractBaseUser для использования кастомной логики аутентификации и 
     PermissionsMixin для поддержки разрешений и групп в Django"""
 
-class CustomUser(AbstractBaseUser, PermissionsMixin):
+class User(AbstractBaseUser, PermissionsMixin):
     class UserType(models.TextChoices):
         CLIENT = 'CL', _('Client')
         SPECIALIST = 'SP', _('Specialist')
@@ -53,7 +53,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
-    objects = CustomUserManager()
+    objects = UserManager()
 
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

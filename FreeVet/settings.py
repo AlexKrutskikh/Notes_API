@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'modeltranslation',
 
-    'apps.auth_users',
+    'apps.auth',
     'apps.vetbooks',
     'apps.questions',
     'apps.verification_codes',
@@ -86,7 +86,7 @@ SOCIAL_AUTH_FACEBOOK_KEY = env('SOCIAL_AUTH_FACEBOOK_KEY')
 SOCIAL_AUTH_FACEBOOK_SECRET = env('SOCIAL_AUTH_FACEBOOK_SECRET')
 
 
-AUTH_USER_MODEL = 'auth_users.CustomUser'
+AUTH_USER_MODEL = 'custom_auth.User'
 
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
@@ -94,7 +94,7 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.auth_allowed',
     'social_core.pipeline.social_auth.social_user',
     'social_core.pipeline.user.get_username',
-    'apps.auth_users.pipeline.create_user',
+    'apps.auth.pipeline.create_user',
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
 )
@@ -156,10 +156,10 @@ TWILIO_NUMBER = '+12513337680'
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
-    {'NAME': 'django.contrib.auth_users.password_validation.UserAttributeSimilarityValidator'},
-    {'NAME': 'django.contrib.auth_users.password_validation.MinimumLengthValidator'},
-    {'NAME': 'django.contrib.auth_users.password_validation.CommonPasswordValidator'},
-    {'NAME': 'django.contrib.auth_users.password_validation.NumericPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # Internationalization
