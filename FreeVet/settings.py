@@ -37,10 +37,8 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG', default=True)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'corsheaders',
@@ -51,12 +49,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites',  # Required for django-allauth
-    'social_django',  # django-social-auth
+    'django.contrib.sites',
+    'social_django',
     'drf_yasg',
 
     'rest_framework',
-    'rest_framework.authtoken',  # Token Authentication
+    'rest_framework.authtoken',
     'modeltranslation',
 
     'apps.auth',
@@ -70,9 +68,6 @@ INSTALLED_APPS = [
 
 ]
 
-AUTH_USER_MODEL = "auth.User"
-
-"""social-auth"""
 
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.google.GoogleOAuth2',
@@ -81,14 +76,17 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 SITE_ID = 1
-LOGIN_REDIRECT_URL = reverse_lazy('custom_login_redirect')  # REDIRECT after registration
-SOCIAL_AUTH_URL_NAMESPACE = 'social'  # namespace social
+SOCIAL_AUTH_URL_NAMESPACE = 'social'
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '1039945308403-lvqi1omlavlk27qltmjtooki4hoengsd.apps.googleusercontent.com' # Google client ID
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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' # Google client secret
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 
-SOCIAL_AUTH_FACEBOOK_KEY='1186656015942216' #Facebook client ID
-SOCIAL_AUTH_FACEBOOK_SECRET='ad7c199b22dafe5e225bbe39af363b21' #Facebook client secret
+
+SOCIAL_AUTH_FACEBOOK_KEY = env('SOCIAL_AUTH_FACEBOOK_KEY')
+SOCIAL_AUTH_FACEBOOK_SECRET = env('SOCIAL_AUTH_FACEBOOK_SECRET')
+
+
+AUTH_USER_MODEL = 'freevet_auth.User'
 
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
@@ -96,13 +94,14 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.auth_allowed',
     'social_core.pipeline.social_auth.social_user',
     'social_core.pipeline.user.get_username',
-    'social_core.pipeline.user.create_user',
-    'auth.pipeline.save_profile',  # Custom pipeline for creating a profile
+    'apps.auth.pipeline.create_user',
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
 )
 
-"""End social-auth"""
+SOCIAL_AUTH_STRATEGY = 'social_django.strategy.DjangoStrategy'
+
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -113,7 +112,6 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.security.SecurityMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -145,8 +143,12 @@ WSGI_APPLICATION = 'FreeVet.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
     }
 }
 

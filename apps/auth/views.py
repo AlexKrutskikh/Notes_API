@@ -1,6 +1,5 @@
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
-from django.shortcuts import redirect
 from django.conf import settings
 from django.http import HttpResponseRedirect
 from rest_framework import generics, status
@@ -11,37 +10,22 @@ from datetime import timedelta
 from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
 from twilio.base.exceptions import TwilioRestException
-from django.shortcuts import render
-
 from apps.profiles.models import Profile
 from apps.profiles.serializers import ProfileViewSerializer
 from apps.auth.serializers import LoginSerializer
 from apps.verification_codes.serializers import SMSVerificationSerializer
 from apps.verification_codes.utils import send_sms
 
-"""Render HTML"""
 
 
-def updatecode_view(request):
-    return render(request, 'updatecode.html')
-
-
-
-
-"""Redirect after registration and authorization"""
-def custom_login_redirect(request):
-    redirect_url = request.session.get('redirect_url', '/default-url')
-    return redirect(redirect_url)
-
-
-"""Redirect for creating an API for authorization"""
+"""API для авторизации и регистрации через социальные сети"""
 
 def google_oauth_redirect(request):
-    redirect_url = f"{settings.BASE_URL}/api/users/social-auth/login/google-oauth2/"
+    redirect_url = f"{settings.BASE_URL}/api/auth/social-auth/login/google-oauth2/"
     return HttpResponseRedirect(redirect_url)
 
 def facebook_oauth_redirect(request):
-    redirect_url = f"{settings.BASE_URL}/api/users/social-auth/login/facebook/"
+    redirect_url = f"{settings.BASE_URL}/api/auth/social-auth/login/facebook/"
     return HttpResponseRedirect(redirect_url)
 
 
