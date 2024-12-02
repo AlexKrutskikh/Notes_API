@@ -25,7 +25,7 @@ def google_oauth_redirect(request):
     return HttpResponseRedirect(redirect_url)
 
 def facebook_oauth_redirect(request):
-    redirect_url = f"{settings.BASE_URL}/api/users/social-auth/login/facebook/"
+    redirect_url = f"{settings.BASE_URL}/api/auth_users/social-auth/login/facebook/"
     return HttpResponseRedirect(redirect_url)
 
 
