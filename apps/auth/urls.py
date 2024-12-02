@@ -17,9 +17,9 @@ urlpatterns = [
     path('social-auth/',
          include('social_django.urls', namespace='social')),                      # api бибsqlite_sequenceлиотеки social-auth-app-django
 
-    path('v2/authentication/google/', google_oauth_redirect, name='google-login-shortcut'),       # регистрация и авторизация google
+    path('v1/authentication/google/', google_oauth_redirect, name='google-login-shortcut'),       # регистрация и авторизация google
 
-    path('v2/authentication/facebook/', facebook_oauth_redirect, name='facebook-login-shortcut'), # регистрация и авторизация facebook
+    path('v1/authentication/facebook/', facebook_oauth_redirect, name='facebook-login-shortcut'), # регистрация и авторизация facebook
 
 
     path('register/', RegisterView.as_view(), name='register'),
