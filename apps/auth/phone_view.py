@@ -1,68 +1,64 @@
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.models import User
-from rest_framework import generics, status
-from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
-from django.utils import timezone
-from datetime import timedelta
-from rest_framework.generics import CreateAPIView
 from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from apps.auth.models import SmsCode
+from apps.auth.serializers import SendSmsCodeSerializer
 from twilio.base.exceptions import TwilioRestException
-from apps.profiles.models import Profile
-from apps.profiles.serializers import ProfileViewSerializer
-from apps.auth.serializers import LoginSerializer
-from apps.verification_codes.serializers import SMSVerificationSerializer
-from apps.verification_codes.utils import send_sms
+import random
+from django.utils import timezone
+from .utils import send_sms
 
 
+"""Эндпоинт для генерации и отправки SMS-кода"""
 
-"""Авторизация Twilio"""
+class SendSmsCode(APIView):
 
-class RegisterView(CreateAPIView):
     def post(self, request, *args, **kwargs):
-        # Получаем данные из формы
-        name = request.POST.get('name')
-        phone = request.POST.get('phone')
-        photo = request.FILES.get('photo', None)
 
-        # Проверка, переданы ли необходимые данные
-        if not name or not phone:
-            return Response(
-                {"detail": "Необходимо указать имя и номер телефона."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        serializer = SendSmsCodeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
 
-        # Проверка, существует ли пользователь с данным номером телефона
-        if Profile.objects.filter(phone=phone).exists():
-            return Response(
-                {"detail": "Пользователь уже зарегистрирован. Перейдите в окно входа."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        phone = serializer.validated_data['phone']
 
-        # Создаем новый профиль
-        profile = Profile.objects.create(
-            name=name,
-            phone=phone,
-            photo=photo  # Устанавливаем фото, если оно передано
-        )
+        existing_entry = SmsCode.objects.filter(phone=phone).first()
 
-        # Генерируем и отправляем SMS-код
-        profile.generate_sms_code()
+        if existing_entry and existing_entry.sms_code:
+            time_since_sent = timezone.now() - existing_entry.code_sent_time
+            if time_since_sent.total_seconds() < 300:  # 5 минут
+                return Response(
+                    {
+                        "error_type": "CodeAlreadySent",
+                        "detail": "Код уже отправлен. Пожалуйста, подождите."
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+
+        sms_code = str(random.randint(100000, 999999))
+        code_sent_time = timezone.now()
 
         try:
-            send_sms(profile.phone, f"Ваш код: {profile.sms_code}")
+            send_sms(phone, f"Ваш код: {sms_code}")
         except TwilioRestException:
-            # Удаляем профиль, если SMS не может быть отправлено
-            profile.delete()
             return Response(
-                {"detail": "С текущими номерами отправителя и получателя SMS не может быть отправлено."},
-                status=status.HTTP_400_BAD_REQUEST
+                {
+                    "error_type": "SmsSendError",
+                    "detail": "Ошибка отправки SMS."
+                },
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        # Возвращаем ответ об успешной регистрации
-        return Response(
-            {"detail": "Регистрация прошла успешно."},
-            status=status.HTTP_201_CREATED
+
+        SmsCode.objects.update_or_create(
+            phone=phone,
+            defaults={
+                "sms_code": sms_code,
+                "code_sent_time": code_sent_time
+            }
         )
 
+        return Response(
+            {"detail": "SMS-код успешно отправлен."},
+            status=status.HTTP_201_CREATED
+        )
 
