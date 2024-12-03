@@ -18,7 +18,7 @@ urlpatterns = [
 
     path('v1/authentication/facebook/', facebook_oauth_redirect, name='facebook-login-shortcut'),  # регистрация и авторизация facebook
 
-    path('/auth/v1/authentication/send-sms-code', SendSmsCode.as_view(), name='SendSmsCode')       # генерация смс кода и запись в базу
+    path('v1/authentication/send-sms-code', SendSmsCode.as_view(), name='SendSmsCode')       # генерация смс кода и запись в базу
 
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

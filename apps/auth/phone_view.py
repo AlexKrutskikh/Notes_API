@@ -42,8 +42,7 @@ class SendSmsCode(APIView):
         except TwilioRestException:
             return Response(
                 {
-                    "error_type": "SmsSendError",
-                    "detail": "Ошибка отправки SMS."
+                    "error_type": "WrongPhone"
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

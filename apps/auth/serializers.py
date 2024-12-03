@@ -15,7 +15,10 @@ class SendSmsCodeSerializer(serializers.ModelSerializer):
         fields = ['phone']
 
     def validate_phone(self, value):
-        if not re.match(r'^\d{10,15}$', value):
-            raise serializers.ValidationError("Введите корректный номер телефона (10-15 цифр).")
+        if not re.match(r'^\+?\d{5,15}$', value):
+            raise serializers.ValidationError(
+                "Введите корректный номер телефона, начинающийся с '+' и содержащий от 5 до 15 цифр."
+            )
+
         return value
 
