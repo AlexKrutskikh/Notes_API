@@ -1,16 +1,13 @@
 from rest_framework import serializers
 
-from apps.profiles.models import Profile
+from apps.auth.models import Profile
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    phone = serializers.CharField(max_length=20)
-    photo = serializers.ImageField(required=False, allow_null=True)
+    phone = serializers.CharField(max_length=15)
+    code = serializers.CharField(max_length=4)
 
     class Meta:
         model = Profile
-        fields = ['name', 'phone', 'photo']
+        fields = ['phone']
 
-
-class LoginSerializer(serializers.Serializer):
-    phone_number = serializers.CharField(max_length=15)
