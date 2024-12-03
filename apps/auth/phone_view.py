@@ -23,16 +23,19 @@ class SendSmsCode(APIView):
         existing_entry = SmsCode.objects.filter(phone=phone).first()
 
         if existing_entry and existing_entry.sms_code:
+
             time_since_sent = timezone.now() - existing_entry.code_sent_time
-            if time_since_sent.total_seconds() < 300:  # 5 минут
+            remaining_time = 300 - time_since_sent.total_seconds()
+
+            if remaining_time > 0:
+                remaining_minutes = int(remaining_time // 60)
                 return Response(
                     {
                         "error_type": "CodeAlreadySent",
-                        "detail": "Код уже отправлен. Пожалуйста, подождите."
+                        "detail": f"Вы можете запросить новый код через {remaining_minutes} минут(ы)."
                     },
-                    status=status.HTTP_400_BAD_REQUEST
+                    status=status.HTTP_401_BAD_REQUEST
                 )
-
 
         sms_code = str(random.randint(100000, 999999))
         code_sent_time = timezone.now()
@@ -42,9 +45,10 @@ class SendSmsCode(APIView):
         except TwilioRestException:
             return Response(
                 {
-                    "error_type": "WrongPhone"
+                    "error_type": "WrongPhone",
+                    "detail": "Неверный формат номера телефона"
                 },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                status=status.HTTP_400_INTERNAL_SERVER_ERROR
             )
 
 
