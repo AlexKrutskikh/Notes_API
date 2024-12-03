@@ -31,9 +31,6 @@ def generate_token_and_redirect(strategy, user, redirect_url):
 
 def create_user(strategy, details, backend, user=None, *args, **kwargs):
 
-
-    print(kwargs)
-
     email = kwargs.get('email', details.get('email'))
 
     User = get_user_model()
