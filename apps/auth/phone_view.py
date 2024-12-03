@@ -9,7 +9,7 @@ from django.utils import timezone
 from .utils import send_sms
 
 
-"""Эндпоинт для генерации и отправки SMS-кода"""
+"""Генерация и отправки SMS-кода"""
 
 class SendSmsCode(APIView):
 
@@ -34,7 +34,7 @@ class SendSmsCode(APIView):
                         "error_type": "CodeAlreadySent",
                         "detail": f"Вы можете запросить новый код через {remaining_minutes} минут(ы)."
                     },
-                    status=status.HTTP_401_BAD_REQUEST
+                    status=status.HTTP_400_BAD_REQUEST
                 )
 
         sms_code = str(random.randint(100000, 999999))
@@ -48,7 +48,7 @@ class SendSmsCode(APIView):
                     "error_type": "WrongPhone",
                     "detail": "Неверный формат номера телефона"
                 },
-                status=status.HTTP_400_INTERNAL_SERVER_ERROR
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
@@ -61,7 +61,9 @@ class SendSmsCode(APIView):
         )
 
         return Response(
-            {"detail": "SMS-код успешно отправлен."},
+
+            {  "type": "Successful operation",
+               "detail": "SMS-код успешно отправлен."},
             status=status.HTTP_201_CREATED
         )
 
