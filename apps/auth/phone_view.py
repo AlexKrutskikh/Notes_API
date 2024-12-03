@@ -28,7 +28,8 @@ class SendSmsCode(APIView):
             remaining_time = 300 - time_since_sent.total_seconds()
 
             if remaining_time > 0:
-                remaining_minutes = int(remaining_time // 60)
+                remaining_minutes = max(1, int(remaining_time // 60) + (remaining_time % 60 > 0))
+
                 return Response(
                     {
                         "error_type": "CodeAlreadySent",
