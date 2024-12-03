@@ -1,10 +1,8 @@
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
-from .views import (
-    google_oauth_redirect,
-    facebook_oauth_redirect, ProfileView
-)
-from .views import RegisterView, LoginView, VerifyCodeView
+from .phone_view import ProfileView
+from .social_view import    google_oauth_redirect, facebook_oauth_redirect
+from .phone_view import RegisterView, LoginView, VerifyCodeView
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -15,11 +13,23 @@ urlpatterns = [
 
 
     path('social-auth/',
-         include('social_django.urls', namespace='social')),                      # api бибsqlite_sequenceлиотеки social-auth-app-django
+         include('social_django.urls', namespace='social')),                                      # api бибsqlite_sequenceлиотеки social-auth-app-django
 
     path('v1/authentication/google/', google_oauth_redirect, name='google-login-shortcut'),       # регистрация и авторизация google
 
     path('v1/authentication/facebook/', facebook_oauth_redirect, name='facebook-login-shortcut'), # регистрация и авторизация facebook
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     path('register/', RegisterView.as_view(), name='register'),

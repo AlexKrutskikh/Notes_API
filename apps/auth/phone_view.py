@@ -1,7 +1,5 @@
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
-from django.conf import settings
-from django.http import HttpResponseRedirect
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -18,20 +16,7 @@ from apps.verification_codes.utils import send_sms
 
 
 
-"""API для авторизации и регистрации через социальные сети"""
-
-def google_oauth_redirect(request):
-    redirect_url = f"{settings.BASE_URL}/api/auth/social-auth/login/google-oauth2/"
-    return HttpResponseRedirect(redirect_url)
-
-def facebook_oauth_redirect(request):
-    redirect_url = f"{settings.BASE_URL}/api/auth/social-auth/login/facebook/"
-    return HttpResponseRedirect(redirect_url)
-
-
-
-
-"""Authorization via Twilio"""
+"""Авторизация Twilio"""
 
 class RegisterView(CreateAPIView):
     def post(self, request, *args, **kwargs):
@@ -46,24 +31,24 @@ class RegisterView(CreateAPIView):
                 {"detail": "Необходимо указать имя и номер телефона."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Проверка, существует ли пользователь с данным номером телефона
         if Profile.objects.filter(phone=phone).exists():
             return Response(
                 {"detail": "Пользователь уже зарегистрирован. Перейдите в окно входа."},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
         # Создаем новый профиль
         profile = Profile.objects.create(
             name=name,
             phone=phone,
             photo=photo  # Устанавливаем фото, если оно передано
         )
-        
+
         # Генерируем и отправляем SMS-код
         profile.generate_sms_code()
-        
+
         try:
             send_sms(profile.phone, f"Ваш код: {profile.sms_code}")
         except TwilioRestException:
@@ -119,7 +104,7 @@ class VerifyCodeView(generics.GenericAPIView):
                 return Response({"error": "Code expired"}, status=status.HTTP_400_BAD_REQUEST)
 
             profile.last_login_time = timezone.now()
-            
+
             # Если у профиля нет пользователя, создаём его
             if profile.user is None:
                 user = User.objects.create(username=profile.phone)
@@ -134,7 +119,7 @@ class VerifyCodeView(generics.GenericAPIView):
             request.session['redirect_url'] = f'https://freevet.me/verification/role?user_id={profile.user.id}'
             # else:
             #     request.session['redirect_url'] = f'https://freevet.me/main?user_id={profile.user.id}'
-            
+
             redirect_url = request.session['redirect_url']
 
             return Response({
@@ -146,8 +131,6 @@ class VerifyCodeView(generics.GenericAPIView):
 
         except Profile.DoesNotExist:
             return Response({"error": "Invalid code"}, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 class ProfileView(APIView):
