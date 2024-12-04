@@ -68,9 +68,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 Она также включает информацию о времени отправки кода."""
 
 class SmsCode(models.Model):
-    code = models.CharField(max_length=6,Blank=False, Null=False)
-    sent_time = models.DateTimeField(Blank=False, Null=False)
-    phone = models.CharField(max_length=50,Blank=False, Null=False, unique=True)
+    code = models.CharField(max_length=6,blank=False, null=False)
+    sent_time = models.DateTimeField(blank=False, null=False)
+    phone = models.CharField(max_length=50,blank=False, null=False, unique=True)
 
     def __str__(self):
         return self.code
