@@ -17,8 +17,9 @@ class SendSmsCodeSerializer(serializers.ModelSerializer):
     def validate_phone(self, value):
         if not re.match(r'^\+?\d{5,15}$', value):
             raise serializers.ValidationError(
-                {"error_type": "WrongPhone",
-                "detail": "Неверный формат номера телефона"
+                {
+                 "error_type": "WrongPhone"
+
                  }
             )
 
