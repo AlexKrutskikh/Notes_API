@@ -84,6 +84,10 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
 
 SOCIAL_AUTH_FACEBOOK_KEY = env('SOCIAL_AUTH_FACEBOOK_KEY')
 SOCIAL_AUTH_FACEBOOK_SECRET = env('SOCIAL_AUTH_FACEBOOK_SECRET')
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email'] # поле для получения от фэйсбука емейла, без него он его вообще не берет
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+    'fields': 'id, name, email'
+} # поле для обработки полученного емейла
 
 
 AUTH_USER_MODEL = 'freevet_auth.User'
@@ -151,7 +155,6 @@ DATABASES = {
         'PORT': config('DB_PORT'),
     }
 }
-
 
 # Настройки Twilio (или Plivo)
 TWILIO_ACCOUNT_SID = env('TWILIO_ACCOUNT_SID')
