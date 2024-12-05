@@ -9,6 +9,17 @@ import secrets
 from django.utils import timezone
 from .utils import send_sms
 
+"""Функция для получения IP-адреса из запроса"""
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+
+    return ip
+
 
 """Генерация и отправки SMS-кода"""
 
@@ -50,14 +61,17 @@ class SendSmsCode(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
+        ip = get_client_ip(request)
 
         SmsCode.objects.update_or_create(
             phone=phone,
             defaults={
                 "code": code,
-                "sent_time": sent_time
+                "sent_time": sent_time,
+                "ip": ip
             }
         )
+
 
         return Response(
 

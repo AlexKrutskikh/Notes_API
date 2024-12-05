@@ -70,7 +70,8 @@ class User(AbstractBaseUser, PermissionsMixin):
 class SmsCode(models.Model):
     code = models.CharField(max_length=6,blank=False, null=False)
     sent_time = models.DateTimeField(blank=False, null=False)
-    phone = models.CharField(max_length=50,blank=False, null=False, unique=True)
+    phone = models.CharField(max_length=50,blank=False, null=False)
+    ip = models.GenericIPAddressField(blank=False, null=False)
 
     def __str__(self):
         return self.code
