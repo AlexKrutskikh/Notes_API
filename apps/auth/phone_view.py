@@ -8,6 +8,7 @@ from twilio.base.exceptions import TwilioRestException
 import secrets
 from django.utils import timezone
 from .utils import send_sms
+from django.conf import settings
 
 """Функция для получения IP-адреса из запроса"""
 
@@ -49,17 +50,19 @@ class SendSmsCode(APIView):
 
         code = ''.join(secrets.choice("0123456789") for _ in range(6))
 
-        try:
-            send_sms(phone, f"Ваш код: {code}")
-        except TwilioRestException as e:
-            return Response(
-                {
 
-                    "error_type": "WrongPhone",
-                    "detail": str(e),
-                },
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        if settings.SEND_SMS:
+            try:
+                send_sms(phone, f"Ваш код: {code}")
+            except TwilioRestException:
+                return Response(
+                    {
+
+                        "error_type": "WrongPhone",
+
+                    },
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
 
 
         SmsCode.objects.create(
@@ -93,9 +96,8 @@ class VerifySmsCode(APIView):
 
         if existing_entry and existing_entry.sent_time:
             time_since_sent = timezone.now() - existing_entry.sent_time
-            print(time_since_sent)
 
-            if time_since_sent < timedelta(seconds=60):
+            if time_since_sent > timedelta(minutes=5):
                 return Response(
                     {
 
@@ -117,13 +119,30 @@ class VerifySmsCode(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
+
         else:
 
-            User.objects.update_or_create(
+            user, created = User.objects.update_or_create(
                 phone=phone,
                 defaults={
-                    "registration_time": timezone.now(),
+                    "last_login": timezone.now(),
                 }
+            )
+
+            if created:
+                user.registration_time = timezone.now()
+                user.save()
+
+            return Response(
+
+                {
+
+                    "type": "Verification successful",
+
+                },
+
+                status=status.HTTP_200_OK
+
             )
 
 

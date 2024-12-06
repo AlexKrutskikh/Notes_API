@@ -39,6 +39,8 @@ DEBUG = env('DEBUG', default=True)
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
 
+SEND_SMS = config('SendSMS', cast=bool, default=False)
+
 
 INSTALLED_APPS = [
     'corsheaders',
