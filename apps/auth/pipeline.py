@@ -3,9 +3,10 @@ from django.contrib.auth import get_user_model
 from social_core.exceptions import AuthException
 from datetime import datetime
 from FreeVet import settings
+from django.http import HttpResponseRedirect
 
 
-def generate_token_and_redirect(strategy, user, redirect_url):
+def generate_token_and_redirect(user, redirect_url):
 
     """Генерирует JWT-токены, устанавливает их в cookies и перенаправляет на заданный URL"""
 
@@ -19,7 +20,7 @@ def generate_token_and_redirect(strategy, user, redirect_url):
         'refresh': str(refresh)
     }
 
-    response = strategy.redirect(redirect_url)
+    response = HttpResponseRedirect(redirect_url)
 
     response.set_cookie('access_token', jwt_tokens['access'], httponly=True, secure=True,samesite=None)
     response.set_cookie('refresh_token', jwt_tokens['refresh'], httponly=True, secure=True,samesite=None)
@@ -40,7 +41,7 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
         existing_user.last_login = datetime.now()
         existing_user.save()
 
-        return generate_token_and_redirect(strategy, existing_user, redirect_url = f"{settings.BASE_URL}/main/")
+        return generate_token_and_redirect(existing_user, redirect_url = f"{settings.BASE_URL}/main/")
 
 
     uid = kwargs.get('uid') or kwargs.get('response', {}).get('sub')
@@ -62,5 +63,5 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
     user = User(**fields)
     user.save()
 
-    return generate_token_and_redirect(strategy, user, redirect_url=f"{settings.BASE_URL}/verification/role/")
+    return generate_token_and_redirect(user, redirect_url=f"{settings.BASE_URL}/verification/role/")
 
