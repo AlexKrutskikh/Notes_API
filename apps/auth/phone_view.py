@@ -2,7 +2,7 @@ from datetime import timedelta
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from apps.auth.models import SmsCode
+from apps.auth.models import SmsCode, User
 from apps.auth.serializers import SendSmsCodeSerializer
 from twilio.base.exceptions import TwilioRestException
 import secrets
@@ -48,28 +48,26 @@ class SendSmsCode(APIView):
                 )
 
         code = ''.join(secrets.choice("0123456789") for _ in range(6))
-        sent_time = timezone.now()
 
         try:
             send_sms(phone, f"Ваш код: {code}")
-        except TwilioRestException:
+        except TwilioRestException as e:
             return Response(
                 {
 
                     "error_type": "WrongPhone",
+                    "detail": str(e),
                 },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-        ip = get_client_ip(request)
 
         SmsCode.objects.create(
-            phone=phone,
-                code=code,
-                sent_time=sent_time,
-                ip=ip
+            phone = phone,
+                code = code,
+                sent_time = timezone.now(),
+                ip = get_client_ip(request)
         )
-
 
         return Response(
 
@@ -80,4 +78,55 @@ class SendSmsCode(APIView):
             },
             status=status.HTTP_201_CREATED
         )
+
+
+class VerifySmsCode(APIView):
+
+    def post(self, request, *args, **kwargs):
+
+        serializer = SendSmsCodeSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        phone, code = map(serializer.validated_data.get, ['phone', 'code'])
+
+        existing_entry = SmsCode.objects.filter(phone=phone).last()
+
+        if existing_entry and existing_entry.sent_time:
+            time_since_sent = timezone.now() - existing_entry.sent_time
+            print(time_since_sent)
+
+            if time_since_sent < timedelta(seconds=60):
+                return Response(
+                    {
+
+                        "error_type": "CodeExpired",
+
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+
+        if existing_entry.code != code:
+
+            return Response(
+                {
+
+                    "error_type": "InvalidСode",
+
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        else:
+
+            User.objects.update_or_create(
+                phone=phone,
+                defaults={
+                    "registration_time": timezone.now(),
+                }
+            )
+
+
+
+
 
