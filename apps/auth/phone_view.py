@@ -32,7 +32,7 @@ class SendSmsCode(APIView):
 
         phone = serializer.validated_data['phone']
 
-        existing_entry = SmsCode.objects.filter(phone=phone).first()
+        existing_entry = SmsCode.objects.filter(phone=phone).last()
 
         if existing_entry and existing_entry.sent_time:
             time_since_sent = timezone.now() - existing_entry.sent_time
@@ -63,13 +63,11 @@ class SendSmsCode(APIView):
 
         ip = get_client_ip(request)
 
-        SmsCode.objects.update_or_create(
+        SmsCode.objects.create(
             phone=phone,
-            defaults={
-                "code": code,
-                "sent_time": sent_time,
-                "ip": ip
-            }
+                code=code,
+                sent_time=sent_time,
+                ip=ip
         )
 
 
