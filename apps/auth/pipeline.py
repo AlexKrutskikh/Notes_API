@@ -26,20 +26,42 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
     if not uid:
         raise AuthException("UID is missing.")
 
-    username = kwargs.get('username', email.split('@')[0])
-    first_name = kwargs.get('response', {}).get('given_name', '')
-    last_name = kwargs.get('response', {}).get('family_name', '')
+    provider = backend.name
 
-    fields = {
-        'username': username,
-        'email': email,
-        'first_name': first_name,
-        'last_name': last_name,
-        'auth_provider': backend.name
-    }
+    if provider == 'google-oauth2':
 
-    user = User(**fields)
-    user.save()
+        username = kwargs.get('username', email.split('@')[0])
+        first_name = kwargs.get('response', {}).get('given_name', '')
+        last_name = kwargs.get('response', {}).get('family_name', '')
 
-    return generate_token_and_redirect(user, redirect_url=f"{settings.BASE_URL}/verification/role/")
+        fields = {
+            'username': username,
+            'email': email,
+            'first_name': first_name,
+            'last_name': last_name,
+            'auth_provider': provider
+        }
 
+        user = User(**fields)
+        user.save()
+
+        return generate_token_and_redirect(strategy, user, redirect_url=f"{settings.BASE_URL}/verification/role/")
+
+    elif provider == 'facebook':
+
+        username = kwargs.get('username', email.split('@')[0])
+        first_name = kwargs.get('response', {}).get('name', '').split(' ')[0]
+        last_name = kwargs.get('response', {}).get('name', '').rsplit(' ')[1]
+
+        fields = {
+            'username': username,
+            'email': email,
+            'first_name': first_name,
+            'last_name': last_name,
+            'auth_provider': provider
+        }
+
+        user = User(**fields)
+        user.save()
+
+        return generate_token_and_redirect(strategy, user, redirect_url=f"{settings.BASE_URL}/verification/role/")
