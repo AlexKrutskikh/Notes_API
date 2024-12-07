@@ -104,14 +104,14 @@ class VerifySmsCode(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        user_entry = User.objects.filter(phone=phone).first()
+        user_exist = User.objects.filter(phone=phone).first()
 
 
-        if user_entry:
-            user_entry.last_login = timezone.now()
-            user_entry.save()
+        if  user_exist:
+            user_exist.last_login = timezone.now()
+            user_exist.save()
 
-            return generate_token_and_redirect(user_entry, redirect_url=f"{settings.BASE_URL}/main/")
+            return generate_token_and_redirect(user_exist, redirect_url=f"{settings.BASE_URL}/main/")
 
         else:
 
