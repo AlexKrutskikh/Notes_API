@@ -1,3 +1,5 @@
+from datetime import timezone
+from random import random
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
@@ -44,6 +46,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
     username = models.CharField(max_length=100, blank=True)
+    phone = models.CharField(max_length=50, blank=True, null=True,unique=True)
     type = models.CharField(
         max_length=2,
         choices=UserType.choices,
@@ -60,3 +63,16 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+"""Модель используется для хранения SMS-кодов, связанных с телефонными номерами.
+Она также включает информацию о времени отправки кода."""
+
+class SmsCode(models.Model):
+    code = models.CharField(max_length=6,blank=False, null=False)
+    sent_time = models.DateTimeField(blank=False, null=False)
+    phone = models.CharField(max_length=50,blank=False, null=False)
+    ip = models.GenericIPAddressField(blank=False, null=False)
+
+    def __str__(self):
+        return self.code

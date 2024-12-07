@@ -1,30 +1,9 @@
-from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from social_core.exceptions import AuthException
 from datetime import datetime
 from FreeVet import settings
+from .utils import generate_token_and_redirect
 
-
-def generate_token_and_redirect(strategy, user, redirect_url):
-
-    """Генерирует JWT-токены, устанавливает их в cookies и перенаправляет на заданный URL"""
-
-    if user is None:
-        raise AuthException("User does not exist or was not found.")
-
-    refresh = RefreshToken.for_user(user)
-    access_token = refresh.access_token
-    jwt_tokens = {
-        'access': str(access_token),
-        'refresh': str(refresh)
-    }
-
-    response = strategy.redirect(redirect_url)
-
-    response.set_cookie('access_token', jwt_tokens['access'], httponly=True, secure=True,samesite=None)
-    response.set_cookie('refresh_token', jwt_tokens['refresh'], httponly=True, secure=True,samesite=None)
-
-    return response
 
 """ Создаёт или обновляет пользователя на основе данных, полученных от провайдера социальной аутентификации.
     Генерирует JWT-токены для пользователя и перенаправляет его на указанный URL"""
@@ -40,7 +19,7 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
         existing_user.last_login = datetime.now()
         existing_user.save()
 
-        return generate_token_and_redirect(strategy, existing_user, redirect_url = f"{settings.BASE_URL}/main/")
+        return generate_token_and_redirect(existing_user, redirect_url = f"{settings.BASE_URL}/main/")
 
 
     uid = kwargs.get('uid') or kwargs.get('response', {}).get('sub')
