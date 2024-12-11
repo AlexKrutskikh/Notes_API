@@ -9,28 +9,35 @@ from apps.auth.models import SmsCode
 """
 
 class SendSmsCodeSerializer(serializers.ModelSerializer):
-    phone = serializers.CharField(max_length=15)
-    code = serializers.CharField(max_length=6, required=False, allow_blank=True)
+
+    phone = serializers.CharField(
+        max_length=15,
+        error_messages={'max_length': "WrongPhone", 'blank': "WrongPhone"},
+    )
+    code = serializers.CharField(
+        max_length=6,
+        required=False,
+        allow_blank=True,
+        error_messages={'invalid': "InvalidCode", 'blank': "InvalidCode"},
+    )
 
     class Meta:
         model = SmsCode
         fields = ['phone', 'code']
 
-    def validate_phone(self, value):
+    def validate(self, attrs):
+        phone = attrs.get('phone')
+        code = attrs.get('code')
 
-        if not re.match(r'^\+?\d{5,15}$', value):
-            raise serializers.ValidationError({
-                "error_type": "WrongPhone"
-            })
-        return value
 
-    def validate_code(self, value):
+        if not re.match(r'^\+\d{5,15}$', phone):
+            raise serializers.ValidationError({"phone": "WrongPhone"})
 
-        if value:
-            if not re.match(r'^\d{6}$', value):
-                raise serializers.ValidationError({
-                    "error_type": "InvalidCode",
-                })
-        return value
+        if code and not re.match(r'^\d{6}$', code):
+            raise serializers.ValidationError({"code": "InvalidCode"})
+
+        return attrs
+
+
 
 
