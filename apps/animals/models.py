@@ -7,8 +7,8 @@ class Animal(models.Model):
     weight = models.DecimalField(max_digits=5, decimal_places=2)
 
     gender_choices = [
-        ('male', 'Male'),
-        ('female', 'Female'),
+        ('male', 'male'),
+        ('female', 'female'),
     ]
 
     is_homeless = models.BooleanField()
@@ -16,7 +16,7 @@ class Animal(models.Model):
     time_creation = models.DateTimeField(auto_now_add=True)
     time_change = models.DateTimeField(auto_now_add=True)
 
-    user_id = models.ForeignKey(User, related_name='animal_user', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='animal_user', on_delete=models.CASCADE)
 
 
 class AnimalPhoto(models.Model):

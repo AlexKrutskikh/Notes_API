@@ -36,7 +36,9 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/auth/', include('apps.auth.urls')),
-    path('api/vetbooks/', include('apps.vetbooks.urls')),  # маршруты для веткнижек
+
+    path('api/animals/', include('apps.animals.urls')),
+    path('api/vetbooks/', include('apps.vetbooks.urls')),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('api/questions/', include('apps.questions.urls')),
 
