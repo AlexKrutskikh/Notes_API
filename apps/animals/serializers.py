@@ -1,39 +1,40 @@
 from rest_framework import serializers
 from .models import Animal, AnimalPhoto
 from django.core.validators import FileExtensionValidator
-
-
-def validate_file_size(value):
-    MAX_SIZE_MB = 10
-    MAX_SIZE_BYTES = MAX_SIZE_MB * 1024 * 1024  # 10 MB
-    if value.size > MAX_SIZE_BYTES:
-        raise serializers.ValidationError("InvalidFile.")
-    return value
+from .utils import validate_file_size
+import re
 
 
 class AnimalSerializer(serializers.ModelSerializer):
+
     def validate_species(self, value):
         if any(char.isdigit() for char in value):
-            raise serializers.ValidationError("InvalidSpeciesName.")
+            raise serializers.ValidationError("InvalidSpeciesName")
         return value
 
     def validate_gender(self, value):
         if value not in ['male', 'female']:
-            raise serializers.ValidationError("InvalidGender.")
+            raise serializers.ValidationError("InvalidGender")
         return value
 
     def validate_weight(self, value):
+
+        if not re.match(r'^\d+(\.\d+)?$', str(value)):
+            raise serializers.ValidationError("InvalidWeight")
+
         try:
             weight = float(value)
             if weight <= 0:
-                raise serializers.ValidationError("InvalidWeight.")
+                raise serializers.ValidationError("InvalidWeight")
         except ValueError:
-            raise serializers.ValidationError("InvalidWeight.")
+            raise serializers.ValidationError("InvalidWeight")
+
         return value
 
     class Meta:
         model = Animal
         fields = [
+
             "species",
             "weight",
             "gender_choices",
