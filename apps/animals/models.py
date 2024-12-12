@@ -3,19 +3,19 @@ from apps.auth.models import User
 
 class Animal(models.Model):
 
-    species = models.CharField(max_length=20)
-    weight = models.DecimalField(max_digits=5, decimal_places=2)
-
     gender_choices = [
+
         ('male', 'male'),
         ('female', 'female'),
     ]
 
+    name = models.CharField(max_length=20)
+    species = models.CharField(max_length=20)
+    weight = models.DecimalField(max_digits=5, decimal_places=2)
+    gender = models.CharField(max_length=10, choices=gender_choices)
     is_homeless = models.BooleanField()
-
     time_creation = models.DateTimeField(auto_now_add=True)
-    time_change = models.DateTimeField(auto_now_add=True)
-
+    time_change = models.DateTimeField(null=True)
     user = models.ForeignKey(User, related_name='animal_user', on_delete=models.CASCADE)
 
 
