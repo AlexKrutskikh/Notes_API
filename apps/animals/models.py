@@ -17,7 +17,7 @@ class Animal(models.Model):
     is_homeless = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True)
-    user_id = models.ForeignKey(User, related_name='animal_user', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='animal_user', on_delete=models.CASCADE)
     photos = models.JSONField(default=list)
 
     def __str__(self):
