@@ -1,8 +1,6 @@
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
 from .social_view import google_oauth_redirect, facebook_oauth_redirect
-from django.conf.urls.static import static
-from django.conf import settings
 from .phone_view import SendSmsCode, VerifySmsCode
 
 
@@ -22,4 +20,4 @@ urlpatterns = [
 
     path('v1/authentication/verify-sms-code', VerifySmsCode.as_view(), name='VerifySmsCode')       # верфикация смс кода и создание USER
 
-]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
