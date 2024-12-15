@@ -9,7 +9,7 @@ import secrets
 from django.utils import timezone
 from .utils import send_sms
 from django.conf import settings
-from .utils import generate_token_and_redirect, get_client_ip
+from .utils import generate_token_and_return_url, get_client_ip
 
 
 """Генерация и отправки SMS-кода"""
@@ -111,7 +111,7 @@ class VerifySmsCode(APIView):
             user_exist.last_login = timezone.now()
             user_exist.save()
 
-            return generate_token_and_redirect(user_exist, redirect_url=f"{settings.BASE_URL}/main/")
+            return generate_token_and_return_url(user_exist, redirect_url=f"{settings.BASE_URL}/main/")
 
         else:
 
@@ -121,7 +121,7 @@ class VerifySmsCode(APIView):
             )
 
 
-            return generate_token_and_redirect(user, redirect_url=f"{settings.BASE_URL}/verification/role/")
+            return generate_token_and_return_url(user, redirect_url=f"{settings.BASE_URL}/verification/role/")
 
 
 

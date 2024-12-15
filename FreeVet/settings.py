@@ -23,8 +23,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = Env()
 Env.read_env(BASE_DIR / '.env')
 
-BASE_URL = ''  # Base URL
-
 CORS_ALLOW_ALL_ORIGINS = True
 
 
@@ -41,6 +39,7 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['*'])
 
 SEND_SMS = config('SendSMS', cast=bool, default=False)
 
+BASE_URL = env('BASE_URL')
 
 INSTALLED_APPS = [
     'corsheaders',
