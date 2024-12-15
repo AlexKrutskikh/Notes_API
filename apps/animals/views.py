@@ -70,5 +70,5 @@ class AddAnimalAPIView(APIView):
 
         return Response({
             'message': 'Successfully created',
-            'id': animal_instance.id
+            'id_animal': animal_instance.id
         }, status=status.HTTP_201_CREATED)

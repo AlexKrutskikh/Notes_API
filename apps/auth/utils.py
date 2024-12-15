@@ -37,6 +37,7 @@ def generate_token_and_redirect(user, redirect_url):
     response.set_cookie('access_token', jwt_tokens['access'], httponly=True, secure=True,samesite=None)
     response.set_cookie('refresh_token', jwt_tokens['refresh'], httponly=True, secure=True,samesite=None)
 
+
     return response
 
 """Получение IP-адреса из запроса"""

@@ -4,6 +4,7 @@ from apps.auth.models import User
 """Модель данных для хранения информации о животных"""
 
 class Animal(models.Model):
+
     gender_choices = [
         ('male', 'male'),
         ('female', 'female'),
@@ -15,8 +16,8 @@ class Animal(models.Model):
     gender = models.CharField(max_length=10, choices=gender_choices)
     is_homeless = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
-    update_at = models.DateTimeField(null=True, blank=True)
-    user = models.ForeignKey(User, related_name='animal_user', on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(null=True, blank=True)
+    user_id = models.ForeignKey(User, related_name='animal_user', on_delete=models.CASCADE)
     photos = models.JSONField(default=list)
 
     def __str__(self):
