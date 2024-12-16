@@ -121,7 +121,7 @@ class VerifySmsCode(APIView):
             )
 
 
-            return generate_token_and_return_url(user, redirect_url=f"{settings.BASE_URL}/verification/role/")
+            return generate_token_and_return_url(user, redirect_url=f"{settings.BASE_URL}/registration/perks/")
 
 
 
