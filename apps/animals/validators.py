@@ -1,65 +1,33 @@
 from django.core.exceptions import ValidationError
-from django.core.validators import FileExtensionValidator
-
-"""
-Функции для валидации различных данных: имени, вида, пола, веса и файлов.
-
-- `validate_name(value)`: проверяет, что имя не содержит цифр.
-- `validate_species(value)`: проверяет, что вид не содержит цифр.
-- `validate_gender(value)`: проверяет, что пол соответствует 'male' или 'female'.
-- `validate_weight(value)`: проверяет, что вес — это положительное число.
-- `validate_file(file)`: проверяет размер файла и его расширение.
--  validate_is_homeless: проверяет, что поле соответствует True или False
-"""
+import re
 
 
-def validate_name(value):
-    if any(char.isdigit() for char in value):
+def validate_animal_data(data):
+
+    if re.search(r'\d', data.get('name', '')):
         raise ValidationError("InvalidName")
-    return value
 
 
-def validate_species(value):
-    if any(char.isdigit() for char in value):
+    if re.search(r'\d', data.get('species', '')):
         raise ValidationError("InvalidSpecies")
-    return value
 
 
-def validate_gender(value):
-    if value not in ['male', 'female']:
+    gender = data.get('gender')
+    if gender not in ['male', 'female']:
         raise ValidationError("InvalidGender")
-    return value
 
 
-def validate_weight(value):
+    weight_str = data.get('weight', '')
     try:
-        weight = float(value)
+        weight = float(weight_str)
         if weight <= 0:
             raise ValidationError("InvalidWeight")
-    except (ValueError, TypeError):
+    except ValueError:
         raise ValidationError("InvalidWeight")
-    return weight
 
-def validate_is_homeless(value):
-    if value.lower() == 'true':
-        return True
-    elif value.lower() == 'false':
-        return False
-    else:
+
+    is_homeless_str = data.get('is_homeless', '').lower()
+    if is_homeless_str not in ['true', 'false']:
         raise ValidationError("InvalidIsHomeless")
 
-
-def validate_file(file):
-
-    max_size_mb = 10
-    if file.size > max_size_mb * 1024 * 1024:
-        raise ValidationError("FileTooLarge")
-
-
-    extension_validator = FileExtensionValidator(
-        allowed_extensions=['jpg', 'jpeg', 'png'],
-        message="InvalidFileExtension"
-    )
-    extension_validator(file)
-
-    return file
+    return data
