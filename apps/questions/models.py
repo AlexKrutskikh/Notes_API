@@ -28,6 +28,5 @@ class Question(models.Model):
 
 
 class QuestionFile(models.Model):
-    question = models.ForeignKey(Question, related_name='files', on_delete=models.CASCADE)
     file = models.FileField(upload_to='questions_files/')
 
