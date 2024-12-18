@@ -1,6 +1,8 @@
 from django.core.exceptions import ValidationError
 import re
 
+"""Валидация данных животного"""
+
 
 def validate_animal_data(data):
 

@@ -28,5 +28,7 @@ class Question(models.Model):
 
 
 class QuestionFile(models.Model):
-    file = models.FileField(upload_to='questions_files/')
+    path = models.CharField(max_length=255)
+    user = models.ForeignKey(User, related_name='question_file_user', on_delete=models.CASCADE)
+
 

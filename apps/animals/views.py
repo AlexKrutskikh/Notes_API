@@ -5,10 +5,18 @@ from .validators import validate_animal_data
 from .models import Animal
 from .serializers import AnimalSerializer
 from django.core.exceptions import ValidationError
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 
+
+"""Сохранение в БД данных о животном и возврат id"""
 class AddAnimalAPIView(APIView):
 
+    authentication_classes = [JWTTokenUserAuthentication]
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
+
 
         user_id = request.user.id
         data = request.data
