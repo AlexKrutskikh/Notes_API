@@ -18,7 +18,7 @@ class Question(models.Model):
         default=Status.IN_PROGRESS,
     )
 
-    text = models.TextField(max_length=300)
+    text = models.TextField(max_length=4000)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(null=True, blank=True)
     user = models.ForeignKey(User, related_name='question_user', on_delete=models.CASCADE)

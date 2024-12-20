@@ -1,14 +1,16 @@
+from django.core.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import QuestionFile, Question
 from .utils import save_files_to_storage
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
-from .serializers import QuestionSerializer
 from rest_framework import status
+from apps.animals.models import  Animal
+from apps.auth.models import User
+from .validators import validate_question_data
 
-"""Сохранение вопроса"""
-
+"""Валидация данных вопроса"""
 
 class AddQuestion(APIView):
 
@@ -18,31 +20,32 @@ class AddQuestion(APIView):
     def post(self, request):
 
         user_id = request.user.id
-        data = request.data
+        data=request.data
+
+        try:
+            validate_data = validate_question_data(data)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-        serializer = QuestionSerializer(data=data)
+        try:
 
-        if serializer.is_valid():
+            Question.objects.create (
 
-            try:
+                user=User.objects.get(id=user_id),
+                text=validate_data.get('text'),
+                animal = Animal.objects.get(id=validate_data.get('animal_id')),
+                file_ids = validate_data.get('file_ids')
 
-                Question.objects.create (
-                    user_id=user_id,
-                    **serializer.validated_data
+                        )
 
-                )
 
-                return Response({
-                    'message': 'Successfully created',
-                }, status=status.HTTP_201_CREATED)
+            return Response({
+                'message': 'Successfully created',
+            }, status=status.HTTP_201_CREATED)
 
-            except Exception as e:
+        except Exception as e:
                 return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
-        else:
-
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
