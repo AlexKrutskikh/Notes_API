@@ -62,7 +62,7 @@ class AddPhotoQuestion(APIView):
 
         try:
 
-            question_files = save_files_to_storage(request, 'question_photo', user_id)
+            question_files = save_files_to_storage(request, 'question_photos', user_id)
 
         except ValidationError as e:
 
