@@ -2,8 +2,6 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
-from rest_framework import status
-from rest_framework.response import Response
 from .models import QuestionFile
 
 """
@@ -31,30 +29,31 @@ def validate_file(file):
 
 def save_files_to_storage(request, upload_path, user_id):
 
-    try:
-        files = request.FILES.getlist('photos')
+    files = request.FILES.getlist('photos')
 
-        if not files:
-            return Response({'error': 'No files uploaded'}, status=status.HTTP_400_BAD_REQUEST)
+    if not files:
+        raise ValidationError('No files uploaded')
 
-        question_files = []
+    question_files = []
 
-        for file in files:
-            try:
-                validate_file(file)
-                file_path = default_storage.save(f"{upload_path}/{file.name}", ContentFile(file.read()))
-                question_file = QuestionFile(path=file_path, user_id=user_id)
-                question_files.append(question_file)
+    for file in files:
+
+        try:
+
+            validate_file(file)
+            file_path = default_storage.save(f"{upload_path}/{file.name}", ContentFile(file.read()))
+            question_file = QuestionFile(path=file_path, user_id=user_id)
+            question_files.append(question_file)
+
+        except:
+
+            raise ValidationError(f"Invalid file: {file.name}")
+
+    return question_files
 
 
-            except ValidationError:
-                return Response({'error': 'Invalid file(s)'}, status=status.HTTP_400_BAD_REQUEST)
 
-        return question_files
 
-    except Exception as e:
-        print("Unexpected error:", e)
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 

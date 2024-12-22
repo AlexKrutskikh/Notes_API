@@ -25,7 +25,7 @@ class AddQuestion(APIView):
         try:
             validate_data = validate_question_data(data)
         except ValidationError as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": e}, status=status.HTTP_400_BAD_REQUEST)
 
 
         try:
@@ -60,10 +60,19 @@ class AddPhotoQuestion(APIView):
 
         user_id = request.user.id
 
-        question_files = save_files_to_storage(request, 'question_photo', user_id)
+        try:
+
+            question_files = save_files_to_storage(request, 'question_photo', user_id)
+
+        except ValidationError as e:
+
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
 
         created_objects = QuestionFile.objects.bulk_create(question_files)
 
         created_ids = [obj.id for obj in created_objects]
 
-        return Response({'ids file(s)': created_ids}, status=201)
+        return Response({'message': 'Successfully created',
+                         'ids file(s)': created_ids}, status=201)
