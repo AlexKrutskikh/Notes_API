@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from apps.chats.models import MessageFile, Message
+from apps.chats.models import Message, MessageFile
 
 
 class MessageFileSerializer(serializers.ModelSerializer):
@@ -8,10 +8,10 @@ class MessageFileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = MessageFile
-        fields = ['file_url']  # Включаем только поле с URL файла
+        fields = ["file_url"]  # Включаем только поле с URL файла
 
     def get_file_url(self, obj):
-        request = self.context.get('request')
+        request = self.context.get("request")
         return request.build_absolute_uri(obj.file.url) if request else obj.file.url
 
 
@@ -20,4 +20,4 @@ class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Message
-        fields = '__all__'
+        fields = "__all__"

@@ -1,14 +1,13 @@
-from datetime import timezone
-from random import random
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-"""Кастомный менеджер пользователей для модели CustomUser. 
+"""Кастомный менеджер пользователей для модели CustomUser.
     Позволяет создавать пользователей и суперпользователей.
-    Этот менеджер переопределяет стандартные методы создания пользователя и суперпользователя, 
-    чтобы использовать email в качестве уникального идентификатора и автоматически нормализовать email """
+    Этот менеджер переопределяет стандартные методы создания пользователя и суперпользователя,
+    чтобы использовать email в качестве уникального идентификатора и автоматически нормализовать email"""
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, **extra_fields):
@@ -30,23 +29,25 @@ class UserManager(BaseUserManager):
 
         return self.create_user(email, password, **extra_fields)
 
+
 """Кастомная модель пользователя.
-    Модель наследует от AbstractBaseUser для использования кастомной логики аутентификации и 
+    Модель наследует от AbstractBaseUser для использования кастомной логики аутентификации и
     PermissionsMixin для поддержки разрешений и групп в Django"""
+
 
 class User(AbstractBaseUser, PermissionsMixin):
     class UserType(models.TextChoices):
-        CLIENT = 'CL', _('Client')
-        SPECIALIST = 'SP', _('Specialist')
+        CLIENT = "CL", _("Client")
+        SPECIALIST = "SP", _("Specialist")
 
     password = None
-    auth_provider = models.CharField(max_length=50, default='Twilio')
+    auth_provider = models.CharField(max_length=50, default="Twilio")
     registration_time = models.DateTimeField(auto_now_add=True)
     email = models.EmailField(unique=True, blank=True, null=True)
     first_name = models.CharField(max_length=100, blank=True)
     last_name = models.CharField(max_length=100, blank=True)
     username = models.CharField(max_length=100, blank=True)
-    phone = models.CharField(max_length=50, blank=True, null=True,unique=True)
+    phone = models.CharField(max_length=50, blank=True, null=True, unique=True)
     type = models.CharField(
         max_length=2,
         choices=UserType.choices,
@@ -68,10 +69,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 """Модель используется для хранения SMS-кодов, связанных с телефонными номерами.
 Она также включает информацию о времени отправки кода."""
 
+
 class SmsCode(models.Model):
-    code = models.CharField(max_length=6,blank=False, null=False)
+    code = models.CharField(max_length=6, blank=False, null=False)
     sent_time = models.DateTimeField(blank=False, null=False)
-    phone = models.CharField(max_length=50,blank=False, null=False)
+    phone = models.CharField(max_length=50, blank=False, null=False)
     ip = models.GenericIPAddressField(blank=False, null=False)
 
     def __str__(self):

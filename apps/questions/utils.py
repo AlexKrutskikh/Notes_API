@@ -1,7 +1,8 @@
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
-from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
+
 from .models import QuestionFile
 
 """
@@ -12,27 +13,25 @@ from .models import QuestionFile
    :return: Список URL-ов на сохраненные файлы или Response с ошибкой.
    """
 
-def validate_file(file):
 
+def validate_file(file):
     max_size_mb = 2
     if file.size > max_size_mb * 1024 * 1024:
         raise ValidationError("FileTooLarge")
 
-
     extension_validator = FileExtensionValidator(
-        allowed_extensions=['jpg', 'jpeg', 'png'],
-        message="InvalidFileExtension"
+        allowed_extensions=["jpg", "jpeg", "png"], message="InvalidFileExtension"
     )
     extension_validator(file)
 
     return file
 
-def save_files_to_storage(request, upload_path, user_id):
 
-    files = request.FILES.getlist('photos')
+def save_files_to_storage(request, upload_path, user_id):
+    files = request.FILES.getlist("photos")
 
     if not files:
-        raise ValidationError('No files uploaded')
+        raise ValidationError("No files uploaded")
 
     question_files = []
 
@@ -45,15 +44,8 @@ def save_files_to_storage(request, upload_path, user_id):
             question_file = QuestionFile(path=file_path, user_id=user_id)
             question_files.append(question_file)
 
-        except:
+        except Exception:
 
             raise ValidationError(f"Invalid file: {file.name}")
 
     return question_files
-
-
-
-
-
-
-

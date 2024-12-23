@@ -6,7 +6,8 @@ from apps.verification_codes.models import SmsCode
 class UpdateVerifyCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = SmsCode
-        fields = ['phone', 'email', 'verify_code']
+        fields = ["phone", "email", "verify_code"]
+
 
 class SMSVerificationSerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=15)
