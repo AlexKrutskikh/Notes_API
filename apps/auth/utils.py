@@ -1,24 +1,24 @@
-from twilio.rest import Client
 from django.conf import settings
+from django.http import HttpResponseRedirect, JsonResponse
 from rest_framework_simplejwt.tokens import RefreshToken
 from social_core.exceptions import AuthException
-from FreeVet import settings
-from django.http import HttpResponseRedirect, JsonResponse
+from twilio.rest import Client
 
 """Отправка SMS Twilio"""
+
 
 def send_sms(phone, verification_code):
     client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
 
     message = client.messages.create(
-        body=f'Your verification code is: {verification_code}',
-        from_=settings.TWILIO_NUMBER,
-        to=str(phone)
+        body=f"Your verification code is: {verification_code}", from_=settings.TWILIO_NUMBER, to=str(phone)
     )
 
     return message.sid
 
+
 """Генерирует JWT-токены, устанавливает их в cookies и перенаправляет на заданный URL"""
+
 
 def generate_token_and_redirect(user, redirect_url):
 
@@ -27,20 +27,18 @@ def generate_token_and_redirect(user, redirect_url):
 
     refresh = RefreshToken.for_user(user)
     access_token = refresh.access_token
-    jwt_tokens = {
-        'access': str(access_token),
-        'refresh': str(refresh)
-    }
+    jwt_tokens = {"access": str(access_token), "refresh": str(refresh)}
 
     response = HttpResponseRedirect(redirect_url)
 
-    response.set_cookie('access_token', jwt_tokens['access'], httponly=True, secure=True,samesite=None)
-    response.set_cookie('refresh_token', jwt_tokens['refresh'], httponly=True, secure=True,samesite=None)
-
+    response.set_cookie("access_token", jwt_tokens["access"], httponly=True, secure=True, samesite=None)
+    response.set_cookie("refresh_token", jwt_tokens["refresh"], httponly=True, secure=True, samesite=None)
 
     return response
 
+
 """Генерирует JWT-токены, устанавливает их в cookies и возвращает URL для редиректа"""
+
 
 def generate_token_and_return_url(user, redirect_url):
 
@@ -49,32 +47,26 @@ def generate_token_and_return_url(user, redirect_url):
 
     refresh = RefreshToken.for_user(user)
     access_token = refresh.access_token
-    jwt_tokens = {
-        'access': str(access_token),
-        'refresh': str(refresh)
-    }
+    jwt_tokens = {"access": str(access_token), "refresh": str(refresh)}
 
-    response_data = {
-        'status': 200,
-        'redirect_url': redirect_url
-    }
-
+    response_data = {"status": 200, "redirect_url": redirect_url}
 
     response = JsonResponse(response_data)
 
-    response.set_cookie('access_token', jwt_tokens['access'], httponly=True, secure=True, samesite=None)
-    response.set_cookie('refresh_token', jwt_tokens['refresh'], httponly=True, secure=True, samesite=None)
+    response.set_cookie("access_token", jwt_tokens["access"], httponly=True, secure=True, samesite=None)
+    response.set_cookie("refresh_token", jwt_tokens["refresh"], httponly=True, secure=True, samesite=None)
 
     return response
 
 
 """Получение IP-адреса из запроса"""
 
+
 def get_client_ip(request):
-    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
     if x_forwarded_for:
-        ip = x_forwarded_for.split(',')[0]
+        ip = x_forwarded_for.split(",")[0]
     else:
-        ip = request.META.get('REMOTE_ADDR')
+        ip = request.META.get("REMOTE_ADDR")
 
     return ip

@@ -2,5 +2,5 @@ from django.apps import AppConfig
 
 
 class SpecialistInfoConfig(AppConfig):
-    default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.specialist_info'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "apps.specialist_info"

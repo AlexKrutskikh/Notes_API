@@ -1,9 +1,16 @@
-from rest_framework import viewsets
 from django.db import transaction
-from .models import Vetbook, Vaccination, Treatment, ClinicalExamination, ClinicVisit, ExtendedTreatment
-from .serializers import (VetbookSerializer, VaccinationSerializer, TreatmentSerializer,
-                          ClinicalExaminationSerializer, ClinicVisitSerializer, ExtendedTreatmentSerializer)
+from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+
+from .models import (
+    ClinicalExamination,
+    ClinicVisit,
+    ExtendedTreatment,
+    Treatment,
+    Vaccination,
+    Vetbook,
+)
+from .serializers import VetbookSerializer
 
 
 class VetbookViewSet(viewsets.ModelViewSet):
@@ -19,11 +26,11 @@ class VetbookViewSet(viewsets.ModelViewSet):
             self._save_related(vetbook)
 
     def _save_related(self, vetbook):
-        vaccinations_data = self.request.data.get('vaccinations', [])
-        treatments_data = self.request.data.get('treatments', [])
-        examinations_data = self.request.data.get('examinations', [])
-        clinic_visits_data = self.request.data.get('clinic_visits', [])
-        extended_treatments_data = self.request.data.get('extended_treatments', [])
+        vaccinations_data = self.request.data.get("vaccinations", [])
+        treatments_data = self.request.data.get("treatments", [])
+        examinations_data = self.request.data.get("examinations", [])
+        clinic_visits_data = self.request.data.get("clinic_visits", [])
+        extended_treatments_data = self.request.data.get("extended_treatments", [])
 
         for vaccination in vaccinations_data:
             Vaccination.objects.create(vetbook=vetbook, **vaccination)
@@ -35,6 +42,3 @@ class VetbookViewSet(viewsets.ModelViewSet):
             ClinicVisit.objects.create(vetbook=vetbook, **visit)
         for ext_treatment in extended_treatments_data:
             ExtendedTreatment.objects.create(vetbook=vetbook, **ext_treatment)
-
-
-
