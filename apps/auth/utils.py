@@ -3,6 +3,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from rest_framework_simplejwt.tokens import RefreshToken
 from social_core.exceptions import AuthException
 from twilio.rest import Client
+from rest_framework.response import Response
 
 """Отправка SMS Twilio"""
 
@@ -17,30 +18,10 @@ def send_sms(phone, verification_code):
     return message.sid
 
 
-"""Генерирует JWT-токены, устанавливает их в cookies и перенаправляет на заданный URL"""
+"""Генерирует JWT-токены"""
 
 
-def generate_token_and_redirect(user, redirect_url):
-
-    if user is None:
-        raise AuthException("User does not exist or was not found.")
-
-    refresh = RefreshToken.for_user(user)
-    access_token = refresh.access_token
-    jwt_tokens = {"access": str(access_token), "refresh": str(refresh)}
-
-    response = HttpResponseRedirect(redirect_url)
-
-    response.set_cookie("access_token", jwt_tokens["access"], httponly=True, secure=True, samesite=None)
-    response.set_cookie("refresh_token", jwt_tokens["refresh"], httponly=True, secure=True, samesite=None)
-
-    return response
-
-
-"""Генерирует JWT-токены, устанавливает их в cookies и возвращает URL для редиректа"""
-
-
-def generate_token_and_return_url(user, redirect_url):
+def generate_token_set_cookie(user,response):
 
     if user is None:
         raise AuthException("User does not exist or was not found.")
@@ -48,10 +29,6 @@ def generate_token_and_return_url(user, redirect_url):
     refresh = RefreshToken.for_user(user)
     access_token = refresh.access_token
     jwt_tokens = {"access": str(access_token), "refresh": str(refresh)}
-
-    response_data = {"status": 200, "redirect_url": redirect_url}
-
-    response = JsonResponse(response_data)
 
     response.set_cookie("access_token", jwt_tokens["access"], httponly=True, secure=True, samesite=None)
     response.set_cookie("refresh_token", jwt_tokens["refresh"], httponly=True, secure=True, samesite=None)
@@ -60,7 +37,6 @@ def generate_token_and_return_url(user, redirect_url):
 
 
 """Получение IP-адреса из запроса"""
-
 
 def get_client_ip(request):
     x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")

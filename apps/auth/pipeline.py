@@ -1,11 +1,9 @@
 from datetime import datetime
-
 from django.contrib.auth import get_user_model
 from social_core.exceptions import AuthException
-
-from FreeVet import settings
-
-from .utils import generate_token_and_redirect
+from .utils import generate_token_set_cookie
+from rest_framework import status
+from rest_framework.response import Response
 
 """ Создаёт или обновляет пользователя на основе данных, полученных от провайдера социальной аутентификации.
     Генерирует JWT-токены для пользователя и перенаправляет его на указанный URL"""
@@ -21,8 +19,6 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
     if existing_user:
         existing_user.last_login = datetime.now()
         existing_user.save()
-
-        return generate_token_and_redirect(existing_user, redirect_url=f"{settings.BASE_URL}/main/")
 
     uid = kwargs.get("uid") or kwargs.get("response", {}).get("sub")
     if not uid:
@@ -47,8 +43,6 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
         user = User(**fields)
         user.save()
 
-        return generate_token_and_redirect(user, redirect_url=f"{settings.BASE_URL}/registration/perks/")
-
     elif provider == "facebook":
 
         username = kwargs.get("username", email.split("@")[0])
@@ -66,4 +60,8 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
         user = User(**fields)
         user.save()
 
-        return generate_token_and_redirect(user, redirect_url=f"{settings.BASE_URL}/registration/perks/")
+    response = Response({"type": "Successful operation"}, status=status.HTTP_201_CREATED)
+
+    generate_token_set_cookie(user, response)
+
+    return response

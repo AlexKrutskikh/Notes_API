@@ -36,9 +36,34 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+
     class UserType(models.TextChoices):
         CLIENT = "CL", _("Client")
         SPECIALIST = "SP", _("Specialist")
+
+    class UserStatus(models.TextChoices):
+        PROFILE_PREFILL = "PR", _("Profile_prefill")
+        STATUS_SELECT = "SS", _("Status_select")
+        VETBOOK_CREATION = "VC", _("Vetbook_creation")
+        SPECIALIST_INFO_FILL = "SF", _("Specialist_info_fill")
+        SPECIALIST_VERIFICATION = "SV", _("Specialist_verification")
+        DONE = "DONE", _("Done")
+
+    USER_TYPE_STATUS_MAPPING = {
+        UserType.CLIENT: [
+            UserStatus.PROFILE_PREFILL,
+            UserStatus.STATUS_SELECT,
+            UserStatus.VETBOOK_CREATION,
+            UserStatus.DONE,
+        ],
+        UserType.SPECIALIST: [
+            UserStatus.PROFILE_PREFILL,
+            UserStatus.STATUS_SELECT,
+            UserStatus.SPECIALIST_INFO_FILL,
+            UserStatus.SPECIALIST_VERIFICATION,
+            UserStatus.DONE,
+        ],
+    }
 
     password = None
     auth_provider = models.CharField(max_length=50, default="Twilio")
@@ -48,10 +73,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=100, blank=True)
     username = models.CharField(max_length=100, blank=True)
     phone = models.CharField(max_length=50, blank=True, null=True, unique=True)
+
     type = models.CharField(
         max_length=2,
         choices=UserType.choices,
         default=UserType.CLIENT,
+    )
+    status = models.CharField(
+        max_length=6,
+        choices=UserStatus.choices,
+        default=UserStatus.STATUS_SELECT,
     )
 
     is_active = models.BooleanField(default=True)

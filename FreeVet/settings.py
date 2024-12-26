@@ -1,7 +1,8 @@
+import os
 from pathlib import Path
+
 from decouple import config
 from django.urls import reverse_lazy
-import os
 from environ import Env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
