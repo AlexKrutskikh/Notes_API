@@ -4,9 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
-
 from apps.auth.models import User
-
 from .models import Animal
 from .validators import validate_animal_data
 
