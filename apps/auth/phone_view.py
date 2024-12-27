@@ -98,4 +98,4 @@ class VerifySmsCode(APIView):
             generate_token_set_cookie(user, response)
 
 
-        return response
+            return response
