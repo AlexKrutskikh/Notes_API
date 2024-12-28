@@ -10,6 +10,7 @@ from twilio.base.exceptions import TwilioRestException
 from apps.auth.models import SmsCode, User
 from .utils import generate_token_set_cookie, get_client_ip, send_sms
 from .validators import validate_phone_code
+from apps.profiles.models import Profile
 
 """Генерация и отправки SMS-кода"""
 
@@ -92,6 +93,8 @@ class VerifySmsCode(APIView):
         else:
 
             user = User.objects.create(phone=phone, registration_time=timezone.now())
+
+            Profile.objects.create(phone=phone,created_at=timezone.now())
 
             response = Response({"type": "Successful operation"}, status=status.HTTP_201_CREATED)
 
