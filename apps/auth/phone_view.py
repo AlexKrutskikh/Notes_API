@@ -53,9 +53,9 @@ class SendSmsCode(APIView):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
 
-        SmsCode.objects.create(phone=phone, code=code, sent_time=timezone.now(), ip=get_client_ip(request))
+        code = SmsCode.objects.create(phone=phone, code=code, sent_time=timezone.now(), ip=get_client_ip(request))
 
-        return Response({"type": "Successful operation"}, status=status.HTTP_201_CREATED)
+        return Response({"type": "Successful operation", "code": code.code }, status=status.HTTP_201_CREATED)
 
 
 """Проверка смс-кода и верификации пользователя по телефону"""
@@ -94,7 +94,7 @@ class VerifySmsCode(APIView):
 
             user = User.objects.create(phone=phone, registration_time=timezone.now())
 
-            Profile.objects.create(phone=phone,created_at=timezone.now())
+            #Profile.objects.create(user=user,phone=phone,created_at=timezone.now())
 
             response = Response({"type": "Successful operation"}, status=status.HTTP_201_CREATED)
 

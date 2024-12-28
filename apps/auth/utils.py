@@ -1,9 +1,8 @@
 from django.conf import settings
-from django.http import HttpResponseRedirect, JsonResponse
 from rest_framework_simplejwt.tokens import RefreshToken
 from social_core.exceptions import AuthException
 from twilio.rest import Client
-from rest_framework.response import Response
+
 
 """Отправка SMS Twilio"""
 
@@ -29,6 +28,7 @@ def generate_token_set_cookie(user,response):
     refresh = RefreshToken.for_user(user)
     access_token = refresh.access_token
     jwt_tokens = {"access": str(access_token), "refresh": str(refresh)}
+    print(1111111111111111)
 
     response.set_cookie("access_token", jwt_tokens["access"], httponly=True, secure=True, samesite=None)
     response.set_cookie("refresh_token", jwt_tokens["refresh"], httponly=True, secure=True, samesite=None)
