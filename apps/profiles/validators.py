@@ -1,4 +1,5 @@
 from rest_framework.exceptions import ValidationError
+import re
 
 """
   Валидирует все роли в полученных данных.
@@ -22,3 +23,28 @@ def validate_perk(data):
             raise ValidationError({perk: f"Invalid value for {perk}, expected a boolean."})
 
     return data
+
+
+def validate_user_data(data):
+    name = data.get("name", "")
+    phone = data.get("phone", "")
+    email = data.get("email", "")
+    telegram = data.get("telegram", "")
+
+
+    if not re.match(r"^[a-zA-Zа-яА-ЯёЁ]{2,}$", name):
+        raise ValidationError("InvalidName")
+
+    if not re.match(r"^\d{10,15}$", str(phone)):
+        raise ValidationError("InvalidPhone")
+
+    if email and not re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", email):
+        raise ValidationError("InvalidEmail")
+
+    if telegram and not re.match(r"^[a-zA-Z]\w{4,31}$", telegram):
+        raise ValidationError("InvalidTelegram")
+
+    return data
+
+
+
