@@ -13,7 +13,7 @@ class Profile(models.Model):
     telegram = models.CharField(max_length=30, blank=True, null=True)
     email = models.EmailField(max_length=254, blank=True, null=True)
     phone = models.CharField(max_length=50, blank=True, null=True, unique=True)
-    path = models.CharField(max_length=255)
+    path_photo = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name

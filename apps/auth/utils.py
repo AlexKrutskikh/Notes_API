@@ -28,7 +28,6 @@ def generate_token_set_cookie(user,response):
     refresh = RefreshToken.for_user(user)
     access_token = refresh.access_token
     jwt_tokens = {"access": str(access_token), "refresh": str(refresh)}
-    print(1111111111111111)
 
     response.set_cookie("access_token", jwt_tokens["access"], httponly=True, secure=True, samesite=None)
     response.set_cookie("refresh_token", jwt_tokens["refresh"], httponly=True, secure=True, samesite=None)

@@ -94,7 +94,7 @@ class VerifySmsCode(APIView):
 
             user = User.objects.create(phone=phone, registration_time=timezone.now())
 
-            #Profile.objects.create(user=user,phone=phone,created_at=timezone.now())
+            Profile.objects.create(user=user,phone=phone,created_at=timezone.now())
 
             response = Response({"type": "Successful operation"}, status=status.HTTP_201_CREATED)
 

@@ -5,10 +5,47 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 from apps.auth.models import User
-from .validators import validate_roles
+from .validators import validate_perk
+from FreeVet.utils import save_files_to_storage
+from .models import Profile
 
 
 """Сохранение в БД данных профиля"""
+
+class ChangeAvatareProfile(APIView):
+
+    authentication_classes = [JWTTokenUserAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        user_id = request.user.id
+
+        try:
+
+            avatar_file = save_files_to_storage(request, "profile_avatar")
+
+        except ValidationError as e:
+
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        existing_profile = Profile.objects.get(user_id=user_id)
+
+        if existing_profile:
+
+            existing_profile.path_photo = avatar_file
+            existing_profile.save()
+
+        else:
+
+            return Response(
+                {
+                    "error": "ProfileNotFound",
+                },
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response({"message": "Successfully created"}, status=201)
 
 
 class AddPerksAPIView(APIView):
@@ -22,7 +59,7 @@ class AddPerksAPIView(APIView):
         data = request.data
 
         try:
-            validate_data=validate_roles(data)
+            validate_data=validate_perk(data)
         except ValidationError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 

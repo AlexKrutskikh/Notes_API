@@ -82,7 +82,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     status = models.CharField(
         max_length=6,
         choices=UserStatus.choices,
-        default=UserStatus.STATUS_SELECT,
+        default=UserStatus.PROFILE_PREFILL,
     )
 
     is_active = models.BooleanField(default=True)

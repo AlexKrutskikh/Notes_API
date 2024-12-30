@@ -4,9 +4,9 @@ from rest_framework.exceptions import ValidationError
   Валидирует все роли в полученных данных.
   Ожидает, что значения всех ключей являются булевыми.
   """
-def validate_roles(data):
+def validate_perk(data):
 
-    roles = {
+    perk = {
         "Homeless_Helper": data.get("Homeless_Helper"),
         "Pers_Helper": data.get("Pers_Helper"),
         "Volunteer": data.get("Volunteer"),
@@ -17,8 +17,8 @@ def validate_roles(data):
         "Zoo_psychologist": data.get("Zoo_psychologist"),
     }
 
-    for role, value in roles.items():
+    for perk, value in perk.items():
         if not isinstance(value, bool):
-            raise ValidationError({role: f"Invalid value for {role}, expected a boolean."})
+            raise ValidationError({perk: f"Invalid value for {perk}, expected a boolean."})
 
-    return roles
+    return data

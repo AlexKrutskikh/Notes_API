@@ -4,6 +4,8 @@ from social_core.exceptions import AuthException
 from .utils import generate_token_set_cookie
 from rest_framework import status
 from rest_framework.response import Response
+from apps.profiles.models import Profile
+from django.utils import timezone
 
 """ Создаёт или обновляет пользователя на основе данных, полученных от провайдера социальной аутентификации.
     Генерирует JWT-токены для пользователя и перенаправляет его на указанный URL"""
@@ -43,6 +45,14 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
         user = User(**fields)
         user.save()
 
+        Profile.objects.create(
+            user=user,
+            name=first_name,
+            last_name=last_name,
+            email=email,
+            created_at=timezone.now()
+        )
+
     elif provider == "facebook":
 
         username = kwargs.get("username", email.split("@")[0])
@@ -59,6 +69,14 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
 
         user = User(**fields)
         user.save()
+
+        Profile.objects.create(
+                           user=user,
+                           name=first_name,
+                           last_name=last_name,
+                           email=email,
+                           created_at=timezone.now()
+                           )
 
     response = Response({"type": "Successful operation"}, status=status.HTTP_201_CREATED)
 
