@@ -8,7 +8,7 @@ from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 from apps.auth.models import User
 from .validators import validate_perk, validate_user_data
 from FreeVet.utils import save_files_to_storage
-from .models import Profile
+from .models import Profile, Perks
 
 
 """Сохранение в БД данных профиля"""
@@ -102,34 +102,39 @@ class EditProfile(APIView):
 
         return Response({"message": "Successfully created"}, status=201)
 
-class AddPerksAPIView(APIView):
+class UpdatePerks(APIView):
 
     authentication_classes = [JWTTokenUserAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
 
+
         user_id = request.user.id
         data = request.data
 
+
         try:
-            validate_data=validate_perk(data)
+            validate_data = validate_perk(data)
         except ValidationError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            animal = Animal.objects.create(
-                user=User.objects.get(id=user_id),
-                name=validate_data.get("name"),
-                species=validate_data.get("species"),
-                gender=validate_data.get("gender"),
-                weight=validate_data.get("weight"),
-                is_homeless=validate_data.get("is_homeless"),
-            )
+        existing_profile = Profile.objects.get(user_id=user_id)
 
-            return Response({"message": "Successfully created", "id_animal": animal.id}, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        for perk_name, is_active in validate_data.items():
+
+            perk = Perks.objects.get(name=perk_name)
+
+            if is_active:
+                existing_profile.perks.add(perk)
+                existing_profile.save()
+
+                user = User.objects.get(id=user_id)
+                user.status = "SS"
+                user.save()
+
+        return Response({"message": "Perks updated successfully"}, status=status.HTTP_200_OK)
+
 
 
 
