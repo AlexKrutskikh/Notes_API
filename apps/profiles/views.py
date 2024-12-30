@@ -46,7 +46,7 @@ class ChangeAvatareProfile(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        return Response({"message": "Successfully created"}, status=201)
+        return Response({"message": "Profile updated photo"}, status=201)
 
 class EditProfile(APIView):
 
@@ -100,7 +100,7 @@ class EditProfile(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        return Response({"message": "Successfully created"}, status=201)
+        return Response({"message": "Profile updated successfully"}, status=201)
 
 class UpdatePerks(APIView):
 
