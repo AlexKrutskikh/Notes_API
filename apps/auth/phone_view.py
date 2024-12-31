@@ -1,16 +1,19 @@
 import secrets
 from datetime import timedelta
-from django.core.exceptions import ValidationError
+
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from twilio.base.exceptions import TwilioRestException
+
 from apps.auth.models import SmsCode, User
+from apps.profiles.models import Profile
+
 from .utils import generate_token_set_cookie, get_client_ip, send_sms
 from .validators import validate_phone_code
-from apps.profiles.models import Profile
 
 """Генерация и отправки SMS-кода"""
 
@@ -20,10 +23,9 @@ class SendSmsCode(APIView):
     def post(self, request, *args, **kwargs):
 
         try:
-          validate_data = validate_phone_code(data=request.data)
+            validate_data = validate_phone_code(data=request.data)
         except ValidationError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
 
         phone = validate_data.get("phone")
 
@@ -55,7 +57,7 @@ class SendSmsCode(APIView):
 
         code = SmsCode.objects.create(phone=phone, code=code, sent_time=timezone.now(), ip=get_client_ip(request))
 
-        return Response({"type": "Successful operation", "code": code.code }, status=status.HTTP_201_CREATED)
+        return Response({"type": "Successful operation", "code": code.code}, status=status.HTTP_201_CREATED)
 
 
 """Проверка смс-кода и верификации пользователя по телефону"""
@@ -94,11 +96,10 @@ class VerifySmsCode(APIView):
 
             user = User.objects.create(phone=phone, registration_time=timezone.now())
 
-            Profile.objects.create(user=user,phone=phone,created_at=timezone.now())
+            Profile.objects.create(user=user, phone=phone, created_at=timezone.now())
 
             response = Response({"type": "Successful operation"}, status=status.HTTP_201_CREATED)
 
             generate_token_set_cookie(user, response)
-
 
             return response

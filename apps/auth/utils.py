@@ -3,7 +3,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from social_core.exceptions import AuthException
 from twilio.rest import Client
 
-
 """Отправка SMS Twilio"""
 
 
@@ -20,7 +19,7 @@ def send_sms(phone, verification_code):
 """Генерирует JWT-токены"""
 
 
-def generate_token_set_cookie(user,response):
+def generate_token_set_cookie(user, response):
 
     if user is None:
         raise AuthException("User does not exist or was not found.")
@@ -36,6 +35,7 @@ def generate_token_set_cookie(user,response):
 
 
 """Получение IP-адреса из запроса"""
+
 
 def get_client_ip(request):
     x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")

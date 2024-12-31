@@ -1,10 +1,13 @@
-from rest_framework.exceptions import ValidationError
 import re
+
+from rest_framework.exceptions import ValidationError
 
 """
   Валидирует все роли в полученных данных.
   Ожидает, что значения всех ключей являются булевыми.
   """
+
+
 def validate_perk(data):
 
     perk = {
@@ -31,7 +34,6 @@ def validate_user_data(data):
     email = data.get("email", "")
     telegram = data.get("telegram", "")
 
-
     if not re.match(r"^[a-zA-Zа-яА-ЯёЁ]{2,}$", name):
         raise ValidationError("InvalidName")
 
@@ -45,6 +47,3 @@ def validate_user_data(data):
         raise ValidationError("InvalidTelegram")
 
     return data
-
-
-

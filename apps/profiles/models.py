@@ -1,8 +1,9 @@
 from django.db import models
+
 from apps.auth.models import User
 
-
 """Модель для хранения перков"""
+
 
 class Perks(models.Model):
 
@@ -12,7 +13,9 @@ class Perks(models.Model):
     def __str__(self):
         return self.name
 
+
 """Модель для хранения профиля"""
+
 
 class Profile(models.Model):
 

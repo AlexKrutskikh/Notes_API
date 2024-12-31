@@ -4,10 +4,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
+
 from apps.animals.models import Animal
 from apps.auth.models import User
-from .models import Question, QuestionFile
 from FreeVet.utils import save_files_to_storage
+
+from .models import Question, QuestionFile
 from .validators import validate_question_data
 
 """Валидация данных вопроса"""
