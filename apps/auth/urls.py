@@ -22,9 +22,7 @@ urlpatterns = [
     path(
         "v1/authentication/verify-sms-code", VerifySmsCode.as_view(), name="VerifySmsCode"
     ),  # верфикация смс кода и создание USER
-
     path(
         "v1/authentication/get-status", GetStatusUser.as_view(), name="GetStatusUser"
     ),  # получение статуса пользователя
-
 ]
