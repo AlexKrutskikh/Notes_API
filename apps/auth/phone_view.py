@@ -92,6 +92,12 @@ class VerifySmsCode(APIView):
             user_exist.last_login = timezone.now()
             user_exist.save()
 
+            response = Response({"type": "Successful operation"}, status=status.HTTP_201_CREATED)
+
+            generate_token_set_cookie(user_exist, response)
+
+            return response
+
         else:
 
             user = User.objects.create(phone=phone, registration_time=timezone.now())

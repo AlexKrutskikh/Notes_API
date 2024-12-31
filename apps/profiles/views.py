@@ -131,7 +131,9 @@ class UpdatePerks(APIView):
                 existing_profile.save()
 
                 user = User.objects.get(id=user_id)
-                user.status = "SS"
+                user.status = "VS"
+                if perk.code in ("VT", "DH", "ZP"):
+                    user.type = "SP"
                 user.save()
 
         return Response({"message": "Perks updated successfully"}, status=status.HTTP_200_OK)
