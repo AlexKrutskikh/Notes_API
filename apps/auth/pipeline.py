@@ -1,12 +1,12 @@
 from datetime import datetime
-from django.http import HttpResponseRedirect
+
 from django.contrib.auth import get_user_model
+from django.http import HttpResponseRedirect
 from django.utils import timezone
-from rest_framework import status
-from rest_framework.response import Response
 from social_core.exceptions import AuthException
-from FreeVet import settings
+
 from apps.profiles.models import Profile
+from FreeVet import settings
 
 from .utils import generate_token_set_cookie
 
@@ -54,7 +54,9 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
             user = User(**fields)
             user.save()
 
-            Profile.objects.create(user=user, name=first_name, last_name=last_name, email=email, created_at=timezone.now())
+            Profile.objects.create(
+                user=user, name=first_name, last_name=last_name, email=email, created_at=timezone.now()
+            )
 
         elif provider == "facebook":
 
@@ -73,7 +75,9 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
             user = User(**fields)
             user.save()
 
-            Profile.objects.create(user=user, name=first_name, last_name=last_name, email=email, created_at=timezone.now())
+            Profile.objects.create(
+                user=user, name=first_name, last_name=last_name, email=email, created_at=timezone.now()
+            )
 
         response = HttpResponseRedirect(f"{settings.BASE_URL}/main/")
 

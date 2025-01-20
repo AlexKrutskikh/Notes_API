@@ -90,7 +90,7 @@ class EditProfile(APIView):
             existing_profile.save()
 
             user = User.objects.get(id=user_id)
-            if user.status=="Profile_prefill":
+            if user.status == "Profile_prefill":
                 user.status = "Status_select"
                 user.save()
 
@@ -120,7 +120,6 @@ class UpdatePerks(APIView):
         # if user.status!="Status_select":
         #     return Response({"error":"Perks selected"} , status=status.HTTP_400_BAD_REQUEST)
 
-
         try:
             valid_perk, role = validate_perk(data)
         except ValidationError as e:
@@ -130,7 +129,7 @@ class UpdatePerks(APIView):
 
         perks_to_add = Perks.objects.filter(name__in=valid_perk)
 
-        existing_profile.perks.add(* perks_to_add)
+        existing_profile.perks.add(*perks_to_add)
 
         user = User.objects.get(id=user_id)
         user.status = "Vetbook_creation"

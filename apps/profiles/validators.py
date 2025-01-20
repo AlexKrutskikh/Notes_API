@@ -21,7 +21,6 @@ def validate_perk(data):
         "Zoo_psychologist": "Specialist",
     }
 
-
     active_perks = []
     choice_role = None
 
@@ -35,12 +34,10 @@ def validate_perk(data):
             if choice_role is None:
                 choice_role = role_mapping.get(perk_name)
 
-
             if role_mapping.get(perk_name) != choice_role:
                 raise ValidationError("All selected perks must have the same role.")
             else:
                 active_perks.append(perk_name)
-
 
     return active_perks, choice_role
 
