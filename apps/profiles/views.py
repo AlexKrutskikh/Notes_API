@@ -116,9 +116,9 @@ class UpdatePerks(APIView):
         user_id = request.user.id
         data = request.data
 
-        # user = User.objects.get(id=user_id)
-        # if user.status!="Status_select":
-        #     return Response({"error":"Perks selected"} , status=status.HTTP_400_BAD_REQUEST)
+        user = User.objects.get(id=user_id)
+        if user.status!="Status_select":
+             return Response({"error":"Perks selected"} , status=status.HTTP_400_BAD_REQUEST)
 
         try:
             valid_perk, role = validate_perk(data)
