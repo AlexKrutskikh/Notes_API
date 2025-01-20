@@ -90,8 +90,9 @@ class EditProfile(APIView):
             existing_profile.save()
 
             user = User.objects.get(id=user_id)
-            user.status = "SS"
-            user.save()
+            if user.status=="Profile_prefill":
+                user.status = "Status_select"
+                user.save()
 
         else:
 
@@ -115,25 +116,25 @@ class UpdatePerks(APIView):
         user_id = request.user.id
         data = request.data
 
+        # user = User.objects.get(id=user_id)
+        # if user.status!="Status_select":
+        #     return Response({"error":"Perks selected"} , status=status.HTTP_400_BAD_REQUEST)
+
+
         try:
-            validate_data = validate_perk(data)
+            valid_perk, role = validate_perk(data)
         except ValidationError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         existing_profile = Profile.objects.get(user_id=user_id)
 
-        for perk_name, is_active in validate_data.items():
+        perks_to_add = Perks.objects.filter(name__in=valid_perk)
 
-            perk = Perks.objects.get(name=perk_name)
+        existing_profile.perks.add(* perks_to_add)
 
-            if is_active:
-                existing_profile.perks.add(perk)
-                existing_profile.save()
-
-                user = User.objects.get(id=user_id)
-                user.status = "VS"
-                if perk.code in ("VT", "DH", "ZP"):
-                    user.type = "SP"
-                user.save()
+        user = User.objects.get(id=user_id)
+        user.status = "Vetbook_creation"
+        user.type = role
+        user.save()
 
         return Response({"message": "Perks updated successfully"}, status=status.HTTP_200_OK)

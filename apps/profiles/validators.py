@@ -10,22 +10,39 @@ from rest_framework.exceptions import ValidationError
 
 def validate_perk(data):
 
-    perk = {
-        "Homeless_Helper": data.get("Homeless_Helper"),
-        "Pers_Helper": data.get("Pers_Helper"),
-        "Volunteer": data.get("Volunteer"),
-        "Shelter_Worker": data.get("Shelter_Worker"),
-        "Pet_Owner": data.get("Pet_Owner"),
-        "Vet": data.get("Vet"),
-        "Dog_Handler": data.get("Dog_Handler"),
-        "Zoo_psychologist": data.get("Zoo_psychologist"),
+    role_mapping = {
+        "Homeless_Helper": "Client",
+        "Pers_Helper": "Client",
+        "Volunteer": "Client",
+        "Shelter_Worker": "Client",
+        "Pet_Owner": "Client",
+        "Vet": "Specialist",
+        "Dog_Handler": "Specialist",
+        "Zoo_psychologist": "Specialist",
     }
 
-    for perk, value in perk.items():
-        if not isinstance(value, bool):
-            raise ValidationError({perk: f"Invalid value for {perk}, expected a boolean."})
 
-    return data
+    active_perks = []
+    choice_role = None
+
+    for perk_name, value in data.items():
+
+        if not isinstance(value, bool):
+            raise ValidationError(f"Invalid value for {perk_name}, expected a boolean.")
+
+        if value:
+
+            if choice_role is None:
+                choice_role = role_mapping.get(perk_name)
+
+
+            if role_mapping.get(perk_name) != choice_role:
+                raise ValidationError("All selected perks must have the same role.")
+            else:
+                active_perks.append(perk_name)
+
+
+    return active_perks, choice_role
 
 
 def validate_user_data(data):

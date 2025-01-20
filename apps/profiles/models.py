@@ -7,7 +7,6 @@ from apps.auth.models import User
 
 class Perks(models.Model):
 
-    code = models.CharField(max_length=2, unique=True)
     name = models.CharField(max_length=50, unique=True)
 
     def __str__(self):

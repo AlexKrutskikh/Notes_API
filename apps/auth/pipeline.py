@@ -1,11 +1,11 @@
 from datetime import datetime
-
+from django.http import HttpResponseRedirect
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from social_core.exceptions import AuthException
-
+from FreeVet import settings
 from apps.profiles.models import Profile
 
 from .utils import generate_token_set_cookie
@@ -25,52 +25,58 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
         existing_user.last_login = datetime.now()
         existing_user.save()
 
-    uid = kwargs.get("uid") or kwargs.get("response", {}).get("sub")
-    if not uid:
-        raise AuthException("UID is missing.")
+        response = HttpResponseRedirect(f"{settings.BASE_URL}/main/")
 
-    provider = backend.name
+        generate_token_set_cookie(existing_user, response)
 
-    if provider == "google-oauth2":
+    else:
 
-        username = kwargs.get("username", email.split("@")[0])
-        first_name = kwargs.get("response", {}).get("given_name", "")
-        last_name = kwargs.get("response", {}).get("family_name", "")
+        uid = kwargs.get("uid") or kwargs.get("response", {}).get("sub")
+        if not uid:
+            raise AuthException("UID is missing.")
 
-        fields = {
-            "username": username,
-            "email": email,
-            "first_name": first_name,
-            "last_name": last_name,
-            "auth_provider": provider,
-        }
+        provider = backend.name
 
-        user = User(**fields)
-        user.save()
+        if provider == "google-oauth2":
 
-        Profile.objects.create(user=user, name=first_name, last_name=last_name, email=email, created_at=timezone.now())
+            username = kwargs.get("username", email.split("@")[0])
+            first_name = kwargs.get("response", {}).get("given_name", "")
+            last_name = kwargs.get("response", {}).get("family_name", "")
 
-    elif provider == "facebook":
+            fields = {
+                "username": username,
+                "email": email,
+                "first_name": first_name,
+                "last_name": last_name,
+                "auth_provider": provider,
+            }
 
-        username = kwargs.get("username", email.split("@")[0])
-        first_name = kwargs.get("response", {}).get("name", "").split(" ")[0]
-        last_name = kwargs.get("response", {}).get("name", "").rsplit(" ")[1]
+            user = User(**fields)
+            user.save()
 
-        fields = {
-            "username": username,
-            "email": email,
-            "first_name": first_name,
-            "last_name": last_name,
-            "auth_provider": provider,
-        }
+            Profile.objects.create(user=user, name=first_name, last_name=last_name, email=email, created_at=timezone.now())
 
-        user = User(**fields)
-        user.save()
+        elif provider == "facebook":
 
-        Profile.objects.create(user=user, name=first_name, last_name=last_name, email=email, created_at=timezone.now())
+            username = kwargs.get("username", email.split("@")[0])
+            first_name = kwargs.get("response", {}).get("name", "").split(" ")[0]
+            last_name = kwargs.get("response", {}).get("name", "").rsplit(" ")[1]
 
-    response = Response({"type": "Successful operation"}, status=status.HTTP_201_CREATED)
+            fields = {
+                "username": username,
+                "email": email,
+                "first_name": first_name,
+                "last_name": last_name,
+                "auth_provider": provider,
+            }
 
-    generate_token_set_cookie(user, response)
+            user = User(**fields)
+            user.save()
+
+            Profile.objects.create(user=user, name=first_name, last_name=last_name, email=email, created_at=timezone.now())
+
+        response = HttpResponseRedirect(f"{settings.BASE_URL}/main/")
+
+        generate_token_set_cookie(user, response)
 
     return response

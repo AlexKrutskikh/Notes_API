@@ -1,7 +1,6 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 """Кастомный менеджер пользователей для модели CustomUser.
     Позволяет создавать пользователей и суперпользователей.
@@ -38,16 +37,16 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
 
     class UserType(models.TextChoices):
-        CLIENT = "CL", _("Client")
-        SPECIALIST = "SP", _("Specialist")
+        CLIENT = "Client"
+        SPECIALIST = "Specialist"
 
     class UserStatus(models.TextChoices):
-        PROFILE_PREFILL = "PR", _("Profile_prefill")
-        STATUS_SELECT = "SS", _("Status_select")
-        VETBOOK_CREATION = "VC", _("Vetbook_creation")
-        SPECIALIST_INFO_FILL = "SF", _("Specialist_info_fill")
-        SPECIALIST_VERIFICATION = "SV", _("Specialist_verification")
-        DONE = "DONE", _("Done")
+        PROFILE_PREFILL = "Profile_prefill"
+        STATUS_SELECT = "Status_select"
+        VETBOOK_CREATION = "Vetbook_creation"
+        SPECIALIST_INFO_FILL = "Specialist_info_fill"
+        SPECIALIST_VERIFICATION = "Specialist_verification"
+        DONE = "Done"
 
     USER_TYPE_STATUS_MAPPING = {
         UserType.CLIENT: [
@@ -75,12 +74,12 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone = models.CharField(max_length=50, blank=True, null=True, unique=True)
 
     type = models.CharField(
-        max_length=2,
+        max_length=10,
         choices=UserType.choices,
         default=UserType.CLIENT,
     )
     status = models.CharField(
-        max_length=6,
+        max_length=25,
         choices=UserStatus.choices,
         default=UserStatus.PROFILE_PREFILL,
     )
