@@ -8,7 +8,7 @@ from social_core.exceptions import AuthException
 from apps.profiles.models import Profile
 from FreeVet import settings
 
-from .utils import generate_token_set_cookie
+from .utils import generate_token_and_redirect
 
 """ Создаёт или обновляет пользователя на основе данных, полученных от провайдера социальной аутентификации.
     Генерирует JWT-токены для пользователя и перенаправляет его на указанный URL"""
@@ -19,15 +19,11 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
     email = kwargs.get("email", details.get("email"))
 
     User = get_user_model()
-    existing_user = User.objects.filter(email=email).first()
+    user = User.objects.filter(email=email).first()
 
-    if existing_user:
-        existing_user.last_login = datetime.now()
-        existing_user.save()
-
-        response = HttpResponseRedirect(f"{settings.BASE_URL}/main/")
-
-        generate_token_set_cookie(existing_user, response)
+    if user:
+        user.last_login = datetime.now()
+        user.save()
 
     else:
 
@@ -44,6 +40,7 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
             last_name = kwargs.get("response", {}).get("family_name", "")
 
             fields = {
+
                 "username": username,
                 "email": email,
                 "first_name": first_name,
@@ -65,6 +62,7 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
             last_name = kwargs.get("response", {}).get("name", "").rsplit(" ")[1]
 
             fields = {
+
                 "username": username,
                 "email": email,
                 "first_name": first_name,
@@ -79,8 +77,4 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
                 user=user, name=first_name, last_name=last_name, email=email, created_at=timezone.now()
             )
 
-        response = HttpResponseRedirect(f"{settings.BASE_URL}/main/")
-
-        generate_token_set_cookie(user, response)
-
-    return response
+    return generate_token_and_redirect(user, redirect_url=f"{settings.BASE_URL}/main/")
