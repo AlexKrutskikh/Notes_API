@@ -3,6 +3,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 
 from .phone_view import SendSmsCode, VerifySmsCode
 from .social_view import facebook_oauth_redirect, google_oauth_redirect
+from .status_view import GetStatusUser
 
 urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
@@ -21,4 +22,7 @@ urlpatterns = [
     path(
         "v1/authentication/verify-sms-code", VerifySmsCode.as_view(), name="VerifySmsCode"
     ),  # верфикация смс кода и создание USER
+    path(
+        "v1/authentication/get-status", GetStatusUser.as_view(), name="GetStatusUser"
+    ),  # получение статуса пользователя
 ]

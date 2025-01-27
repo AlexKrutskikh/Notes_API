@@ -29,6 +29,7 @@ class AddAnimalAPIView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
+
             animal = Animal.objects.create(
                 user=User.objects.get(id=user_id),
                 name=validate_data.get("name"),

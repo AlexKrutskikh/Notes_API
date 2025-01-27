@@ -1,0 +1,58 @@
+[
+    {
+        "model": "profiles.perks",
+        "pk": 1,
+        "fields": {
+            "name": "Homeless_Helper"
+        }
+    },
+    {
+        "model": "profiles.perks",
+        "pk": 2,
+        "fields": {
+            "name": "Pers_Helper"
+        }
+    },
+    {
+        "model": "profiles.perks",
+        "pk": 3,
+        "fields": {
+            "name": "Volunteer"
+        }
+    },
+    {
+        "model": "profiles.perks",
+        "pk": 4,
+        "fields": {
+            "name": "Shelter_Worker"
+        }
+    },
+    {
+        "model": "profiles.perks",
+        "pk": 5,
+        "fields": {
+            "name": "Pet_Owner"
+        }
+    },
+    {
+        "model": "profiles.perks",
+        "pk": 6,
+        "fields": {
+            "name": "Vet"
+        }
+    },
+    {
+        "model": "profiles.perks",
+        "pk": 7,
+        "fields": {
+            "name": "Dog_Handler"
+        }
+    },
+    {
+        "model": "profiles.perks",
+        "pk": 8,
+        "fields": {
+            "name": "Zoo_psychologist"
+        }
+    }
+]

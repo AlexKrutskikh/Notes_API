@@ -3,7 +3,7 @@ from django.core.files.base import ContentFile
 from django.core.files.storage import default_storage
 from django.core.validators import FileExtensionValidator
 
-from .models import QuestionFile
+from apps.questions.models import QuestionFile
 
 """
    Функция для сохранения и валидации файлов  в указанное место и возвратом URL-ов.
@@ -15,7 +15,7 @@ from .models import QuestionFile
 
 
 def validate_file(file):
-    max_size_mb = 2
+    max_size_mb = 10
     if file.size > max_size_mb * 1024 * 1024:
         raise ValidationError("FileTooLarge")
 
@@ -27,25 +27,20 @@ def validate_file(file):
     return file
 
 
-def save_files_to_storage(request, upload_path, user_id):
+def save_files_to_storage(request, upload_path):
     files = request.FILES.getlist("photos")
 
     if not files:
         raise ValidationError("No files uploaded")
 
-    question_files = []
+    file_paths = []
 
     for file in files:
-
         try:
-
             validate_file(file)
             file_path = default_storage.save(f"{upload_path}/{file.name}", ContentFile(file.read()))
-            question_file = QuestionFile(path=file_path, user_id=user_id)
-            question_files.append(question_file)
-
+            file_paths.append(file_path)
         except Exception:
-
             raise ValidationError(f"Invalid file: {file.name}")
 
-    return question_files
+    return file_paths

@@ -7,9 +7,9 @@ from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 
 from apps.animals.models import Animal
 from apps.auth.models import User
+from FreeVet.utils import save_files_to_storage
 
 from .models import Question, QuestionFile
-from .utils import save_files_to_storage
 from .validators import validate_question_data
 
 """Валидация данных вопроса"""
@@ -64,11 +64,13 @@ class AddPhotoQuestion(APIView):
 
         try:
 
-            question_files = save_files_to_storage(request, "question_photos", user_id)
+            file_paths = save_files_to_storage(request, "question_photos")
 
         except ValidationError as e:
 
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        question_files = [QuestionFile(path=path, user_id=user_id) for path in file_paths]
 
         created_objects = QuestionFile.objects.bulk_create(question_files)
 

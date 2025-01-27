@@ -1,17 +1,31 @@
 [tool.flake8]
 max-line-length = 120
 extend-ignore = ["E203"]
-exclude = ["venv", "migrations", "*/migrations/*"]
+exclude = [
+    "venv",
+    ".venv",
+    "migrations",
+    "*/migrations/*",
+    "*/venv/*",
+    "*/.venv/*"
+]
 
 [tool.isort]
 profile = "black"
-skip = ["venv", "migrations", "*/migrations/*"]
+skip = [
+    "venv",
+    ".venv",
+    "migrations",
+    "*/migrations/*",
+    "*/venv/*",
+    "*/.venv/*"
+]
 
 [tool.black]
 line-length = 120
 exclude = '''
 /(
-    venv
+    .*?venv
     |migrations
     |.*/migrations/.*
 )/

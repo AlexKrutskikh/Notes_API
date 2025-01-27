@@ -20,3 +20,7 @@ db.*
 
 # Ignore certificate files
 cert.*
+
+# Ignore logs
+/logs/
+*.log
