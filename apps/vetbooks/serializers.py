@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from .models import (
-    Animal,
     Appointment,
     ClinicalExamination,
     Identification,
@@ -11,13 +10,6 @@ from .models import (
     Vaccination,
     Vetbook,
 )
-
-
-class AnimalSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Animal
-        fields = ["id", "name", "species", "weight", "gender", "is_homeless"]
-
 
 class IdentificationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -99,7 +91,6 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
 
 class VetbookSerializer(serializers.ModelSerializer):
-    vetbook_animals = AnimalSerializer(many=True, read_only=True)  # Related animals
     vetbook_identifications = IdentificationSerializer(many=True, read_only=True)  # Related identifications
     vetbook_vaccinations = VaccinationSerializer(many=True, read_only=True)  # Related vaccinations
     vetbook_procedures = ProcedureSerializer(many=True, read_only=True)  # Related procedures
@@ -113,7 +104,11 @@ class VetbookSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "owner",
-            "vetbook_animals",
+            "name",
+            "species",
+            "weight",
+            "gender",
+            "is_homeless",
             "vetbook_identifications",
             "vetbook_vaccinations",
             "vetbook_procedures",

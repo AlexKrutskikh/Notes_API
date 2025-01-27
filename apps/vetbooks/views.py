@@ -29,11 +29,8 @@ class CreateVetbook(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            vetbook = Vetbook.objects.create(owner=User.objects.get(id=user_id))
-
-            Animal.objects.create(
-                vetbook=vetbook,
-                user=User.objects.get(id=user_id),
+            vetbook = Vetbook.objects.create(
+                owner=User.objects.get(id=user_id),
                 name=validated_data.get("name"),
                 species=validated_data.get("species"),
                 gender=validated_data.get("gender"),
@@ -56,7 +53,6 @@ class VetbookInfo(APIView):
         vetbook_id = request.data.get("vetbook_id", "")
         try:
             vetbook = Vetbook.objects.prefetch_related(
-                "vetbook_animals",
                 "vetbook_identifications",
                 "vetbook_vaccinations",
                 "vetbook_procedures",

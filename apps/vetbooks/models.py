@@ -5,23 +5,17 @@ from apps.profiles.models import Profile
 
 
 class Vetbook(models.Model):
-    owner = models.ForeignKey(Profile, on_delete=models.CASCADE)  # Владелец ветеринарной книжки (связь с Profile)
-
-
-class Animal(models.Model):
-
     gender_choices = [
         ("male", "male"),
         ("female", "female"),
     ]
 
-    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_animals")  # Веткнижка
+    owner = models.ForeignKey(Profile, on_delete=models.CASCADE)  # Владелец ветеринарной книжки (связь с Profile)
     name = models.CharField(max_length=20)  # Имя
     species = models.CharField(max_length=20)  # Порода
     weight = models.DecimalField(max_digits=5, decimal_places=2)  # Вес
     gender = models.CharField(max_length=10, choices=gender_choices)  # Пол
     is_homeless = models.BooleanField()  # Бездомность
-
 
 class Identification(models.Model):
     vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_identifications")  # Веткнижка
