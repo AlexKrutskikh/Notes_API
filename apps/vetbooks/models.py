@@ -48,7 +48,7 @@ class Procedure(models.Model):
 class ClinicalExamination(models.Model):
     vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="evetbook_examinations")
     examination_date = models.DateField()
-    results = models.TextField(blank=True, null=True)
+    results = models.TextField(max_length=255, blank=True, null=True)
     files_ids = models.JSONField(blank=True, null=True)
 
 
