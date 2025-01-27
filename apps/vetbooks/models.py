@@ -17,6 +17,7 @@ class Vetbook(models.Model):
     gender = models.CharField(max_length=10, choices=gender_choices)  # Пол
     is_homeless = models.BooleanField()  # Бездомность
 
+
 class Identification(models.Model):
     vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_identifications")  # Веткнижка
     chip_number = models.CharField(max_length=50, blank=True, null=True)  # Номер чипа

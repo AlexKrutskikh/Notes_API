@@ -7,7 +7,7 @@ from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 
 from apps.auth.models import User
 
-from .models import Animal, Identification, Vetbook
+from .models import Identification, Vetbook
 from .serializers import VetbookSerializer
 from .validators import validate_animal_data, validate_identification_data
 
