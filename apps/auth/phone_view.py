@@ -12,7 +12,7 @@ from twilio.base.exceptions import TwilioRestException
 from apps.auth.models import SmsCode, User
 from apps.profiles.models import Profile
 
-from .utils import generate_token_set_cookie, get_client_ip, send_sms, generate_token_and_redirect
+from .utils import get_client_ip, send_sms, generate_token_and_redirect
 from .validators import validate_phone_code
 
 """Генерация и отправки SMS-кода"""
