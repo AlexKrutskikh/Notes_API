@@ -1,8 +1,8 @@
 from django.conf import settings
+from django.http import HttpResponseRedirect
 from rest_framework_simplejwt.tokens import RefreshToken
 from social_core.exceptions import AuthException
 from twilio.rest import Client
-from django.http import HttpResponseRedirect
 
 """Отправка SMS Twilio"""
 
@@ -18,6 +18,7 @@ def send_sms(phone, verification_code):
 
 
 """Генерирует JWT-токены, устанавливает их в cookies и перенаправляет на заданный URL"""
+
 
 def generate_token_and_redirect(user, redirect_url):
 

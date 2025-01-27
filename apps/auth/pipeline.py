@@ -1,7 +1,6 @@
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
-from django.http import HttpResponseRedirect
 from django.utils import timezone
 from social_core.exceptions import AuthException
 
@@ -40,7 +39,6 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
             last_name = kwargs.get("response", {}).get("family_name", "")
 
             fields = {
-
                 "username": username,
                 "email": email,
                 "first_name": first_name,
@@ -62,7 +60,6 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
             last_name = kwargs.get("response", {}).get("name", "").rsplit(" ")[1]
 
             fields = {
-
                 "username": username,
                 "email": email,
                 "first_name": first_name,

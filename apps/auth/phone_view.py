@@ -12,7 +12,7 @@ from twilio.base.exceptions import TwilioRestException
 from apps.auth.models import SmsCode, User
 from apps.profiles.models import Profile
 
-from .utils import get_client_ip, send_sms, generate_token_and_redirect
+from .utils import generate_token_and_redirect, get_client_ip, send_sms
 from .validators import validate_phone_code
 
 """Генерация и отправки SMS-кода"""
@@ -62,6 +62,7 @@ class SendSmsCode(APIView):
 
 """Проверка смс-кода и верификации пользователя по телефону"""
 
+
 class VerifySmsCode(APIView):
 
     def post(self, request, *args, **kwargs):
@@ -95,6 +96,5 @@ class VerifySmsCode(APIView):
 
             user = User.objects.create(phone=phone, registration_time=timezone.now())
             Profile.objects.create(user=user, phone=phone, created_at=timezone.now())
-
 
         return generate_token_and_redirect(user, redirect_url=f"{settings.BASE_URL}/main/")
