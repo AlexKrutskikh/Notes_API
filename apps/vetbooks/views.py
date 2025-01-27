@@ -1,44 +1,19 @@
-from django.db import transaction
-from rest_framework import viewsets
+from django.core.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 
-from .models import (
-    ClinicalExamination,
-    ClinicVisit,
-    ExtendedTreatment,
-    Treatment,
-    Vaccination,
-    Vetbook,
-)
-from .serializers import VetbookSerializer
+"""Сохранение в БД данных о веткнижке"""
 
+class CreateVetbook(APIView):
 
-class VetbookViewSet(viewsets.ModelViewSet):
-    queryset = Vetbook.objects.all()
-    serializer_class = VetbookSerializer
+    authentication_classes = [JWTTokenUserAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        with transaction.atomic():
-            vetbook = serializer.save(owner=self.request.user.profile)
+    def post(self, request):
+        user = request.user.id
 
-            # Дополнительная логика
-            self._save_related(vetbook)
 
-    def _save_related(self, vetbook):
-        vaccinations_data = self.request.data.get("vaccinations", [])
-        treatments_data = self.request.data.get("treatments", [])
-        examinations_data = self.request.data.get("examinations", [])
-        clinic_visits_data = self.request.data.get("clinic_visits", [])
-        extended_treatments_data = self.request.data.get("extended_treatments", [])
-
-        for vaccination in vaccinations_data:
-            Vaccination.objects.create(vetbook=vetbook, **vaccination)
-        for treatment in treatments_data:
-            Treatment.objects.create(vetbook=vetbook, **treatment)
-        for examination in examinations_data:
-            ClinicalExamination.objects.create(vetbook=vetbook, **examination)
-        for visit in clinic_visits_data:
-            ClinicVisit.objects.create(vetbook=vetbook, **visit)
-        for ext_treatment in extended_treatments_data:
-            ExtendedTreatment.objects.create(vetbook=vetbook, **ext_treatment)
+        return Response({"message": "Vetbook created successfully"}, status=status.HTTP_201_CREATED)
