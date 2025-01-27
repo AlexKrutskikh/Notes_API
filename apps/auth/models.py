@@ -1,7 +1,6 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
 """Кастомный менеджер пользователей для модели CustomUser.
     Позволяет создавать пользователей и суперпользователей.
@@ -36,9 +35,34 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
+
     class UserType(models.TextChoices):
-        CLIENT = "CL", _("Client")
-        SPECIALIST = "SP", _("Specialist")
+        CLIENT = "Client"
+        SPECIALIST = "Specialist"
+
+    class UserStatus(models.TextChoices):
+        PROFILE_PREFILL = "Profile_prefill"
+        STATUS_SELECT = "Status_select"
+        VETBOOK_CREATION = "Vetbook_creation"
+        SPECIALIST_INFO_FILL = "Specialist_info_fill"
+        SPECIALIST_VERIFICATION = "Specialist_verification"
+        DONE = "Done"
+
+    USER_TYPE_STATUS_MAPPING = {
+        UserType.CLIENT: [
+            UserStatus.PROFILE_PREFILL,
+            UserStatus.STATUS_SELECT,
+            UserStatus.VETBOOK_CREATION,
+            UserStatus.DONE,
+        ],
+        UserType.SPECIALIST: [
+            UserStatus.PROFILE_PREFILL,
+            UserStatus.STATUS_SELECT,
+            UserStatus.SPECIALIST_INFO_FILL,
+            UserStatus.SPECIALIST_VERIFICATION,
+            UserStatus.DONE,
+        ],
+    }
 
     password = None
     auth_provider = models.CharField(max_length=50, default="Twilio")
@@ -48,10 +72,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=100, blank=True)
     username = models.CharField(max_length=100, blank=True)
     phone = models.CharField(max_length=50, blank=True, null=True, unique=True)
+
     type = models.CharField(
-        max_length=2,
+        max_length=10,
         choices=UserType.choices,
         default=UserType.CLIENT,
+    )
+    status = models.CharField(
+        max_length=25,
+        choices=UserStatus.choices,
+        default=UserStatus.PROFILE_PREFILL,
     )
 
     is_active = models.BooleanField(default=True)
