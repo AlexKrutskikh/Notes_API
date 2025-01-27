@@ -1,14 +1,18 @@
 from django.core.exceptions import ValidationError
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 
-from .validators import validate_identification_data
-from .models import Vetbook, Identification
+from apps.auth.models import User
+
+from .models import Animal, Identification, Vetbook
+from .serializers import VetbookSerializer
+from .validators import validate_animal_data, validate_identification_data
 
 """Сохранение в БД данных о веткнижке"""
+
 
 class CreateVetbook(APIView):
 
@@ -16,13 +20,61 @@ class CreateVetbook(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        user = request.user.id
+        user_id = request.user.id
+        data = request.data
+
+        try:
+            validated_data = validate_animal_data(data)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            vetbook = Vetbook.objects.create(owner=User.objects.get(id=user_id))
+
+            Animal.objects.create(
+                vetbook=vetbook,
+                user=User.objects.get(id=user_id),
+                name=validated_data.get("name"),
+                species=validated_data.get("species"),
+                gender=validated_data.get("gender"),
+                weight=validated_data.get("weight"),
+                is_homeless=validated_data.get("is_homeless"),
+            )
+
+            return Response(
+                {"message": "Vetbook created successfully", "vetbook_id": vetbook.id}, status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-        return Response({"message": "Vetbook created successfully"}, status=status.HTTP_201_CREATED)
-    
+class VetbookInfo(APIView):
+    authentication_classes = [JWTTokenUserAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        vetbook_id = request.data.get("vetbook_id", "")
+        try:
+            vetbook = Vetbook.objects.prefetch_related(
+                "vetbook_animals",
+                "vetbook_identifications",
+                "vetbook_vaccinations",
+                "vetbook_procedures",
+                "vetbook_examinations",
+                "vetbook_registration",
+                "vetbook_treatments",
+                "vetbook_appointments",
+            ).get(id=vetbook_id)
+
+            # Serialize the vetbook object
+            serializer = VetbookSerializer(vetbook)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 """Сохранение в БД данных о идентификации в веткнижке и возврат ее id"""
+
 
 class AddIdentification(APIView):
 
@@ -30,15 +82,15 @@ class AddIdentification(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        # CAN WE GET VETBOOK ID LIKE request.data.vetbook_id or request.data.get("vetbook_id", "")
         data = request.data
+        vetbook_id = request.data.get("vetbook_id", "")
         try:
             validated_data = validate_identification_data(data)
         except ValidationError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        
-        vetbook = Vetbook.objects.get(id=request.data.get("vetbook_id", ""))
-    
+
+        vetbook = Vetbook.objects.get(id=vetbook_id)
+
         if not vetbook:
             return Response(
                 {
@@ -46,15 +98,21 @@ class AddIdentification(APIView):
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        
+
         try:
             identification = Identification.objects.create(
                 vetbook=vetbook,
                 chip_number=validated_data.get("chip_number"),
                 clinic_name=validated_data.get("clinic_name"),
                 chip_installation_location=validated_data.get("chip_installation_location"),
-                chip_installation_date=validated_data.get("chip_installation_date")
+                chip_installation_date=validated_data.get("chip_installation_date"),
             )
-            return Response({"message": "Identification for a vetbook created successfully", "identification_id": identification.id}, status=status.HTTP_201_CREATED)
+            return Response(
+                {
+                    "message": "Identification for a vetbook created successfully",
+                    "identification_id": identification.id,
+                },
+                status=status.HTTP_201_CREATED,
+            )
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
