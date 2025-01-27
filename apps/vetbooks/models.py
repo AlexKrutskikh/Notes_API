@@ -9,6 +9,20 @@ class Vetbook(models.Model):
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE)  # Владелец ветеринарной книжки (связь с Profile)
     animal = models.ForeignKey(Animal, on_delete=models.CASCADE, related_name="animal_vetbook") # Паспорт животного (связь с Animal)
 
+class Animal(models.Model):
+
+    gender_choices = [
+        ("male", "male"),
+        ("female", "female"),
+    ]
+
+    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_identifications") # Веткнижка
+    name = models.CharField(max_length=20) # Имя
+    species = models.CharField(max_length=20) # Порода
+    weight = models.DecimalField(max_digits=5, decimal_places=2) # Вес
+    gender = models.CharField(max_length=10, choices=gender_choices) # Пол
+    is_homeless = models.BooleanField() # Бездомность
+
 class Identification(models.Model):
     vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_identifications") # Веткнижка
     chip_number = models.CharField(max_length=50, blank=True, null=True)  # Номер чипа
@@ -56,3 +70,22 @@ class Registration(models.Model):
     vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_registration") # Веткнижка
     clinic_name = models.CharField(max_length=255, blank=True, null=True) # Название клиники
     registration_number = models.CharField(max_length=50, blank=True, null=True)  # Номер регистрации
+
+
+class Treatment(models.Model):
+    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="extended_treatments")
+    medication = models.CharField(max_length=255)
+    dosage = models.CharField(max_length=100)
+    frequency = models.CharField(max_length=100)
+    start_date = models.DateField()
+    end_date = models.DateField()
+    calendar = models.JSONField(blank=True, null=True)  # Массив дат
+
+class Appointment(models.Model):
+    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_appointments")
+    clinic_name = models.CharField(max_length=255)
+    visit_date = models.DateField()
+    complaints = models.TextField(max_length=255, blank=True, null=True)
+    doctor_report = models.TextField(max_length=255, blank=True, null=True)
+    examination_files_ids = models.JSONField(blank=True, null=True)
+    other_files_ids = models.JSONField(blank=True, null=True)

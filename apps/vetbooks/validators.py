@@ -1,5 +1,35 @@
 from rest_framework.exceptions import ValidationError
 from datetime import date
+import re
+
+"""Валидация данных животного"""
+
+
+def validate_animal_data(data):
+
+    if re.search(r"\d", data.get("name", "")):
+        raise ValidationError("InvalidName")
+
+    if re.search(r"\d", data.get("species", "")):
+        raise ValidationError("InvalidSpecies")
+
+    gender = data.get("gender")
+    if gender not in ["male", "female"]:
+        raise ValidationError("InvalidGender")
+
+    weight_str = data.get("weight", "")
+    try:
+        weight = float(weight_str)
+        if weight <= 0:
+            raise ValidationError("InvalidWeight")
+    except ValueError:
+        raise ValidationError("InvalidWeight")
+
+    is_homeless = data.get("is_homeless")
+    if not isinstance(is_homeless, bool):
+        raise ValidationError("InvalidIsHomeless")
+
+    return data
 
 """
   Валидирует номер чипа, название клиники, место и дату установки чипа.
@@ -171,5 +201,99 @@ def validate_registration_data(data):
     # Validate registration_number
     if registration_number and len(registration_number) > 50:
         raise ValidationError("Registration number cannot exceed 50 characters.")
+    
+    return data
+
+
+"""
+  Валидирует поля лечения - препарат, дозировка, периодичность, начало и окончание приема, календарь.
+"""
+
+def validate_treatment_data(data):
+    medication = data.get("medication", "")
+    dosage = data.get("dosage", "")
+    frequency = data.get("frequency", "")
+    start_date = data.get("start_date", "")
+    end_date = data.get("end_date", "")
+    missed_doses = data.get("missed_doses", "")
+    calendar = data.get("calendar", [])
+
+    # Validate medication
+    if not medication or len(medication) > 255:
+        raise ValidationError("Medication must be provided and cannot exceed 255 characters.")
+    
+    # Validate dosage
+    if not dosage or len(dosage) > 100:
+        raise ValidationError("Dosage must be provided and cannot exceed 100 characters.")
+    
+    # Validate frequency
+    if not frequency or len(frequency) > 100:
+        raise ValidationError("Frequency must be provided and cannot exceed 100 characters.")
+    
+    # Validate start_date
+    if start_date:
+        try:
+            parsed_start_date = date.fromisoformat(start_date)
+            if parsed_start_date > date.today():
+                raise ValidationError("Start date cannot be in the future.")
+        except ValueError:
+            raise ValidationError("Invalid start date format. Use YYYY-MM-DD.")
+    
+    # Validate end_date
+    if end_date:
+        try:
+            parsed_end_date = date.fromisoformat(end_date)
+            if parsed_end_date < start_date:
+                raise ValidationError("End date must be after or equal to the start date.")
+        except ValueError:
+            raise ValidationError("Invalid end date format. Use YYYY-MM-DD.")
+    
+    # Validate calendar (array of dates)
+    if calendar:
+        if not isinstance(calendar, list):
+            raise ValidationError("Calendar must be a list of dates.")
+    
+    return data
+
+"""
+  Валидирует поля посещений - название клиники, дата посещения, жалобы, заключение, выписка и др. файлы.
+"""
+
+def validate_appointment_data(data):
+    clinic_name = data.get("clinic_name", "")
+    visit_date = data.get("visit_date", "")
+    complaints = data.get("complaints", "")
+    doctor_report = data.get("doctor_report", "")
+    examination_files_ids = data.get("examination_files_ids", [])
+    other_files_ids = data.get("other_files_ids", [])
+
+    # Validate clinic_name
+    if not clinic_name or len(clinic_name) > 255:
+        raise ValidationError("Clinic name must be provided and cannot exceed 255 characters.")
+    
+    # Validate visit_date
+    if visit_date:
+        try:
+            parsed_visit_date = date.fromisoformat(visit_date)
+            if parsed_visit_date > date.today():
+                raise ValidationError("Visit date cannot be in the future.")
+        except ValueError:
+            raise ValidationError("Invalid visit date format. Use YYYY-MM-DD.")
+    
+    # Validate complaints
+    if complaints and len(complaints) > 255:
+        raise ValidationError("Complaints description must be provided and cannot exceed 255 characters.")
+    
+    # Validate doctor_report
+    if doctor_report and len(doctor_report) > 255:
+        raise ValidationError("Doctor report description must be provided and cannot exceed 255 characters.")
+    
+    # Validate examination_files_ids
+    if examination_files_ids and not isinstance(examination_files_ids, list):
+        raise ValidationError("Examination files IDs must be a list.")
+    
+    # Validate other_files_ids
+    if other_files_ids and not isinstance(other_files_ids, list):
+        raise ValidationError("Other files IDs must be a list.")
     
     return data
