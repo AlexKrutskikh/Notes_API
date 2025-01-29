@@ -6,10 +6,6 @@ from django.core.exceptions import ValidationError
 
 
 def validate_animal_data(data):
-
-    if re.search(r"\d", data.get("name", "")):
-        raise ValidationError("InvalidName")
-
     if re.search(r"\d", data.get("species", "")):
         raise ValidationError("InvalidSpecies")
 
@@ -25,7 +21,7 @@ def validate_animal_data(data):
     except ValueError:
         raise ValidationError("InvalidWeight")
 
-    is_homeless = data.get("is_homeless")
+    is_homeless = data.get("isHomeless")
     if not isinstance(is_homeless, bool):
         raise ValidationError("InvalidIsHomeless")
 
