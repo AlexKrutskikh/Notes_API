@@ -32,9 +32,11 @@ def validate_create_data(data):
 
     return data
 
+
 """
   Валидирует породу, окрас, дату рождения и особые приметы
 """
+
 
 def validate_additional_description(data):
     breed = data.get("breed", "")
@@ -67,7 +69,7 @@ def validate_additional_description(data):
 
 
 """
-  Валидирует данные идентиыикации - номер чипа, название клиники, место и дату установки чипа. 
+  Валидирует данные идентиыикации - номер чипа, название клиники, место и дату установки чипа.
 """
 
 
@@ -145,9 +147,11 @@ def validate_vaccination(data):
 
     return data
 
+
 """
   Валидирует поля дегельминтизации - препарат, дату и название клиники.
 """
+
 
 def validate_deworming(data):
     deworming_drug = data.get("dewormingDrug", "")
@@ -169,6 +173,7 @@ def validate_deworming(data):
             raise ValidationError("Invalid deworming date format. Use YYYY-MM-DD.")
 
     return data
+
 
 """
   Валидирует поля обработки - препарат, дату и название клиники.

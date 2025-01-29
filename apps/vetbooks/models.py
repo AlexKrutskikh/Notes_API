@@ -1,8 +1,7 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 
-from apps.auth.models import User
 from apps.animals.models import Animal
+from apps.auth.models import User
 
 
 class Vetbook(models.Model):
@@ -12,18 +11,20 @@ class Vetbook(models.Model):
     ]
 
     owner = models.ForeignKey(User, on_delete=models.CASCADE)  # Владелец ветеринарной книжки (связь с Profile)
-    animal = models.ForeignKey(Animal, on_delete=models.CASCADE) # Животное
+    animal = models.ForeignKey(Animal, on_delete=models.CASCADE)  # Животное
     name = models.CharField(max_length=20)  # Имя
-    photosPaths = models.JSONField(blank=True, null=True) # Фото
-
+    photosPaths = models.JSONField(blank=True, null=True)  # Фото
 
 
 class AdditionalDescription(models.Model):
-    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_additionalDescription")  # Веткнижка
+    vetbook = models.ForeignKey(
+        Vetbook, on_delete=models.CASCADE, related_name="vetbook_additionalDescription"
+    )  # Веткнижка
     breed = models.CharField(max_length=20)  # Порода
-    color =  models.CharField(max_length=20)  # Окрас
+    color = models.CharField(max_length=20)  # Окрас
     birthDate = models.DateField()  # Дата рождения
     specialMarks = models.CharField(max_length=20)  # Особые приметы
+
 
 class Identification(models.Model):
     vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_identifications")  # Веткнижка
@@ -34,7 +35,9 @@ class Identification(models.Model):
 
 
 class VaccinationAgainstRabies(models.Model):
-    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_vaccinationAgainstRabies")  # Веткнижка
+    vetbook = models.ForeignKey(
+        Vetbook, on_delete=models.CASCADE, related_name="vetbook_vaccinationAgainstRabies"
+    )  # Веткнижка
     vaccine = models.CharField(max_length=20)
     series = models.CharField(max_length=20)  # Серия
     expirationDate = models.DateField()  # Срок годности
@@ -42,14 +45,18 @@ class VaccinationAgainstRabies(models.Model):
     dateOfVaccination = models.DateField()  # Дата вакцинации
     vaccineExpirationDate = models.DateField()  # Срок окончания действия
 
+
 class VaccinationOthers(models.Model):
-    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_vaccinationOthers")  # Веткнижка
+    vetbook = models.ForeignKey(
+        Vetbook, on_delete=models.CASCADE, related_name="vetbook_vaccinationOthers"
+    )  # Веткнижка
     vaccine = models.CharField(max_length=20)
     series = models.CharField(max_length=20)  # Серия
     expirationDate = models.DateField()  # Срок годности
     vaccinationClinic = models.CharField(max_length=20)  # Название клиники
     dateOfVaccination = models.DateField()  # Дата вакцинации
     vaccineExpirationDate = models.DateField()  # Срок окончания действия
+
 
 class Deworming(models.Model):
     vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_deworming")  # Веткнижка
@@ -66,10 +73,10 @@ class EctoparasiteTreatment(models.Model):
 
 
 class ClinicalExamination(models.Model):
-    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_examinations") # Веткнижка
-    date = models.DateField() # Дата осмотра
-    result = models.TextField(max_length=20) # Результаты
-    files_ids = models.JSONField(blank=True, null=True) # Файлы
+    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_examinations")  # Веткнижка
+    date = models.DateField()  # Дата осмотра
+    result = models.TextField(max_length=20)  # Результаты
+    files_ids = models.JSONField(blank=True, null=True)  # Файлы
 
 
 class Registration(models.Model):

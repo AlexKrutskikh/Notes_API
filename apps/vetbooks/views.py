@@ -5,13 +5,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 
-from apps.auth.models import User
 from apps.animals.models import Animal
+from apps.auth.models import User
+from FreeVet.utils import save_files_to_storage
 
 from .models import Vetbook
 from .validators import validate_create_data
-
-from FreeVet.utils import save_files_to_storage
 
 """Сохранение в БД данных о веткнижке"""
 
@@ -47,10 +46,7 @@ class CreateVetbook(APIView):
                 isHomeless=validated_data.get("isHomeless"),
             )
             vetbook = Vetbook.objects.create(
-                owner=user,
-                name=validated_data.get("name"),
-                animal=animal,
-                photosPaths=photos_paths
+                owner=user, name=validated_data.get("name"), animal=animal, photosPaths=photos_paths
             )
 
             return Response(
