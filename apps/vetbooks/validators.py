@@ -21,12 +21,24 @@ def validate_create_data(data):
     weight_str = data.get("weight", "")
     try:
         weight = float(weight_str)
+        data.weight = float(weight_str)
         if weight <= 0:
             raise ValidationError("InvalidWeight")
     except ValueError:
         raise ValidationError("InvalidWeight")
 
-    is_homeless = data.get("isHomeless")
+    is_homeless = data.get("is_homeless")
+    # Convert string values to boolean if needed
+    if isinstance(is_homeless, str):
+        is_homeless = is_homeless.lower()  # Convert to lowercase for consistency
+        if is_homeless in ["true", "1"]:
+            data.is_homeless = True
+            is_homeless = True
+        elif is_homeless in ["false", "0"]:
+            data.is_homeless = False
+            is_homeless = False
+        else:
+            raise ValidationError("InvalidIsHomeless")  # If not a valid boolean string
     if not isinstance(is_homeless, bool):
         raise ValidationError("InvalidIsHomeless")
 
@@ -41,8 +53,8 @@ def validate_create_data(data):
 def validate_additional_description(data):
     breed = data.get("breed", "")
     color = data.get("color", "")
-    birth_date = data.get("birthDate", "")
-    special_marks = data.get("specialMarks", "")
+    birth_date = data.get("birth_date", "")
+    special_marks = data.get("special_marks", "")
 
     # Validate breed
     if breed and len(breed) > 20:
@@ -74,9 +86,9 @@ def validate_additional_description(data):
 
 
 def validate_identification(data):
-    chip_number = data.get("chipNumber", "")
+    chip_number = data.get("chip_number", "")
     clinic = data.get("clinic", "")
-    location_install_chip = data.get("locationInstallChip", "")
+    chip_installation_location = data.get("chip_installation_location", "")
     chip_date = data.get("chipDate", "")
 
     if chip_number and len(chip_number) > 35:
@@ -85,7 +97,7 @@ def validate_identification(data):
     if clinic and len(clinic) > 20:
         raise ValidationError("Clinic name cannot exceed 20 characters.")
 
-    if location_install_chip and len(location_install_chip) > 20:
+    if chip_installation_location and len(chip_installation_location) > 20:
         raise ValidationError("Installation location cannot exceed 20 characters.")
 
     if chip_date:
@@ -107,10 +119,10 @@ def validate_identification(data):
 def validate_vaccination(data):
     vaccine = data.get("vaccine", "")
     series = data.get("series", "")
-    expiration_date = data.get("expirationDate", "")
-    vaccination_clinic = data.get("vaccinationClinic", "")
-    date_of_vaccination = data.get("dateOfVaccination", "")
-    vaccine_expiration_date = data.get("vaccineExpirationDate", "")
+    expiration_date = data.get("expiration_date", "")
+    vaccination_clinic = data.get("vaccination_clinic", "")
+    date_of_vaccination = data.get("date_of_vaccination", "")
+    vaccine_expiration_date = data.get("vaccine_expiration_date", "")
 
     if vaccine and len(vaccine) > 20:
         raise ValidationError("Vaccine name cannot exceed 20 characters.")
@@ -154,9 +166,9 @@ def validate_vaccination(data):
 
 
 def validate_deworming(data):
-    deworming_drug = data.get("dewormingDrug", "")
-    deworming_date = data.get("dewormingDate", "")
-    deworming_clinic = data.get("dewormingClinic", "")
+    deworming_drug = data.get("drug", "")
+    deworming_date = data.get("date", "")
+    deworming_clinic = data.get("clinic", "")
 
     if deworming_drug and len(deworming_drug) > 35:
         raise ValidationError("Deworming drug name cannot exceed 35 characters.")
@@ -181,9 +193,9 @@ def validate_deworming(data):
 
 
 def validate_ectoparasite_treatment(data):
-    ectoparasites_drug = data.get("ectoparasitesDrug", "")
-    ectoparasites_date = data.get("ectoparasitesDate", "")
-    ectoparasites_clinic = data.get("ectoparasitesClinic", "")
+    ectoparasites_drug = data.get("drug", "")
+    ectoparasites_date = data.get("date", "")
+    ectoparasites_clinic = data.get("clinic", "")
 
     if ectoparasites_drug and len(ectoparasites_drug) > 35:
         raise ValidationError("Ectoparasite treatment drug name cannot exceed 35 characters.")
@@ -232,7 +244,7 @@ def validate_clinical_examination(data):
 
 def validate_registration(data):
     clinic = data.get("clinic", "")
-    registration_number = data.get("registrationNumber", "")
+    registration_number = data.get("registration_number", "")
 
     if clinic and len(clinic) > 20:
         raise ValidationError("Clinic name cannot exceed 20 characters.")
@@ -241,99 +253,3 @@ def validate_registration(data):
         raise ValidationError("Registration number cannot exceed 35 characters.")
 
     return data
-
-
-# """
-#   Валидирует поля лечения - препарат, дозировка, периодичность, начало и окончание приема, календарь.
-# """
-
-
-# def validate_treatment_data(data):
-#     medication = data.get("medication", "")
-#     dosage = data.get("dosage", "")
-#     frequency = data.get("frequency", "")
-#     start_date = data.get("start_date", "")
-#     end_date = data.get("end_date", "")
-#     calendar = data.get("calendar", [])
-
-#     # Validate medication
-#     if not medication or len(medication) > 255:
-#         raise ValidationError("Medication must be provided and cannot exceed 255 characters.")
-
-#     # Validate dosage
-#     if not dosage or len(dosage) > 100:
-#         raise ValidationError("Dosage must be provided and cannot exceed 100 characters.")
-
-#     # Validate frequency
-#     if not frequency or len(frequency) > 100:
-#         raise ValidationError("Frequency must be provided and cannot exceed 100 characters.")
-
-#     # Validate start_date
-#     if start_date:
-#         try:
-#             parsed_start_date = date.fromisoformat(start_date)
-#             if parsed_start_date > date.today():
-#                 raise ValidationError("Start date cannot be in the future.")
-#         except ValueError:
-#             raise ValidationError("Invalid start date format. Use YYYY-MM-DD.")
-
-#     # Validate end_date
-#     if end_date:
-#         try:
-#             parsed_end_date = date.fromisoformat(end_date)
-#             if parsed_end_date < start_date:
-#                 raise ValidationError("End date must be after or equal to the start date.")
-#         except ValueError:
-#             raise ValidationError("Invalid end date format. Use YYYY-MM-DD.")
-
-#     # Validate calendar (array of dates)
-#     if calendar:
-#         if not isinstance(calendar, list):
-#             raise ValidationError("Calendar must be a list of dates.")
-
-#     return data
-
-
-# """
-#   Валидирует поля посещений - название клиники, дата посещения, жалобы, заключение, выписка и др. файлы.
-# """
-
-
-# def validate_appointment_data(data):
-#     clinic_name = data.get("clinic_name", "")
-#     visit_date = data.get("visit_date", "")
-#     complaints = data.get("complaints", "")
-#     doctor_report = data.get("doctor_report", "")
-#     examination_files_ids = data.get("examination_files_ids", [])
-#     other_files_ids = data.get("other_files_ids", [])
-
-#     # Validate clinic_name
-#     if not clinic_name or len(clinic_name) > 255:
-#         raise ValidationError("Clinic name must be provided and cannot exceed 255 characters.")
-
-#     # Validate visit_date
-#     if visit_date:
-#         try:
-#             parsed_visit_date = date.fromisoformat(visit_date)
-#             if parsed_visit_date > date.today():
-#                 raise ValidationError("Visit date cannot be in the future.")
-#         except ValueError:
-#             raise ValidationError("Invalid visit date format. Use YYYY-MM-DD.")
-
-#     # Validate complaints
-#     if complaints and len(complaints) > 255:
-#         raise ValidationError("Complaints description must be provided and cannot exceed 255 characters.")
-
-#     # Validate doctor_report
-#     if doctor_report and len(doctor_report) > 255:
-#         raise ValidationError("Doctor report description must be provided and cannot exceed 255 characters.")
-
-#     # Validate examination_files_ids
-#     if examination_files_ids and not isinstance(examination_files_ids, list):
-#         raise ValidationError("Examination files IDs must be a list.")
-
-#     # Validate other_files_ids
-#     if other_files_ids and not isinstance(other_files_ids, list):
-#         raise ValidationError("Other files IDs must be a list.")
-
-#     return data

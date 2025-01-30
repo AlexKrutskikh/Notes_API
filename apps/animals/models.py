@@ -15,5 +15,5 @@ class Animal(models.Model):
     species = models.CharField(max_length=20)  # Вид
     weight = models.DecimalField(max_digits=5, decimal_places=2)  # Вес
     gender = models.CharField(max_length=10, choices=gender_choices)  # Пол
-    isHomeless = models.BooleanField()  # Бездомность
+    is_homeless = models.BooleanField()  # Бездомность
     user = models.ForeignKey(User, related_name="user_animals", on_delete=models.CASCADE)
