@@ -8,6 +8,10 @@ from rest_framework.exceptions import ValidationError
 
 def validate_create_data(data):
 
+    files_ids = data.get("files_ids")
+    if not isinstance(files_ids, list):
+        raise ValidationError("InvalidFiles_ids")
+
     if re.search(r"\d", data.get("name", "")):
         raise ValidationError("InvalidName")
 
@@ -21,24 +25,12 @@ def validate_create_data(data):
     weight_str = data.get("weight", "")
     try:
         weight = float(weight_str)
-        data.weight = float(weight_str)
         if weight <= 0:
             raise ValidationError("InvalidWeight")
     except ValueError:
         raise ValidationError("InvalidWeight")
 
     is_homeless = data.get("is_homeless")
-    # Convert string values to boolean if needed
-    if isinstance(is_homeless, str):
-        is_homeless = is_homeless.lower()  # Convert to lowercase for consistency
-        if is_homeless in ["true", "1"]:
-            data.is_homeless = True
-            is_homeless = True
-        elif is_homeless in ["false", "0"]:
-            data.is_homeless = False
-            is_homeless = False
-        else:
-            raise ValidationError("InvalidIsHomeless")  # If not a valid boolean string
     if not isinstance(is_homeless, bool):
         raise ValidationError("InvalidIsHomeless")
 

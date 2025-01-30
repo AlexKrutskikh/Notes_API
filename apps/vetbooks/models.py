@@ -13,7 +13,14 @@ class Vetbook(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)  # Владелец ветеринарной книжки (связь с Profile)
     animal = models.ForeignKey(Animal, on_delete=models.CASCADE)  # Животное
     name = models.CharField(max_length=20)  # Имя
-    photos_paths = models.JSONField(blank=True, null=True)  # Фото
+    files_ids = models.JSONField(blank=True, null=True)  # Фото
+
+
+class VetbookFile(models.Model):
+    path = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, related_name="vetbook_file_user", on_delete=models.CASCADE)
+    vetbooks = models.ManyToManyField(Vetbook, related_name="vetbook_related_files", blank=True)
 
 
 class AdditionalDescription(models.Model):
