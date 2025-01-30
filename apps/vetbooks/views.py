@@ -33,7 +33,6 @@ class CreateVetbook(APIView):
 
         try:
             validated_data = validate_create_data(data)
-            print(validated_data.get("is_homeless"))
         except ValidationError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -48,8 +47,6 @@ class CreateVetbook(APIView):
             vetbook = Vetbook.objects.create(
                 owner=user, name=validated_data.get("name"), animal=animal, photos_paths=photos_paths
             )
-            print("Vetbook created successfully")
-
             return Response(
                 {"message": "Vetbook created successfully", "vetbook_id": vetbook.id}, status=status.HTTP_201_CREATED
             )

@@ -66,7 +66,9 @@ class Deworming(models.Model):
 
 
 class EctoparasiteTreatment(models.Model):
-    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_ectoparasite_treatment")  # Веткнижка
+    vetbook = models.ForeignKey(
+        Vetbook, on_delete=models.CASCADE, related_name="vetbook_ectoparasite_treatment"
+    )  # Веткнижка
     drug = models.CharField(max_length=35)  # Препарат
     date = models.DateField()  # Дата обработки
     clinic = models.CharField(max_length=35)  # Название клиники
