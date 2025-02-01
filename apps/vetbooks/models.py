@@ -13,6 +13,8 @@ class Vetbook(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE)  # Владелец ветеринарной книжки (связь с Profile)
     animal = models.ForeignKey(Animal, on_delete=models.CASCADE)  # Животное
     name = models.CharField(max_length=20)  # Имя
+    created_at = models.DateTimeField(auto_now_add=True)  # Дата создания
+    updated_at = models.DateTimeField(null=True, blank=True)  # Дата обновления
     files_ids = models.JSONField(blank=True, null=True)  # Фото
 
 

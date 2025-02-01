@@ -12,8 +12,14 @@ class Animal(models.Model):
         ("female", "female"),
     ]
 
-    species = models.CharField(max_length=20)  # Вид
-    weight = models.DecimalField(max_digits=5, decimal_places=2)  # Вес
-    gender = models.CharField(max_length=10, choices=gender_choices)  # Пол
-    is_homeless = models.BooleanField()  # Бездомность
-    user = models.ForeignKey(User, related_name="user_animals", on_delete=models.CASCADE)
+    name = models.CharField(max_length=20)
+    species = models.CharField(max_length=20)
+    weight = models.DecimalField(max_digits=5, decimal_places=2)
+    gender = models.CharField(max_length=10, choices=gender_choices)
+    is_homeless = models.BooleanField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(null=True, blank=True)
+    user = models.ForeignKey(User, related_name="animal_user", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name

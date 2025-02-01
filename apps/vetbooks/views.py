@@ -32,6 +32,7 @@ class CreateVetbook(APIView):
             user = User.objects.get(id=user_id)
             animal = Animal.objects.create(
                 user=user,
+                name=validated_data.get("name"),
                 gender=validated_data.get("gender"),
                 weight=validated_data.get("weight"),
                 is_homeless=validated_data.get("is_homeless"),
