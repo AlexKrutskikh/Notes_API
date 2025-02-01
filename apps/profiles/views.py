@@ -59,6 +59,10 @@ class EditProfile(APIView):
         user_id = request.user.id
         data = request.data
 
+        user = User.objects.get(id=user_id)
+        if user.status != "Profile_prefill":
+            return Response({"error": "Unable profile prefill"}, status=status.HTTP_400_BAD_REQUEST)
+
         try:
             validate_data = validate_user_data(data)
         except ValidationError as e:
@@ -88,9 +92,8 @@ class EditProfile(APIView):
             existing_profile.save()
 
             user = User.objects.get(id=user_id)
-            if user.status == "Profile_prefill":
-                user.status = "Status_select"
-                user.save()
+            user.status = "Status_select"
+            user.save()
 
         else:
 
@@ -115,7 +118,7 @@ class UpdatePerks(APIView):
 
         user = User.objects.get(id=user_id)
         if user.status != "Status_select":
-            return Response({"error": "Unable to select perks again"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Unable to select perks"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             valid_perk, role = validate_perk(data)
