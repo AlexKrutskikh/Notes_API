@@ -3,9 +3,9 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 
 from apps.animals.models import Animal
+from apps.auth.authentication import CookieJWTAuthentication
 from apps.auth.models import User
 from FreeVet.utils import save_files_to_storage
 
@@ -16,8 +16,7 @@ from .validators import validate_create_data
 
 
 class CreateVetbook(APIView):
-
-    authentication_classes = [JWTTokenUserAuthentication]
+    authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -52,7 +51,7 @@ class CreateVetbook(APIView):
 
 class AddPhotoToVetbook(APIView):
 
-    authentication_classes = [JWTTokenUserAuthentication]
+    authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
