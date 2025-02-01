@@ -4,8 +4,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 
+from apps.auth.authentication import CookieJWTAuthentication
 from apps.auth.models import User
 from FreeVet.utils import save_files_to_storage
 
@@ -16,8 +16,7 @@ from .validators import validate_perk, validate_user_data
 
 
 class ChangeAvatareProfile(APIView):
-
-    authentication_classes = [JWTTokenUserAuthentication]
+    authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -52,8 +51,7 @@ class ChangeAvatareProfile(APIView):
 
 
 class EditProfile(APIView):
-
-    authentication_classes = [JWTTokenUserAuthentication]
+    authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
@@ -107,8 +105,7 @@ class EditProfile(APIView):
 
 
 class UpdatePerks(APIView):
-
-    authentication_classes = [JWTTokenUserAuthentication]
+    authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):

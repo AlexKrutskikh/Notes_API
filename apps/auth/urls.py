@@ -1,12 +1,12 @@
 from django.urls import include, path
-from rest_framework_simplejwt.views import TokenRefreshView
 
+from .authentication import CustomTokenRefreshView
 from .phone_view import SendSmsCode, VerifySmsCode
 from .social_view import facebook_oauth_redirect, google_oauth_redirect
 from .status_view import GetStatusUser
 
 urlpatterns = [
-    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("token/refresh/", CustomTokenRefreshView.as_view(), name="token_refresh"),
     path(
         "social-auth/", include("social_django.urls", namespace="social")
     ),  # api бибsqlite_sequenceлиотеки social-auth-app-django
