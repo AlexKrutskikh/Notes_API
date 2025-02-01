@@ -1,7 +1,7 @@
 from django.urls import path
 
-from .views import SpecialistCreateAPIView
+from .views import AddSpecialist
 
 urlpatterns = [
-    path("v1/specialist/create/", SpecialistCreateAPIView.as_view(), name="specialist-create"),
+    path("v1/specialist/create/", AddSpecialist.as_view(), name="specialist-create"),
 ]
