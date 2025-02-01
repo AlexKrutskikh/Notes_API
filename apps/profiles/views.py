@@ -59,10 +59,6 @@ class EditProfile(APIView):
         user_id = request.user.id
         data = request.data
 
-        user = User.objects.get(id=user_id)
-        if user.status != "Profile_prefill":
-            return Response({"error": "Unable profile prefill"}, status=status.HTTP_400_BAD_REQUEST)
-
         try:
             validate_data = validate_user_data(data)
         except ValidationError as e:
