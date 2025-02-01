@@ -11,7 +11,7 @@ from apps.auth.models import User
 from .models import Specialist, SpecialistDocument
 from .validators import validate_specialist_data
 
-"""Сохранение в БД данных о животном и возврат id"""
+"""Сохранение в БД данных о специалисте"""
 
 
 class AddSpecialist(APIView):
