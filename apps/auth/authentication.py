@@ -43,8 +43,8 @@ class CustomTokenRefreshView(APIView):
             new_refresh_token = str(refresh)
 
             response = Response({"access": access_token, "refresh": new_refresh_token}, status=status.HTTP_200_OK)
-            response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="Lax")
-            response.set_cookie("refresh_token", new_refresh_token, httponly=True, secure=True, samesite="Lax")
+            response.set_cookie("access_token", access_token, httponly=True, secure=True, samesite="None")
+            response.set_cookie("refresh_token", new_refresh_token, httponly=True, secure=True, samesite="None")
 
             return response
 
