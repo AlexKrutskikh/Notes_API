@@ -69,7 +69,6 @@ class UploadSpecialistDocuments(APIView):
 
             created_objects = SpecialistDocument.objects.bulk_create(document_objects)
 
-
             for doc in created_objects:
                 doc.specialists.add(specialist)
 
