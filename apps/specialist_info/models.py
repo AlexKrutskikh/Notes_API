@@ -1,29 +1,32 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from apps.auth.models import User
 
-"""Модель данных для хранения информации о специалиста"""
+"""Модель данных для хранения информации о специалисте"""
 
 
 class Specialist(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=30)
     specialization = models.CharField(max_length=255)
     animals = models.CharField(max_length=255)
     additional_info = models.TextField(blank=True)
     telegram = models.CharField(max_length=50, unique=True)
+    user = models.OneToOneField(User, related_name="specialist", on_delete=models.CASCADE)
 
     def __str__(self):
         return f"{self.name} {self.last_name} - {self.specialization}"
 
 
-"""Модель данных для хранения информации о документах специалиста"""
+"""Модель данных для хранения файлов документов специалиста"""
 
 
 class SpecialistDocument(models.Model):
-    document = models.FileField(upload_to="documents/")
-    specialist = models.ForeignKey(Specialist, related_name="documents", on_delete=models.CASCADE)
+    path = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, related_name="specialist_file_user", on_delete=models.CASCADE)
+    specialists = models.ManyToManyField(Specialist, related_name="related_documents", blank=True)
 
     def __str__(self):
-        return f"Document for {self.specialist}"
+        return f"Document for {self.specialists.all()}"
