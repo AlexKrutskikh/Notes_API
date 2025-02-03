@@ -21,10 +21,6 @@ class CreateVetbook(APIView):
 
     def post(self, request):
         user_id = request.user.id
-        user = User.objects.get(id=user_id)
-
-        if user.status != "Vetbook_creation":
-            return Response({"error": "Unable to create a vetbook"}, status=status.HTTP_400_BAD_REQUEST)
 
         data = request.data
 
@@ -34,6 +30,7 @@ class CreateVetbook(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
+            user = User.objects.get(id=user_id)
             animal = Animal.objects.create(
                 user=user,
                 name=validated_data.get("name"),
@@ -47,8 +44,6 @@ class CreateVetbook(APIView):
                 animal=animal,
                 files_ids=validated_data.get("files_ids"),
             )
-            user.status = "Done"
-            user.save()
             return Response(
                 {"message": "Vetbook created successfully", "vetbook_id": vetbook.id}, status=status.HTTP_201_CREATED
             )
