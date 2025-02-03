@@ -5,11 +5,6 @@ from apps.auth.models import User
 
 
 class Vetbook(models.Model):
-    gender_choices = [
-        ("male", "male"),
-        ("female", "female"),
-    ]
-
     owner = models.ForeignKey(User, on_delete=models.CASCADE)  # Владелец ветеринарной книжки (связь с Profile)
     animal = models.ForeignKey(Animal, on_delete=models.CASCADE)  # Животное
     name = models.CharField(max_length=20)  # Имя
@@ -25,72 +20,76 @@ class VetbookFile(models.Model):
     vetbooks = models.ManyToManyField(Vetbook, related_name="vetbook_related_files", blank=True)
 
 
+class Vetpass(models.Model):
+    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbooks_vetpass")  # Веткнижка
+
+
 class AdditionalDescription(models.Model):
-    vetbook = models.ForeignKey(
-        Vetbook, on_delete=models.CASCADE, related_name="vetbook_additional_description"
-    )  # Веткнижка
-    breed = models.CharField(max_length=20)  # Порода
-    color = models.CharField(max_length=20)  # Окрас
-    birth_date = models.DateField()  # Дата рождения
-    special_marks = models.CharField(max_length=20)  # Особые приметы
+    vetpass = models.ForeignKey(
+        Vetpass, on_delete=models.CASCADE, related_name="vetpass_additional_description"
+    )  # Ветпаспорт
+    breed = models.CharField(max_length=20, blank=True, null=True)  # Порода
+    color = models.CharField(max_length=20, blank=True, null=True)  # Окрас
+    birth_date = models.DateField(blank=True, null=True)  # Дата рождения
+    special_marks = models.CharField(max_length=20, blank=True, null=True)  # Особые приметы
 
 
 class Identification(models.Model):
-    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_identification")  # Веткнижка
-    chip_number = models.CharField(max_length=35)  # Номер чипа
-    clinic = models.CharField(max_length=20)  # Клиника установки чипа
-    chip_installation_location = models.CharField(max_length=20)  # Место установки чипа
-    date = models.DateField()  # Дата установки чипа
+    vetpass = models.ForeignKey(Vetpass, on_delete=models.CASCADE, related_name="vetpass_identification")  # Ветпаспорт
+    chip_number = models.CharField(max_length=35, blank=True, null=True)  # Номер чипа
+    clinic = models.CharField(max_length=20, blank=True, null=True)  # Клиника установки чипа
+    chip_installation_location = models.CharField(max_length=20, blank=True, null=True)  # Место установки чипа
+    date = models.DateField(blank=True, null=True)  # Дата установки чипа
 
 
 class VaccinationAgainstRabies(models.Model):
-    vetbook = models.ForeignKey(
-        Vetbook, on_delete=models.CASCADE, related_name="vetbook_other_vaccinations"
-    )  # Веткнижка
-    vaccine = models.CharField(max_length=20)
-    series = models.CharField(max_length=20)  # Серия
-    expiration_date = models.DateField()  # Срок годности
-    vaccination_clinic = models.CharField(max_length=20)  # Название клиники
-    date_of_vaccination = models.DateField()  # Дата вакцинации
-    vaccine_expiration_date = models.DateField()  # Срок окончания действия
+    vetpass = models.ForeignKey(
+        Vetpass, on_delete=models.CASCADE, related_name="vetpass_other_vaccinations"
+    )  # Ветпаспорт
+    vaccine = models.CharField(max_length=20, blank=True, null=True)
+    series = models.CharField(max_length=20, blank=True, null=True)  # Серия
+    expiration_date = models.DateField(blank=True, null=True)  # Срок годности
+    vaccination_clinic = models.CharField(max_length=20, blank=True, null=True)  # Название клиники
+    date_of_vaccination = models.DateField(blank=True, null=True)  # Дата вакцинации
+    vaccine_expiration_date = models.DateField(blank=True, null=True)  # Срок окончания действия
 
 
 class VaccinationOthers(models.Model):
-    vetbook = models.ForeignKey(
-        Vetbook, on_delete=models.CASCADE, related_name="vetbook_vaccination_against_rabies"
-    )  # Веткнижка
-    vaccine = models.CharField(max_length=20)
-    series = models.CharField(max_length=20)  # Серия
-    expiration_date = models.DateField()  # Срок годности
-    vaccination_clinic = models.CharField(max_length=20)  # Название клиники
-    date_of_vaccination = models.DateField()  # Дата вакцинации
-    vaccine_expiration_date = models.DateField()  # Срок окончания действия
+    vetpass = models.ForeignKey(
+        Vetpass, on_delete=models.CASCADE, related_name="vetpass_vaccination_against_rabies"
+    )  # Ветпаспорт
+    vaccine = models.CharField(max_length=20, blank=True, null=True)
+    series = models.CharField(max_length=20, blank=True, null=True)  # Серия
+    expiration_date = models.DateField(blank=True, null=True)  # Срок годности
+    vaccination_clinic = models.CharField(max_length=20, blank=True, null=True)  # Название клиники
+    date_of_vaccination = models.DateField(blank=True, null=True)  # Дата вакцинации
+    vaccine_expiration_date = models.DateField(blank=True, null=True)  # Срок окончания действия
 
 
 class Deworming(models.Model):
-    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_deworming")  # Веткнижка
-    drug = models.CharField(max_length=35)  # Препарат
-    date = models.DateField()  # Дата
-    clinic = models.CharField(max_length=35)  # Название клиники
+    vetpass = models.ForeignKey(Vetpass, on_delete=models.CASCADE, related_name="vetpass_deworming")  # Ветпаспорт
+    drug = models.CharField(max_length=35, blank=True, null=True)  # Препарат
+    date = models.DateField(blank=True, null=True)  # Дата
+    clinic = models.CharField(max_length=35, blank=True, null=True)  # Название клиники
 
 
 class EctoparasiteTreatment(models.Model):
-    vetbook = models.ForeignKey(
-        Vetbook, on_delete=models.CASCADE, related_name="vetbook_ectoparasite_treatment"
-    )  # Веткнижка
-    drug = models.CharField(max_length=35)  # Препарат
-    date = models.DateField()  # Дата обработки
-    clinic = models.CharField(max_length=35)  # Название клиники
+    vetpass = models.ForeignKey(
+        Vetpass, on_delete=models.CASCADE, related_name="vetpass_ectoparasite_treatment"
+    )  # Ветпаспорт
+    drug = models.CharField(max_length=35, blank=True, null=True)  # Препарат
+    date = models.DateField(blank=True, null=True)  # Дата обработки
+    clinic = models.CharField(max_length=35, blank=True, null=True)  # Название клиники
 
 
 class ClinicalExamination(models.Model):
-    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_examinations")  # Веткнижка
-    date = models.DateField()  # Дата осмотра
-    result = models.TextField(max_length=20)  # Результаты
+    vetpass = models.ForeignKey(Vetpass, on_delete=models.CASCADE, related_name="vetpass_examinations")  # Ветпаспорт
+    date = models.DateField(blank=True, null=True)  # Дата осмотра
+    result = models.TextField(max_length=20, blank=True, null=True)  # Результаты
     files_ids = models.JSONField(blank=True, null=True)  # Файлы
 
 
 class Registration(models.Model):
-    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_registration")  # Веткнижка
-    clinic = models.CharField(max_length=20)  # Название клиники
-    registration_number = models.CharField(max_length=35)  # Номер регистрации
+    vetpass = models.ForeignKey(Vetpass, on_delete=models.CASCADE, related_name="vetpass_registration")  # Ветпаспорт
+    clinic = models.CharField(max_length=20, blank=True, null=True)  # Название клиники
+    registration_number = models.CharField(max_length=35, blank=True, null=True)  # Номер регистрации

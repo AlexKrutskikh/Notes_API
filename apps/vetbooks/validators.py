@@ -8,9 +8,13 @@ from rest_framework.exceptions import ValidationError
 
 def validate_create_data(data):
 
+    question_id = data.get("question_id")
+    if question_id and not isinstance(question_id, int):
+        raise ValidationError("InvalidQuestionId")
+
     files_ids = data.get("files_ids")
-    if not isinstance(files_ids, list):
-        raise ValidationError("InvalidFiles_ids")
+    if files_ids and not isinstance(files_ids, list):
+        raise ValidationError("InvalidFilesIds")
 
     if re.search(r"\d", data.get("name", "")):
         raise ValidationError("InvalidName")
@@ -19,19 +23,20 @@ def validate_create_data(data):
         raise ValidationError("InvalidSpecies")
 
     gender = data.get("gender")
-    if gender not in ["male", "female"]:
+    if gender and gender not in ["male", "female"]:
         raise ValidationError("InvalidGender")
 
-    weight_str = data.get("weight", "")
-    try:
-        weight = float(weight_str)
-        if weight <= 0:
+    weight_str = data.get("weight")
+    if weight_str:
+        try:
+            weight = float(weight_str)
+            if weight <= 0:
+                raise ValidationError("InvalidWeight")
+        except ValueError:
             raise ValidationError("InvalidWeight")
-    except ValueError:
-        raise ValidationError("InvalidWeight")
 
     is_homeless = data.get("is_homeless")
-    if not isinstance(is_homeless, bool):
+    if is_homeless and not isinstance(is_homeless, bool):
         raise ValidationError("InvalidIsHomeless")
 
     return data
