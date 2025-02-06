@@ -4,9 +4,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 
-from apps.auth.models import User
 from FreeVet.utils import save_files_to_storage
 
+from ..auth.models import User
 from .models import Specialist, SpecialistDocument
 
 """Сохранение в БД данных  специалиста"""
@@ -17,35 +17,38 @@ class CreateSpecialist(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        try:
-            user = User.objects.get(id=request.user.id)
-        except User.DoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
-
+        user = User.objects.get(id=request.user.id)
         data = request.data
 
-        try:
+        # Проверка на наличие специалиста
+        if hasattr(user, "specialist") and user.specialist is not None:
+            if user.specialist.status == Specialist.SPECIALIST_VERIFICATION:
+                return Response(
+                    {"error": "You cannot create a specialist profile."}, status=status.HTTP_400_BAD_REQUEST
+                )
 
-            specialist = Specialist.objects.create(
-                user=user,
-                name=data.get("name"),
-                last_name=data.get("last_name"),
-                specialization=data.get("specialization"),
-                animals=data.get("animals"),
-                telegram=data.get("telegram"),
-                additional_info=data.get("additional_info", ""),
-            )
+        # Создание нового специалиста
+        specialist = Specialist.objects.create(
+            user=user,
+            name=data.get("name"),
+            last_name=data.get("last_name"),
+            specialization=data.get("specialization"),
+            animals=data.get("animals"),
+            telegram=data.get("telegram"),
+            additional_info=data.get("additional_info", ""),
+        )
 
-            return Response(
-                {
-                    "message": "Specialist created successfully",
-                    "specialist_id": specialist.id,
-                },
-                status=status.HTTP_201_CREATED,
-            )
+        # Сменить статус на верификацию после заполнения
+        specialist.status = Specialist.SPECIALIST_VERIFICATION
+        specialist.save()
 
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {
+                "message": "Specialist created successfully",
+                "specialist_id": specialist.id,
+            },
+            status=status.HTTP_201_CREATED,
+        )
 
 
 """Сохранение в БД путей к файлам и привязка к специалисту"""
@@ -55,32 +58,32 @@ class UploadSpecialistDocuments(APIView):
     authentication_classes = [JWTTokenUserAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, specialist_id):
+    def post(self, request):
+
+        specialist_id = request.data.get("specialist_id")
+
         try:
             specialist = Specialist.objects.get(id=specialist_id)
         except Specialist.DoesNotExist:
             return Response({"error": "Specialist not found"}, status=status.HTTP_404_NOT_FOUND)
 
-        try:
+        file_paths = save_files_to_storage(request, "specialist_documents")
 
-            file_paths = save_files_to_storage(request, "specialist_documents")
+        document_objects = [SpecialistDocument(path=path, user=specialist.user) for path in file_paths]
 
-            document_objects = [SpecialistDocument(path=path, user=specialist.user) for path in file_paths]
+        created_objects = SpecialistDocument.objects.bulk_create(document_objects)
 
-            created_objects = SpecialistDocument.objects.bulk_create(document_objects)
+        # Привязка загруженных документов к специалисту
+        for doc in created_objects:
+            doc.specialists.add(specialist)
 
-            for doc in created_objects:
-                doc.specialists.add(specialist)
+        # Получение идентификаторов созданных документов
+        created_ids = [obj.id for obj in created_objects]
 
-            created_ids = [obj.id for obj in created_objects]
-
-            return Response(
-                {
-                    "message": "Documents uploaded successfully",
-                    "document_ids": created_ids,
-                },
-                status=status.HTTP_201_CREATED,
-            )
-
-        except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {
+                "message": "Documents uploaded successfully",
+                "document_ids": created_ids,
+            },
+            status=status.HTTP_201_CREATED,
+        )

@@ -6,6 +6,9 @@ from apps.auth.models import User
 
 
 class Specialist(models.Model):
+    SPECIALIST_INFO_FILL = "Specialist_info_fill"
+    SPECIALIST_VERIFICATION = "Specialist_verification"
+
     name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=30)
     specialization = models.CharField(max_length=255)
@@ -13,6 +16,7 @@ class Specialist(models.Model):
     additional_info = models.TextField(blank=True)
     telegram = models.CharField(max_length=50, unique=True)
     user = models.OneToOneField(User, related_name="specialist", on_delete=models.CASCADE)
+    status = models.CharField(max_length=50, default=SPECIALIST_INFO_FILL)
 
     def __str__(self):
         return f"{self.name} {self.last_name} - {self.specialization}"
