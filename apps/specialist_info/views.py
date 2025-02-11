@@ -4,28 +4,27 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.authentication import JWTTokenUserAuthentication
 
+from apps.auth.authentication import CookieJWTAuthentication
+from apps.auth.models import User
 from FreeVet.utils import save_files_to_storage
 
-from ..auth.models import User
 from .models import Specialist, SpecialistDocument
 
-"""Сохранение в БД данных  специалиста"""
+"""Сохранение в БД данных специалиста"""
 
 
 class CreateSpecialist(APIView):
-    authentication_classes = [JWTTokenUserAuthentication]
+    authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        user = User.objects.get(id=request.user.id)
+        user_id = request.user.id
+        user = User.objects.get(id=user_id)
         data = request.data
 
-        # Проверка на наличие специалиста
-        if hasattr(user, "specialist") and user.specialist is not None:
-            if user.specialist.status == Specialist.SPECIALIST_VERIFICATION:
-                return Response(
-                    {"error": "You cannot create a specialist profile."}, status=status.HTTP_400_BAD_REQUEST
-                )
+        # Проверка статуса перед созданием специалиста
+        if user.status != "Specialist_info_fill":
+            return Response({"error": "Unable to create a specialist profile."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Создание нового специалиста
         specialist = Specialist.objects.create(
@@ -38,9 +37,13 @@ class CreateSpecialist(APIView):
             additional_info=data.get("additional_info", ""),
         )
 
-        # Сменить статус на верификацию после заполнения
-        specialist.status = Specialist.SPECIALIST_VERIFICATION
-        specialist.save()
+        # Проверяем, если статус пользователя SPECIALIST_INFO_FILL
+        if user.status == "Specialist_info_fill":
+
+            # Обновляем статус на SPECIALIST_VERIFICATION
+            user.status = "Specialist_verification"
+            user.save()
+            return Response({"message": "User status updated to Specialist Verification."}, status=status.HTTP_200_OK)
 
         return Response(
             {
@@ -59,7 +62,6 @@ class UploadSpecialistDocuments(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-
         specialist_id = request.data.get("specialist_id")
 
         try:

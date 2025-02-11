@@ -129,7 +129,11 @@ class UpdatePerks(APIView):
         existing_profile.perks.add(*perks_to_add)
 
         user = User.objects.get(id=user_id)
-        user.status = "Vetbook_creation"
+        if role == "client":
+            user.status = "Vetbook_creation"
+        elif role == "specialist":
+            user.status = "Specialist_info_fill"
+
         user.type = role
         user.save()
 
