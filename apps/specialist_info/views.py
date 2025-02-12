@@ -58,7 +58,7 @@ class CreateSpecialist(APIView):
 
 
 class UploadSpecialistDocuments(APIView):
-    authentication_classes = [JWTTokenUserAuthentication]
+    authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
     def post(self, request):

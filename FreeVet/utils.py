@@ -20,7 +20,7 @@ def validate_file(file):
         raise ValidationError("FileTooLarge")
 
     extension_validator = FileExtensionValidator(
-        allowed_extensions=["jpg", "jpeg", "png"], message="InvalidFileExtension"
+        allowed_extensions=["jpg", "jpeg", "png","pdf"], message="InvalidFileExtension"
     )
     extension_validator(file)
 

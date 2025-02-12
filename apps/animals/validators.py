@@ -25,7 +25,7 @@ def validate_animal_data(data):
     except ValueError:
         raise ValidationError("InvalidWeight")
 
-    is_homeless = data.get("is_homeless")
+    is_homeless = data.get("isHomeless")
     if not isinstance(is_homeless, bool):
         raise ValidationError("InvalidIsHomeless")
 

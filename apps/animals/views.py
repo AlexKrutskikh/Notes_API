@@ -35,7 +35,7 @@ class AddAnimalAPIView(APIView):
                 species=validate_data.get("species"),
                 gender=validate_data.get("gender"),
                 weight=validate_data.get("weight"),
-                is_homeless=validate_data.get("is_homeless"),
+                is_homeless=validate_data.get("isHomeless"),
             )
 
             return Response({"message": "Successfully created", "id_animal": animal.id}, status=status.HTTP_201_CREATED)
