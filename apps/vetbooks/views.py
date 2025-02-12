@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -23,7 +24,7 @@ from .models import (
     VetbookFile,
     Vetpass,
 )
-from .validators import validate_create_data
+from .validators import validate_additional_description, validate_create_data
 
 """Сохранение в БД данных о веткнижке"""
 
@@ -95,6 +96,9 @@ class CreateVetbook(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
+"""Сохранение в БД файлов фотографий для веткнижки"""
+
+
 class AddPhotoToVetbook(APIView):
 
     authentication_classes = [CookieJWTAuthentication]
@@ -119,3 +123,58 @@ class AddPhotoToVetbook(APIView):
         created_ids = [obj.id for obj in created_objects]
 
         return Response({"message": "Successfully created", "file(s) ids": created_ids}, status=201)
+
+
+""" Изменение дополнительного описания в ветпаспорте """
+
+
+class EditAdditionalDescription(APIView):
+    def patch(self, request):
+        # Validate data
+        data = request.data
+        try:
+            validated_data = validate_additional_description(data)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_id = request.user.id
+        try:
+            user = User.objects.get(id=user_id)
+            vetbook = Vetbook.objects.get(id=validated_data["vetbook_id"])
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Vetbook.DoesNotExist:
+            return Response({"error": "Vetbook not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Check if the user is the owner of the vetbook
+        if user != vetbook.owner:
+            return Response({"error": "Not authoried to edit the vetbook"}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            vetpass = Vetpass.objects.get(vetbook=vetbook)
+        except Vetpass.DoesNotExist:
+            return Response({"error": "Vetpass not found for this vetbook"}, status=status.HTTP_404_NOT_FOUND)
+
+        # Get or create AdditionalDescription
+        additional_info = AdditionalDescription.objects.get(vetpass=vetpass)
+
+        # Update fields if they exist in the request
+        if "breed" in validated_data:
+            additional_info.breed = validated_data["breed"]
+        if "color" in validated_data:
+            additional_info.color = validated_data["color"]
+        if "birth_date" in validated_data:
+            additional_info.birth_date = validated_data["birth_date"]
+        if "special_marks" in validated_data:
+            additional_info.special_marks = validated_data["special_marks"]
+
+        additional_info.save()
+
+        # Update vetbook's updated_at field
+        vetbook.updated_at = now()
+        vetbook.save()
+
+        return Response(
+            {"message": "Additional information updated successfully"},
+            status=status.HTTP_200_OK,
+        )
