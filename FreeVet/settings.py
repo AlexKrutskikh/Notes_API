@@ -115,8 +115,7 @@ INSTALLED_APPS = [
     'apps.profiles',
     'apps.chats',
     'apps.specialist_info',
-    'apps.animals',
-
+    'apps.animals'
 ]
 
 AUTHENTICATION_BACKENDS = [

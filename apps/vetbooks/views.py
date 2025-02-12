@@ -1,44 +1,121 @@
-from django.db import transaction
-from rest_framework import viewsets
+from django.core.exceptions import ValidationError
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from apps.animals.models import Animal
+from apps.auth.authentication import CookieJWTAuthentication
+from apps.auth.models import User
+from apps.questions.models import Question
+from FreeVet.utils import save_files_to_storage
 
 from .models import (
+    AdditionalDescription,
     ClinicalExamination,
-    ClinicVisit,
-    ExtendedTreatment,
-    Treatment,
-    Vaccination,
+    Deworming,
+    EctoparasiteTreatment,
+    Identification,
+    Registration,
+    VaccinationAgainstRabies,
+    VaccinationOthers,
     Vetbook,
+    VetbookFile,
+    Vetpass,
 )
-from .serializers import VetbookSerializer
+from .validators import validate_create_data
+
+"""Сохранение в БД данных о веткнижке"""
 
 
-class VetbookViewSet(viewsets.ModelViewSet):
-    queryset = Vetbook.objects.all()
-    serializer_class = VetbookSerializer
+class CreateVetbook(APIView):
+    authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        with transaction.atomic():
-            vetbook = serializer.save(owner=self.request.user.profile)
+    def post(self, request):
+        user_id = request.user.id
+        user = User.objects.get(id=user_id)
+        data = request.data
 
-            # Дополнительная логика
-            self._save_related(vetbook)
+        # ONLY FOR TESTING PURPOSES
+        user.status = "Done"
 
-    def _save_related(self, vetbook):
-        vaccinations_data = self.request.data.get("vaccinations", [])
-        treatments_data = self.request.data.get("treatments", [])
-        examinations_data = self.request.data.get("examinations", [])
-        clinic_visits_data = self.request.data.get("clinic_visits", [])
-        extended_treatments_data = self.request.data.get("extended_treatments", [])
+        # Only users with status "Vetbook_creation" or "Done" are allowed to create a vetbook
+        if user.status not in ["Vetbook_creation", "Done"]:
+            return Response({"error": "Unable to create a vetbook"}, status=status.HTTP_400_BAD_REQUEST)
 
-        for vaccination in vaccinations_data:
-            Vaccination.objects.create(vetbook=vetbook, **vaccination)
-        for treatment in treatments_data:
-            Treatment.objects.create(vetbook=vetbook, **treatment)
-        for examination in examinations_data:
-            ClinicalExamination.objects.create(vetbook=vetbook, **examination)
-        for visit in clinic_visits_data:
-            ClinicVisit.objects.create(vetbook=vetbook, **visit)
-        for ext_treatment in extended_treatments_data:
-            ExtendedTreatment.objects.create(vetbook=vetbook, **ext_treatment)
+        # Check if request comes from question (includes question_id and files_ids)
+        is_from_question = True if data.get("question_id") else False
+
+        # Validate data
+        try:
+            validated_data = validate_create_data(data)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Creating vetbook from found or newly created animal
+            if is_from_question:
+                question = Question.objects.select_related("animal").get(id=validated_data.get("question_id"))
+                animal = question.animal
+                vetbook = Vetbook.objects.create(owner=user, name=validated_data.get("name"), animal=animal)
+            else:
+                animal = Animal.objects.create(
+                    user=user,
+                    name=validated_data.get("name"),
+                    gender=validated_data.get("gender"),
+                    weight=validated_data.get("weight"),
+                    is_homeless=validated_data.get("is_homeless"),
+                )
+                vetbook = Vetbook.objects.create(
+                    owner=user,
+                    name=validated_data.get("name"),
+                    animal=animal,
+                    files_ids=validated_data.get("files_ids"),
+                )
+
+            # Creating vetpass and its blank instances
+            vetpass = Vetpass.objects.create(vetbook=vetbook)
+            AdditionalDescription.objects.create(vetpass=vetpass)
+            Identification.objects.create(vetpass=vetpass)
+            VaccinationAgainstRabies.objects.create(vetpass=vetpass)
+            VaccinationOthers.objects.create(vetpass=vetpass)
+            Deworming.objects.create(vetpass=vetpass)
+            EctoparasiteTreatment.objects.create(vetpass=vetpass)
+            ClinicalExamination.objects.create(vetpass=vetpass)
+            Registration.objects.create(vetpass=vetpass)
+
+            if user.status == "Vetbook_creation":
+                user.status = "Done"
+                user.save()
+            return Response(
+                {"message": "Vetbook created successfully", "vetbook_id": vetbook.id}, status=status.HTTP_201_CREATED
+            )
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AddPhotoToVetbook(APIView):
+
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+
+        user_id = request.user.id
+
+        try:
+
+            file_paths = save_files_to_storage(request, "vetbook_photos")
+
+        except ValidationError as e:
+
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        vetbook_files = [VetbookFile(path=path, user_id=user_id) for path in file_paths]
+
+        created_objects = VetbookFile.objects.bulk_create(vetbook_files)
+
+        created_ids = [obj.id for obj in created_objects]
+
+        return Response({"message": "Successfully created", "file(s) ids": created_ids}, status=201)

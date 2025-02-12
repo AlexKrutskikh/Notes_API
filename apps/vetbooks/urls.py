@@ -1,11 +1,8 @@
-from django.urls import include, path
-from rest_framework.routers import DefaultRouter
+from django.urls import path
 
-from .views import VetbookViewSet
-
-router = DefaultRouter()
-router.register(r"vetbooks", VetbookViewSet)
+from .views import AddPhotoToVetbook, CreateVetbook
 
 urlpatterns = [
-    path("", include(router.urls)),  # Используем маршруты по умолчанию
+    path("v1/vetbook/create/", CreateVetbook.as_view(), name="create_vetbook"),
+    path("v1/upload-photo/", AddPhotoToVetbook.as_view(), name="add_vetbook_photo"),
 ]

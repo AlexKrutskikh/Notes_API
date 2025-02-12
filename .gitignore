@@ -24,3 +24,7 @@ cert.*
 # Ignore logs
 /logs/
 *.log
+
+# Ignore .DS_Store
+*/.DS_Store
+.DS_Store

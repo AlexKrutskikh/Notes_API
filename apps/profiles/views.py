@@ -88,9 +88,8 @@ class EditProfile(APIView):
             existing_profile.save()
 
             user = User.objects.get(id=user_id)
-            if user.status == "Profile_prefill":
-                user.status = "Status_select"
-                user.save()
+            user.status = "Status_select"
+            user.save()
 
         else:
 
@@ -115,7 +114,7 @@ class UpdatePerks(APIView):
 
         user = User.objects.get(id=user_id)
         if user.status != "Status_select":
-            return Response({"error": "Unable to select perks again"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Unable to select perks"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
             valid_perk, role = validate_perk(data)
