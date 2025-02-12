@@ -89,6 +89,11 @@ def validate_additional_description(data):
 
 
 def validate_identification(data):
+    # Validate vetbook id
+    vetbook_id = data.get("vetbook_id")
+    if not isinstance(vetbook_id, int):
+        raise ValidationError("InvalidVetbookId")
+
     chip_number = data.get("chip_number", "")
     clinic = data.get("clinic", "")
     chip_installation_location = data.get("chip_installation_location", "")
