@@ -28,6 +28,7 @@ from .validators import (
     validate_additional_description,
     validate_create_data,
     validate_identification,
+    validate_vaccination,
 )
 
 """Сохранение в БД данных о веткнижке"""
@@ -204,7 +205,7 @@ class EditIdentification(APIView):
         if error_response:
             return error_response  # Return error if any issue is found
 
-        # Get or create Identification
+        # Get Identification
         identification = Identification.objects.get(vetpass=vetpass)
 
         # Update fields if present in the request
@@ -219,3 +220,42 @@ class EditIdentification(APIView):
         vetbook.save()
 
         return Response({"message": "Identification information updated successfully"}, status=status.HTTP_200_OK)
+
+
+class EditVaccination(APIView):
+    def patch(self, request):
+        data = request.data
+        try:
+            validated_data = validate_vaccination(data)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        vetbook, vetpass, error_response = get_vetbook_and_vetpass(request, validated_data)
+        if error_response:
+            return error_response  # Return error if any issue is found
+
+        # Get vaccination
+        if data["type"] == "rabies":
+            vaccination = VaccinationAgainstRabies.objects.get(vetpass=vetpass)
+        else:
+            vaccination = VaccinationOthers.objects.get(vetpass=vetpass)
+
+        # Update fields if present in the request
+        for field in [
+            "vaccine",
+            "series",
+            "expiration_date",
+            "vaccination_clinic",
+            "date_of_vaccination",
+            "vaccine_expiration_date",
+        ]:
+            if field in validated_data:
+                setattr(vaccination, field, validated_data[field])
+
+        vaccination.save()
+
+        # Update vetbook's updated_at field
+        vetbook.updated_at = now()
+        vetbook.save()
+
+        return Response({"message": "Vaccination information updated successfully"}, status=status.HTTP_200_OK)

@@ -125,12 +125,22 @@ def validate_identification(data):
 
 
 def validate_vaccination(data):
+
+    # Validate vetbook id
+    vetbook_id = data.get("vetbook_id")
+    if not isinstance(vetbook_id, int):
+        raise ValidationError("InvalidVetbookId")
+
+    type = data.get("type", "")
     vaccine = data.get("vaccine", "")
     series = data.get("series", "")
     expiration_date = data.get("expiration_date", "")
     vaccination_clinic = data.get("vaccination_clinic", "")
     date_of_vaccination = data.get("date_of_vaccination", "")
     vaccine_expiration_date = data.get("vaccine_expiration_date", "")
+
+    if not type or type not in ["rabies", "other"]:
+        raise ValidationError("Unknown vaccine type")
 
     if vaccine and len(vaccine) > 20:
         raise ValidationError("Vaccine name cannot exceed 20 characters.")

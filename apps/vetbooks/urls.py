@@ -5,6 +5,7 @@ from .views import (
     CreateVetbook,
     EditAdditionalDescription,
     EditIdentification,
+    EditVaccination,
 )
 
 urlpatterns = [
@@ -12,4 +13,5 @@ urlpatterns = [
     path("v1/upload-photo/", AddPhotoToVetbook.as_view(), name="add_vetbook_photo"),
     path("v1/edit-additional-description/", EditAdditionalDescription.as_view(), name="edit_additional_description"),
     path("v1/edit-identification/", EditIdentification.as_view(), name="edit_identification"),
+    path("v1/edit-vaccination/", EditVaccination.as_view(), name="edit_vaccination"),
 ]
