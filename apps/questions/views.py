@@ -1,4 +1,6 @@
 from django.core.exceptions import ValidationError
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -19,6 +21,47 @@ class AddQuestion(APIView):
     authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="""
+        Create a new question related to an animal.
+
+        **Request Body Example:**
+        ```json
+        {
+            "text": "What should I do if my dog refuses to eat?",
+            "animal_id": 5,
+            "file_ids": [1, 2, 3]
+        }
+        ```
+        """,
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "text": openapi.Schema(type=openapi.TYPE_STRING, description="Question text (required)"),
+                "animal_id": openapi.Schema(
+                    type=openapi.TYPE_INTEGER, description="ID of the related animal (required)"
+                ),
+                "file_ids": openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Items(type=openapi.TYPE_INTEGER),
+                    description="List of uploaded file IDs (optional)",
+                ),
+            },
+            required=["text", "animal_id"],
+        ),
+        responses={
+            201: openapi.Response(
+                "Question successfully created",
+                openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "message": openapi.Schema(type=openapi.TYPE_STRING),
+                    },
+                ),
+            ),
+            400: "Bad Request - Validation Error",
+        },
+    )
     def post(self, request):
 
         user_id = request.user.id
@@ -56,6 +99,36 @@ class AddPhotoQuestion(APIView):
     authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Upload photo(s) related to a question and get their IDs.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "photos": openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Items(type=openapi.TYPE_STRING, format="binary"),
+                    description="List of image files to upload",
+                ),
+            },
+        ),
+        responses={
+            201: openapi.Response(
+                "Files successfully uploaded",
+                openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "message": openapi.Schema(type=openapi.TYPE_STRING),
+                        "ids file(s)": openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Items(type=openapi.TYPE_INTEGER),
+                            description="List of uploaded file IDs",
+                        ),
+                    },
+                ),
+            ),
+            400: "Bad Request - File Upload Error",
+        },
+    )
     def post(self, request):
 
         user_id = request.user.id

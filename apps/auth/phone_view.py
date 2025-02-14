@@ -4,6 +4,8 @@ from datetime import timedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils import timezone
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -20,6 +22,30 @@ from .validators import validate_phone_code
 
 class SendSmsCode(APIView):
 
+    @swagger_auto_schema(
+        operation_description="Send an SMS code for phone verification.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "phone": openapi.Schema(type=openapi.TYPE_STRING, description="Phone number in international format."),
+            },
+            required=["phone"],
+        ),
+        responses={
+            201: openapi.Response(
+                "SMS code sent successfully",
+                openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "type": openapi.Schema(type=openapi.TYPE_STRING, description="Operation result"),
+                        "code": openapi.Schema(type=openapi.TYPE_STRING, description="Generated SMS verification code"),
+                    },
+                ),
+            ),
+            400: openapi.Response("Bad Request - Validation Error or Rate Limit Exceeded"),
+            500: openapi.Response("Server Error - SMS Sending Failed"),
+        },
+    )
     def post(self, request, *args, **kwargs):
 
         try:
@@ -65,6 +91,32 @@ class SendSmsCode(APIView):
 
 class VerifySmsCode(APIView):
 
+    @swagger_auto_schema(
+        operation_description="Verify the SMS code for user authentication.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "phone": openapi.Schema(type=openapi.TYPE_STRING, description="Phone number used to receive the SMS."),
+                "code": openapi.Schema(type=openapi.TYPE_STRING, description="The 6-digit code received via SMS."),
+            },
+            required=["phone", "code"],
+        ),
+        responses={
+            200: openapi.Response(
+                "Verification successful",
+                openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "message": openapi.Schema(type=openapi.TYPE_STRING, description="Verification success message"),
+                        "redirect_url": openapi.Schema(
+                            type=openapi.TYPE_STRING, description="URL to redirect the user"
+                        ),
+                    },
+                ),
+            ),
+            400: openapi.Response("Bad Request - Invalid Code or Expired Code"),
+        },
+    )
     def post(self, request, *args, **kwargs):
 
         try:
