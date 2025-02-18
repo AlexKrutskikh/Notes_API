@@ -48,10 +48,16 @@ def validate_create_data(data):
 
 
 def validate_additional_description(data):
+    vetbook_id = data.get("vetbook_id")
     breed = data.get("breed", "")
     color = data.get("color", "")
     birth_date = data.get("birth_date", "")
     special_marks = data.get("special_marks", "")
+
+    # Validate vetbook id
+
+    if not isinstance(vetbook_id, int):
+        raise ValidationError("InvalidVetbookId")
 
     # Validate breed
     if breed and len(breed) > 20:
@@ -83,6 +89,11 @@ def validate_additional_description(data):
 
 
 def validate_identification(data):
+    # Validate vetbook id
+    vetbook_id = data.get("vetbook_id")
+    if not isinstance(vetbook_id, int):
+        raise ValidationError("InvalidVetbookId")
+
     chip_number = data.get("chip_number", "")
     clinic = data.get("clinic", "")
     chip_installation_location = data.get("chip_installation_location", "")
