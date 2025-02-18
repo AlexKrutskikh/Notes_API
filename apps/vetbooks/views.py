@@ -30,6 +30,7 @@ from .validators import (
     validate_additional_description,
     validate_create_data,
     validate_identification,
+    validate_vaccination,
 )
 
 """Сохранение в БД данных о веткнижке"""
@@ -230,6 +231,23 @@ def get_vetbook_and_vetpass(request, validated_data):
 
 
 class EditAdditionalDescription(APIView):
+
+    @swagger_auto_schema(
+        operation_description="Update additional description details of the vetbook.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "vetbook_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Vetbook ID"),
+                "breed": openapi.Schema(type=openapi.TYPE_STRING, description="Breed of the animal"),
+                "color": openapi.Schema(type=openapi.TYPE_STRING, description="Color of the animal"),
+                "birth_date": openapi.Schema(
+                    type=openapi.TYPE_STRING, format="date", description="Birth date (YYYY-MM-DD)"
+                ),
+                "special_marks": openapi.Schema(type=openapi.TYPE_STRING, description="Special marks"),
+            },
+        ),
+        responses={200: openapi.Response("Additional information updated successfully")},
+    )
     def patch(self, request):
         # Validate data
         data = request.data
@@ -262,7 +280,29 @@ class EditAdditionalDescription(APIView):
         )
 
 
+""" Изменение идентификации в ветпаспорте """
+
+
 class EditIdentification(APIView):
+
+    @swagger_auto_schema(
+        operation_description="Update identification details of the vetbook.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "vetbook_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Vetbook ID"),
+                "chip_number": openapi.Schema(type=openapi.TYPE_STRING, description="Microchip number"),
+                "clinic": openapi.Schema(type=openapi.TYPE_STRING, description="Clinic where chip was installed"),
+                "chip_installation_location": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Location of chip installation"
+                ),
+                "date": openapi.Schema(
+                    type=openapi.TYPE_STRING, format="date", description="Date of chip installation (YYYY-MM-DD)"
+                ),
+            },
+        ),
+        responses={200: openapi.Response("Identification information updated successfully")},
+    )
     def patch(self, request):
         data = request.data
         try:
@@ -274,7 +314,7 @@ class EditIdentification(APIView):
         if error_response:
             return error_response  # Return error if any issue is found
 
-        # Get or create Identification
+        # Get Identification
         identification = Identification.objects.get(vetpass=vetpass)
 
         # Update fields if present in the request
@@ -289,3 +329,71 @@ class EditIdentification(APIView):
         vetbook.save()
 
         return Response({"message": "Identification information updated successfully"}, status=status.HTTP_200_OK)
+
+
+""" Изменение вакцинаций в ветпаспорте """
+
+
+class EditVaccination(APIView):
+
+    @swagger_auto_schema(
+        operation_description="Update vaccination details for the vetbook.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "vetbook_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Vetbook ID"),
+                "type": openapi.Schema(type=openapi.TYPE_STRING, description="Type of vaccination (rabies or others)"),
+                "vaccine": openapi.Schema(type=openapi.TYPE_STRING, description="Vaccine name"),
+                "series": openapi.Schema(type=openapi.TYPE_STRING, description="Vaccine series"),
+                "expiration_date": openapi.Schema(
+                    type=openapi.TYPE_STRING, format="date", description="Expiration date"
+                ),
+                "vaccination_clinic": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Clinic where vaccination was administered"
+                ),
+                "date_of_vaccination": openapi.Schema(
+                    type=openapi.TYPE_STRING, format="date", description="Date of vaccination"
+                ),
+                "vaccine_expiration_date": openapi.Schema(
+                    type=openapi.TYPE_STRING, format="date", description="Vaccine expiration date"
+                ),
+            },
+        ),
+        responses={200: openapi.Response("Vaccination information updated successfully")},
+    )
+    def patch(self, request):
+        data = request.data
+        try:
+            validated_data = validate_vaccination(data)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        vetbook, vetpass, error_response = get_vetbook_and_vetpass(request, validated_data)
+        if error_response:
+            return error_response  # Return error if any issue is found
+
+        # Get vaccination
+        if data["type"] == "rabies":
+            vaccination = VaccinationAgainstRabies.objects.get(vetpass=vetpass)
+        else:
+            vaccination = VaccinationOthers.objects.get(vetpass=vetpass)
+
+        # Update fields if present in the request
+        for field in [
+            "vaccine",
+            "series",
+            "expiration_date",
+            "vaccination_clinic",
+            "date_of_vaccination",
+            "vaccine_expiration_date",
+        ]:
+            if field in validated_data:
+                setattr(vaccination, field, validated_data[field])
+
+        vaccination.save()
+
+        # Update vetbook's updated_at field
+        vetbook.updated_at = now()
+        vetbook.save()
+
+        return Response({"message": "Vaccination information updated successfully"}, status=status.HTTP_200_OK)
