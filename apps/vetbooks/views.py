@@ -1,5 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.utils.timezone import now
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
+
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -37,6 +40,47 @@ class CreateVetbook(APIView):
     authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="""
+    Create a Vetbook using either an existing question or new animal data.
+
+    **Request Body Options:**
+
+    1. **Using an Existing Question:**
+    ```json
+    {
+        "question_id": 1,
+        "name": "Druzhok"
+    }
+    ```
+
+    2. **Using New Animal Data:**
+    ```json
+    {
+        "name": "Druzhok",
+        "gender": "male",
+        "weight": 10.5,
+        "is_homeless": false,
+        "files_ids": [1, 2, 3]
+    }
+    ```
+
+    """,
+        request_body=None,  # No explicit schema, only description
+        responses={
+            201: openapi.Response(
+                "Vetbook successfully created",
+                openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "message": openapi.Schema(type=openapi.TYPE_STRING),
+                        "vetbook_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Created Vetbook ID"),
+                    },
+                ),
+            ),
+            400: "Bad Request - Validation Error",
+        },
+    )
     def post(self, request):
         user_id = request.user.id
         user = User.objects.get(id=user_id)
@@ -108,6 +152,33 @@ class AddPhotoToVetbook(APIView):
     authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "photos": openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Items(type=openapi.TYPE_STRING, format="binary"),
+                    description="List of image files to upload",
+                ),
+            },
+        ),
+        responses={
+            201: openapi.Response(
+                "Successfully created",
+                openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "message": openapi.Schema(type=openapi.TYPE_STRING),
+                        "file(s) ids": openapi.Schema(
+                            type=openapi.TYPE_ARRAY, items=openapi.Items(type=openapi.TYPE_INTEGER)
+                        ),
+                    },
+                ),
+            ),
+            400: "Bad request - Validation error",
+        },
+    )
     def post(self, request):
 
         user_id = request.user.id
