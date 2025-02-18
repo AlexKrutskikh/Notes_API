@@ -28,8 +28,12 @@ from .models import (
 )
 from .validators import (
     validate_additional_description,
+    validate_clinical_examination,
     validate_create_data,
+    validate_deworming,
+    validate_ectoparasite_treatment,
     validate_identification,
+    validate_registration,
     validate_vaccination,
 )
 
@@ -397,3 +401,184 @@ class EditVaccination(APIView):
         vetbook.save()
 
         return Response({"message": "Vaccination information updated successfully"}, status=status.HTTP_200_OK)
+
+
+class EditDeworming(APIView):
+    @swagger_auto_schema(
+        operation_description="Update deworming details of the vetbook.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "vetbook_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Vetbook ID"),
+                "drug": openapi.Schema(type=openapi.TYPE_STRING, description="Deworming drug name"),
+                "date": openapi.Schema(
+                    type=openapi.TYPE_STRING, format="date", description="Date of deworming (YYYY-MM-DD)"
+                ),
+                "clinic": openapi.Schema(type=openapi.TYPE_STRING, description="Clinic where deworming was performed"),
+            },
+        ),
+        responses={200: openapi.Response("Deworming information updated successfully")},
+    )
+    def patch(self, request):
+        data = request.data
+        try:
+            validated_data = validate_deworming(data)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        vetbook, vetpass, error_response = get_vetbook_and_vetpass(request, validated_data)
+        if error_response:
+            return error_response  # Return error if any issue is found
+
+        # Get Deworming record
+        deworming = Deworming.objects.get(vetpass=vetpass)
+
+        # Update fields if present in the request
+        for field in ["drug", "date", "clinic"]:
+            if field in validated_data:
+                setattr(deworming, field, validated_data[field])
+
+        deworming.save()
+
+        # Update vetbook's updated_at field
+        vetbook.updated_at = now()
+        vetbook.save()
+
+        return Response({"message": "Deworming information updated successfully"}, status=status.HTTP_200_OK)
+
+
+class EditEctoparasiteTreatment(APIView):
+    @swagger_auto_schema(
+        operation_description="Update ectoparasite treatment details of the vetbook.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "vetbook_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Vetbook ID"),
+                "drug": openapi.Schema(type=openapi.TYPE_STRING, description="Ectoparasite treatment drug name"),
+                "date": openapi.Schema(
+                    type=openapi.TYPE_STRING, format="date", description="Date of treatment (YYYY-MM-DD)"
+                ),
+                "clinic": openapi.Schema(type=openapi.TYPE_STRING, description="Clinic where treatment was performed"),
+            },
+        ),
+        responses={200: openapi.Response("Ectoparasite treatment information updated successfully")},
+    )
+    def patch(self, request):
+        data = request.data
+        try:
+            validated_data = validate_ectoparasite_treatment(data)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        vetbook, vetpass, error_response = get_vetbook_and_vetpass(request, validated_data)
+        if error_response:
+            return error_response  # Return error if any issue is found
+
+        # Get Ectoparasite Treatment record
+        treatment = EctoparasiteTreatment.objects.get(vetpass=vetpass)
+
+        # Update fields if present in the request
+        for field in ["drug", "date", "clinic"]:
+            if field in validated_data:
+                setattr(treatment, field, validated_data[field])
+
+        treatment.save()
+
+        # Update vetbook's updated_at field
+        vetbook.updated_at = now()
+        vetbook.save()
+
+        return Response(
+            {"message": "Ectoparasite treatment information updated successfully"}, status=status.HTTP_200_OK
+        )
+
+
+class EditClinicalExamination(APIView):
+    @swagger_auto_schema(
+        operation_description="Update clinical examination details of the vetbook.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "vetbook_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Vetbook ID"),
+                "date": openapi.Schema(
+                    type=openapi.TYPE_STRING, format="date", description="Date of examination (YYYY-MM-DD)"
+                ),
+                "result": openapi.Schema(type=openapi.TYPE_STRING, description="Examination result (max 20 chars)"),
+                "files_ids": openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Items(type=openapi.TYPE_STRING),
+                    description="List of file IDs",
+                ),
+            },
+        ),
+        responses={200: openapi.Response("Clinical examination information updated successfully")},
+    )
+    def patch(self, request):
+        data = request.data
+        try:
+            validated_data = validate_clinical_examination(data)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        vetbook, vetpass, error_response = get_vetbook_and_vetpass(request, validated_data)
+        if error_response:
+            return error_response  # Return error if any issue is found
+
+        # Get Clinical Examination record
+        examination = ClinicalExamination.objects.get(vetpass=vetpass)
+
+        # Update fields if present in the request
+        for field in ["date", "result", "files_ids"]:
+            if field in validated_data:
+                setattr(examination, field, validated_data[field])
+
+        examination.save()
+
+        # Update vetbook's updated_at field
+        vetbook.updated_at = now()
+        vetbook.save()
+
+        return Response({"message": "Clinical examination information updated successfully"}, status=status.HTTP_200_OK)
+
+
+class EditRegistration(APIView):
+    @swagger_auto_schema(
+        operation_description="Update registration details of the vetbook.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "vetbook_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Vetbook ID"),
+                "clinic": openapi.Schema(type=openapi.TYPE_STRING, description="Clinic name (max 20 chars)"),
+                "registration_number": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Registration number (max 35 chars)"
+                ),
+            },
+        ),
+        responses={200: openapi.Response("Registration information updated successfully")},
+    )
+    def patch(self, request):
+        data = request.data
+        try:
+            validated_data = validate_registration(data)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        vetbook, vetpass, error_response = get_vetbook_and_vetpass(request, validated_data)
+        if error_response:
+            return error_response  # Return error if any issue is found
+
+        # Get Registration record
+        registration = Registration.objects.get(vetpass=vetpass)
+
+        # Update fields if present in the request
+        for field in ["clinic", "registration_number"]:
+            if field in validated_data:
+                setattr(registration, field, validated_data[field])
+
+        registration.save()
+
+        # Update vetbook's updated_at field
+        vetbook.updated_at = now()
+        vetbook.save()
+
+        return Response({"message": "Registration information updated successfully"}, status=status.HTTP_200_OK)

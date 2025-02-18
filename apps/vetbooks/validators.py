@@ -184,6 +184,11 @@ def validate_vaccination(data):
 
 
 def validate_deworming(data):
+    # Validate vetbook id
+    vetbook_id = data.get("vetbook_id")
+    if not isinstance(vetbook_id, int):
+        raise ValidationError("InvalidVetbookId")
+
     deworming_drug = data.get("drug", "")
     deworming_date = data.get("date", "")
     deworming_clinic = data.get("clinic", "")
@@ -211,6 +216,11 @@ def validate_deworming(data):
 
 
 def validate_ectoparasite_treatment(data):
+    # Validate vetbook id
+    vetbook_id = data.get("vetbook_id")
+    if not isinstance(vetbook_id, int):
+        raise ValidationError("InvalidVetbookId")
+
     ectoparasites_drug = data.get("drug", "")
     ectoparasites_date = data.get("date", "")
     ectoparasites_clinic = data.get("clinic", "")
@@ -238,6 +248,11 @@ def validate_ectoparasite_treatment(data):
 
 
 def validate_clinical_examination(data):
+    # Validate vetbook id
+    vetbook_id = data.get("vetbook_id")
+    if not isinstance(vetbook_id, int):
+        raise ValidationError("InvalidVetbookId")
+
     date_value = data.get("date", "")
     result = data.get("result", "")
 
@@ -261,6 +276,11 @@ def validate_clinical_examination(data):
 
 
 def validate_registration(data):
+    # Validate vetbook id
+    vetbook_id = data.get("vetbook_id")
+    if not isinstance(vetbook_id, int):
+        raise ValidationError("InvalidVetbookId")
+
     clinic = data.get("clinic", "")
     registration_number = data.get("registration_number", "")
 
