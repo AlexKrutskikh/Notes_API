@@ -20,6 +20,9 @@ class UploadSpecialistDocuments(APIView):
         user_id = request.user.id
         user = User.objects.get(id=user_id)
 
+        if user.status != "Specialist_info_fill":
+            return Response({"error": "Unable to upload a specialist documents."}, status=status.HTTP_400_BAD_REQUEST)
+
         file_paths = save_files_to_storage(request, "specialist_documents")
 
         if not file_paths:
