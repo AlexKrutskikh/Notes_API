@@ -184,7 +184,6 @@ class AddPhotoToVetbook(APIView):
         },
     )
     def post(self, request):
-
         user_id = request.user.id
 
         try:
@@ -235,6 +234,9 @@ def get_vetbook_and_vetpass(request, validated_data):
 
 
 class EditAdditionalDescription(APIView):
+
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_description="Update additional description details of the vetbook.",
@@ -289,6 +291,9 @@ class EditAdditionalDescription(APIView):
 
 class EditIdentification(APIView):
 
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         operation_description="Update identification details of the vetbook.",
         request_body=openapi.Schema(
@@ -339,6 +344,8 @@ class EditIdentification(APIView):
 
 
 class EditVaccination(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_description="Update vaccination details for the vetbook.",
@@ -403,7 +410,13 @@ class EditVaccination(APIView):
         return Response({"message": "Vaccination information updated successfully"}, status=status.HTTP_200_OK)
 
 
+""" Изменение данных о дегельминтизации в ветпаспорте """
+
+
 class EditDeworming(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         operation_description="Update deworming details of the vetbook.",
         request_body=openapi.Schema(
@@ -447,7 +460,13 @@ class EditDeworming(APIView):
         return Response({"message": "Deworming information updated successfully"}, status=status.HTTP_200_OK)
 
 
+""" Изменение данных об обработке от паразитов в ветпаспорте """
+
+
 class EditEctoparasiteTreatment(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         operation_description="Update ectoparasite treatment details of the vetbook.",
         request_body=openapi.Schema(
@@ -493,7 +512,13 @@ class EditEctoparasiteTreatment(APIView):
         )
 
 
+""" Изменение данных о клиническом осмотре в ветпаспорте """
+
+
 class EditClinicalExamination(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         operation_description="Update clinical examination details of the vetbook.",
         request_body=openapi.Schema(
@@ -541,7 +566,13 @@ class EditClinicalExamination(APIView):
         return Response({"message": "Clinical examination information updated successfully"}, status=status.HTTP_200_OK)
 
 
+""" Изменение данных о регистрации в ветпаспорте """
+
+
 class EditRegistration(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         operation_description="Update registration details of the vetbook.",
         request_body=openapi.Schema(
