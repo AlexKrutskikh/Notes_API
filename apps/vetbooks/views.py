@@ -62,6 +62,7 @@ class CreateVetbook(APIView):
     ```json
     {
         "name": "Druzhok",
+        "species": "dog",
         "gender": "male",
         "weight": 10.5,
         "is_homeless": false,
@@ -82,7 +83,29 @@ class CreateVetbook(APIView):
                     },
                 ),
             ),
-            400: "Bad Request - Validation Error",
+            400: openapi.Response(
+                "Bad Request - Multiple Possible Errors",
+                openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "error": openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description="Possible error messages",
+                            enum=[
+                                "Unable to create a vetbook due to status",
+                                "InvalidQuestionId",
+                                "InvalidFilesIds",
+                                "InvalidName",
+                                "InvalidSpecies",
+                                "InvalidGender",
+                                "InvalidWeight",
+                                "InvalidIsHomeless"
+                                "Missing required fields",
+                            ],
+                        ),
+                    },
+                ),
+            ),
         },
     )
     def post(self, request):
@@ -95,7 +118,7 @@ class CreateVetbook(APIView):
 
         # Only users with status "Vetbook_creation" or "Done" are allowed to create a vetbook
         if user.status not in ["Vetbook_creation", "Done"]:
-            return Response({"error": "Unable to create a vetbook"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Unable to create a vetbook dut to status"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if request comes from question (includes question_id and files_ids)
         is_from_question = True if data.get("question_id") else False
@@ -116,6 +139,7 @@ class CreateVetbook(APIView):
                 animal = Animal.objects.create(
                     user=user,
                     name=validated_data.get("name"),
+                    species=validated_data.get("species"),
                     gender=validated_data.get("gender"),
                     weight=validated_data.get("weight"),
                     is_homeless=validated_data.get("is_homeless"),
@@ -348,30 +372,36 @@ class EditVaccination(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_description="Update vaccination details for the vetbook.",
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                "vetbook_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Vetbook ID"),
-                "type": openapi.Schema(type=openapi.TYPE_STRING, description="Type of vaccination (rabies or others)"),
-                "vaccine": openapi.Schema(type=openapi.TYPE_STRING, description="Vaccine name"),
-                "series": openapi.Schema(type=openapi.TYPE_STRING, description="Vaccine series"),
-                "expiration_date": openapi.Schema(
-                    type=openapi.TYPE_STRING, format="date", description="Expiration date"
-                ),
-                "vaccination_clinic": openapi.Schema(
-                    type=openapi.TYPE_STRING, description="Clinic where vaccination was administered"
-                ),
-                "date_of_vaccination": openapi.Schema(
-                    type=openapi.TYPE_STRING, format="date", description="Date of vaccination"
-                ),
-                "vaccine_expiration_date": openapi.Schema(
-                    type=openapi.TYPE_STRING, format="date", description="Vaccine expiration date"
-                ),
-            },
-        ),
-        responses={200: openapi.Response("Vaccination information updated successfully")},
-    )
+    operation_description="Update vaccination details for the vetbook.",
+    request_body=openapi.Schema(
+        type=openapi.TYPE_OBJECT,
+        properties={
+            "vetbook_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Vetbook ID"),
+            "type": openapi.Schema(
+                type=openapi.TYPE_STRING,
+                description="Type of vaccination (must be 'rabies' or 'other')",
+                enum=["rabies", "other"],  # Restrict values
+            ),
+            "vaccine": openapi.Schema(type=openapi.TYPE_STRING, description="Vaccine name"),
+            "series": openapi.Schema(type=openapi.TYPE_STRING, description="Vaccine series"),
+            "expiration_date": openapi.Schema(
+                type=openapi.TYPE_STRING, format="date", description="Expiration date"
+            ),
+            "vaccination_clinic": openapi.Schema(
+                type=openapi.TYPE_STRING, description="Clinic where vaccination was administered"
+            ),
+            "date_of_vaccination": openapi.Schema(
+                type=openapi.TYPE_STRING, format="date", description="Date of vaccination"
+            ),
+            "vaccine_expiration_date": openapi.Schema(
+                type=openapi.TYPE_STRING, format="date", description="Vaccine expiration date"
+            ),
+        },
+        required=["vetbook_id", "type", "vaccine"],  # Ensure required fields
+    ),
+    responses={200: openapi.Response("Vaccination information updated successfully")},
+)
+
     def patch(self, request):
         data = request.data
         try:
