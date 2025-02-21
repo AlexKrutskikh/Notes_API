@@ -99,8 +99,7 @@ class CreateVetbook(APIView):
                                 "InvalidSpecies",
                                 "InvalidGender",
                                 "InvalidWeight",
-                                "InvalidIsHomeless"
-                                "Missing required fields",
+                                "InvalidIsHomeless" "Missing required fields",
                             ],
                         ),
                     },
@@ -372,36 +371,35 @@ class EditVaccination(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-    operation_description="Update vaccination details for the vetbook.",
-    request_body=openapi.Schema(
-        type=openapi.TYPE_OBJECT,
-        properties={
-            "vetbook_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Vetbook ID"),
-            "type": openapi.Schema(
-                type=openapi.TYPE_STRING,
-                description="Type of vaccination (must be 'rabies' or 'other')",
-                enum=["rabies", "other"],  # Restrict values
-            ),
-            "vaccine": openapi.Schema(type=openapi.TYPE_STRING, description="Vaccine name"),
-            "series": openapi.Schema(type=openapi.TYPE_STRING, description="Vaccine series"),
-            "expiration_date": openapi.Schema(
-                type=openapi.TYPE_STRING, format="date", description="Expiration date"
-            ),
-            "vaccination_clinic": openapi.Schema(
-                type=openapi.TYPE_STRING, description="Clinic where vaccination was administered"
-            ),
-            "date_of_vaccination": openapi.Schema(
-                type=openapi.TYPE_STRING, format="date", description="Date of vaccination"
-            ),
-            "vaccine_expiration_date": openapi.Schema(
-                type=openapi.TYPE_STRING, format="date", description="Vaccine expiration date"
-            ),
-        },
-        required=["vetbook_id", "type", "vaccine"],  # Ensure required fields
-    ),
-    responses={200: openapi.Response("Vaccination information updated successfully")},
-)
-
+        operation_description="Update vaccination details for the vetbook.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "vetbook_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Vetbook ID"),
+                "type": openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description="Type of vaccination (must be 'rabies' or 'other')",
+                    enum=["rabies", "other"],  # Restrict values
+                ),
+                "vaccine": openapi.Schema(type=openapi.TYPE_STRING, description="Vaccine name"),
+                "series": openapi.Schema(type=openapi.TYPE_STRING, description="Vaccine series"),
+                "expiration_date": openapi.Schema(
+                    type=openapi.TYPE_STRING, format="date", description="Expiration date"
+                ),
+                "vaccination_clinic": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Clinic where vaccination was administered"
+                ),
+                "date_of_vaccination": openapi.Schema(
+                    type=openapi.TYPE_STRING, format="date", description="Date of vaccination"
+                ),
+                "vaccine_expiration_date": openapi.Schema(
+                    type=openapi.TYPE_STRING, format="date", description="Vaccine expiration date"
+                ),
+            },
+            required=["vetbook_id", "type", "vaccine"],  # Ensure required fields
+        ),
+        responses={200: openapi.Response("Vaccination information updated successfully")},
+    )
     def patch(self, request):
         data = request.data
         try:
