@@ -137,7 +137,6 @@ class CreateVetbook(APIView):
             else:
                 animal = Animal.objects.create(
                     user=user,
-                    name=validated_data.get("name"),
                     species=validated_data.get("species"),
                     gender=validated_data.get("gender"),
                     weight=validated_data.get("weight"),
