@@ -1,9 +1,9 @@
 name: Deploy to Server
 
 on:
-  pull_request:
+  push:
     branches:
-      - dev
+      - dev  # Workflow будет запускаться после слияния PR в ветку dev
 
 jobs:
   deploy:
@@ -16,7 +16,7 @@ jobs:
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.5.4
         with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
 
       - name: Deploy to Server
         run: |
