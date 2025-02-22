@@ -1,7 +1,7 @@
 name: Deploy to Server
 
 on:
-  push:
+  pull_request:
     branches:
       - dev
 
@@ -13,23 +13,29 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup SSH for Server Access
+      - name: Setup SSH
         uses: webfactory/ssh-agent@v0.5.4
         with:
           ssh-private-key: ${{ secrets.DEPLOY_KEY }}
 
-      - name: Add GitHub to known_hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no kruts@34.34.29.241 "
+            # Переходим в каталог проекта
             cd /home/kruts/FreeVetbackend &&
-            git remote set-url origin git@github.com:AlexKrutskikh/freevet-backend.git &&
+            
+            # Настройка удаленного репозитория на HTTPS
+            git remote set-url origin https://github.com/yourusername/your-repository.git &&
+            
+            # Настройка аутентификации через персональный токен GitHub
+            echo 'https://yourusername:${{ secrets.GIT_TOKEN}}@github.com/yourusername/your-repository.git' > ~/.git-credentials &&
+            git config --global credential.helper store &&
+            
+            # Получаем последние изменения с ветки dev
             git fetch origin dev &&
             git reset --hard origin/dev &&
+            
+            # Останавливаем и пересоздаем контейнеры Docker
             docker-compose down &&
             docker-compose up -d --build
           "
