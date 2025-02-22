@@ -1,22 +1,32 @@
+name: Deploy to Server
+
 on:
-  push:
+  workflow_run:
+    workflows: ["check.yml"]
+    types:
+      - completed
+    branches:
+      - dev
 
 jobs:
-  checks-source-code:
-    timeout-minutes: 15
-    runs-on: ubuntu-22.04
+  deploy:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.5.4
         with:
-         python-version: '3.13'
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+          ssh-key-passphrase: ${{ secrets.DEPLOY_KEY_PASSPHRASE }}
 
-      - name: Install dependencies
-        run: make deps
-
-      - name: Run linters
-        run: make lint
+      - name: Deploy to Server
+        run: |
+          ssh -o StrictHostKeyChecking=no kruts@34.34.29.241 "
+            cd /home/kruts/FreeVetbackend &&
+            git pull &&
+            docker-compose down &&
+            docker-compose up -d --build
+          "
