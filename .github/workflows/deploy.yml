@@ -5,6 +5,8 @@ on:
     workflows: ["check.yml"]
     types:
       - completed
+    branches:
+      - dev
 
 jobs:
   deploy:
