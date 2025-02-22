@@ -1,10 +1,9 @@
 name: Deploy to Server
 
 on:
-  push:
+  pull_request:
     branches:
       - dev
-
 
 jobs:
   deploy:
@@ -17,14 +16,14 @@ jobs:
       - name: Setup SSH
         uses: webfactory/ssh-agent@v0.5.4
         with:
-          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
-
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no kruts@34.34.29.241 "
             cd /home/kruts/FreeVetbackend &&
-            git pull &&
+            git fetch origin dev &&
+            git reset --hard origin/dev &&
             docker-compose down &&
             docker-compose up -d --build
           "
