@@ -22,6 +22,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no kruts@34.34.29.241 "
             cd /home/kruts/FreeVetbackend &&
+            git remote set-url origin git@github.com:AlexKrutskikh/freevet-backend.git &&
             git fetch origin dev &&
             git reset --hard origin/dev &&
             docker-compose down &&
