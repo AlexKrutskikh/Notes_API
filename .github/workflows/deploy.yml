@@ -25,10 +25,10 @@ jobs:
             cd /home/kruts/FreeVetbackend &&
             
             # Настройка удаленного репозитория на HTTPS
-            git remote set-url origin https://github.com/yourusername/your-repository.git &&
+            git remote set-url origin https://github.com/tail-book/freevet-backend.git &&
             
             # Настройка аутентификации через персональный токен GitHub
-            echo 'https://yourusername:${{ secrets.GIT_TOKEN}}@github.com/yourusername/your-repository.git' > ~/.git-credentials &&
+            echo 'https://yourusername:${{ secrets.GIT_TOKEN}}@github.com/tail-book/freevet-backend.git' > ~/.git-credentials &&
             git config --global credential.helper store &&
             
             # Получаем последние изменения с ветки dev
