@@ -19,6 +19,7 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.DEPLOY_KEY }}
 
+
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no kruts@34.34.29.241 "
