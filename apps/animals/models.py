@@ -12,7 +12,6 @@ class Animal(models.Model):
         ("female", "female"),
     ]
 
-    name = models.CharField(max_length=20)
     species = models.CharField(max_length=20)
     weight = models.DecimalField(max_digits=5, decimal_places=2)
     gender = models.CharField(max_length=10, choices=gender_choices)

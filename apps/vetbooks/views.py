@@ -62,6 +62,7 @@ class CreateVetbook(APIView):
     ```json
     {
         "name": "Druzhok",
+        "species": "dog",
         "gender": "male",
         "weight": 10.5,
         "is_homeless": false,
@@ -82,7 +83,28 @@ class CreateVetbook(APIView):
                     },
                 ),
             ),
-            400: "Bad Request - Validation Error",
+            400: openapi.Response(
+                "Bad Request - Multiple Possible Errors",
+                openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "error": openapi.Schema(
+                            type=openapi.TYPE_STRING,
+                            description="Possible error messages",
+                            enum=[
+                                "Unable to create a vetbook due to status",
+                                "InvalidQuestionId",
+                                "InvalidFilesIds",
+                                "InvalidName",
+                                "InvalidSpecies",
+                                "InvalidGender",
+                                "InvalidWeight",
+                                "InvalidIsHomeless" "Missing required fields",
+                            ],
+                        ),
+                    },
+                ),
+            ),
         },
     )
     def post(self, request):
@@ -95,7 +117,7 @@ class CreateVetbook(APIView):
 
         # Only users with status "Vetbook_creation" or "Done" are allowed to create a vetbook
         if user.status not in ["Vetbook_creation", "Done"]:
-            return Response({"error": "Unable to create a vetbook"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Unable to create a vetbook dut to status"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Check if request comes from question (includes question_id and files_ids)
         is_from_question = True if data.get("question_id") else False
@@ -115,7 +137,7 @@ class CreateVetbook(APIView):
             else:
                 animal = Animal.objects.create(
                     user=user,
-                    name=validated_data.get("name"),
+                    species=validated_data.get("species"),
                     gender=validated_data.get("gender"),
                     weight=validated_data.get("weight"),
                     is_homeless=validated_data.get("is_homeless"),
@@ -184,7 +206,6 @@ class AddPhotoToVetbook(APIView):
         },
     )
     def post(self, request):
-
         user_id = request.user.id
 
         try:
@@ -235,6 +256,9 @@ def get_vetbook_and_vetpass(request, validated_data):
 
 
 class EditAdditionalDescription(APIView):
+
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_description="Update additional description details of the vetbook.",
@@ -289,6 +313,9 @@ class EditAdditionalDescription(APIView):
 
 class EditIdentification(APIView):
 
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         operation_description="Update identification details of the vetbook.",
         request_body=openapi.Schema(
@@ -339,6 +366,8 @@ class EditIdentification(APIView):
 
 
 class EditVaccination(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_description="Update vaccination details for the vetbook.",
@@ -346,7 +375,11 @@ class EditVaccination(APIView):
             type=openapi.TYPE_OBJECT,
             properties={
                 "vetbook_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Vetbook ID"),
-                "type": openapi.Schema(type=openapi.TYPE_STRING, description="Type of vaccination (rabies or others)"),
+                "type": openapi.Schema(
+                    type=openapi.TYPE_STRING,
+                    description="Type of vaccination (must be 'rabies' or 'other')",
+                    enum=["rabies", "other"],  # Restrict values
+                ),
                 "vaccine": openapi.Schema(type=openapi.TYPE_STRING, description="Vaccine name"),
                 "series": openapi.Schema(type=openapi.TYPE_STRING, description="Vaccine series"),
                 "expiration_date": openapi.Schema(
@@ -362,6 +395,7 @@ class EditVaccination(APIView):
                     type=openapi.TYPE_STRING, format="date", description="Vaccine expiration date"
                 ),
             },
+            required=["vetbook_id", "type", "vaccine"],  # Ensure required fields
         ),
         responses={200: openapi.Response("Vaccination information updated successfully")},
     )
@@ -403,7 +437,13 @@ class EditVaccination(APIView):
         return Response({"message": "Vaccination information updated successfully"}, status=status.HTTP_200_OK)
 
 
+""" Изменение данных о дегельминтизации в ветпаспорте """
+
+
 class EditDeworming(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         operation_description="Update deworming details of the vetbook.",
         request_body=openapi.Schema(
@@ -447,7 +487,13 @@ class EditDeworming(APIView):
         return Response({"message": "Deworming information updated successfully"}, status=status.HTTP_200_OK)
 
 
+""" Изменение данных об обработке от паразитов в ветпаспорте """
+
+
 class EditEctoparasiteTreatment(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         operation_description="Update ectoparasite treatment details of the vetbook.",
         request_body=openapi.Schema(
@@ -493,7 +539,13 @@ class EditEctoparasiteTreatment(APIView):
         )
 
 
+""" Изменение данных о клиническом осмотре в ветпаспорте """
+
+
 class EditClinicalExamination(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         operation_description="Update clinical examination details of the vetbook.",
         request_body=openapi.Schema(
@@ -541,7 +593,13 @@ class EditClinicalExamination(APIView):
         return Response({"message": "Clinical examination information updated successfully"}, status=status.HTTP_200_OK)
 
 
+""" Изменение данных о регистрации в ветпаспорте """
+
+
 class EditRegistration(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         operation_description="Update registration details of the vetbook.",
         request_body=openapi.Schema(
