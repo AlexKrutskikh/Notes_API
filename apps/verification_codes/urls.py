@@ -1,8 +1,8 @@
 from django.urls import path
 
-from .views import UpdateVerifyCodeView, VerifyCodeVetView
+from .views import GenerateVerificationCode, VerifySpecialist
 
 urlpatterns = [
-    path("update_verify_code/", UpdateVerifyCodeView.as_view(), name="Update_VerifyCode"),
-    path("verify_code_vet/", VerifyCodeVetView.as_view(), name="verify_code_vet"),
+    path("generate-code/", GenerateVerificationCode.as_view(), name="generate-verification-code"),
+    path("verify-specialist/", VerifySpecialist.as_view(), name="verify-specialist"),
 ]
