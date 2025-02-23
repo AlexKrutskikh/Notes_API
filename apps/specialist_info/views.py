@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -18,20 +19,16 @@ class UploadSpecialistDocuments(APIView):
 
     def post(self, request):
         user_id = request.user.id
-        user = User.objects.get(id=user_id)
 
-        if user.status != "Specialist_info_fill":
-            return Response({"error": "Unable to upload a specialist documents."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            file_paths = save_files_to_storage(request, "specialist_documents")
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        file_paths = save_files_to_storage(request, "specialist_documents")
-
-        if not file_paths:
-            return Response({"error": "No files uploaded."}, status=status.HTTP_400_BAD_REQUEST)
-
-        document_objects = [SpecialistDocument(path=path, user=user) for path in file_paths]
+        # Создание документов в базе данных
+        document_objects = [SpecialistDocument(path=path, user_id=user_id) for path in file_paths]
         created_objects = SpecialistDocument.objects.bulk_create(document_objects)
 
-        # Получение идентификаторов созданных документов
         created_ids = [obj.id for obj in created_objects]
 
         return Response(
@@ -73,13 +70,14 @@ class CreateSpecialist(APIView):
         )
 
         # Привязка документов к специалисту
-        documents = SpecialistDocument.objects.filter(id__in=document_ids, user=user)
+        documents = SpecialistDocument.objects.filter(id__in=document_ids)
 
         if not documents:
             return Response({"error": "No valid documents found."}, status=status.HTTP_400_BAD_REQUEST)
 
         for doc in documents:
-            doc.specialists.add(specialist)
+            doc.specialist = specialist
+            doc.save()
 
         # Обновление статуса пользователя
         user.status = "Specialist_verification"
