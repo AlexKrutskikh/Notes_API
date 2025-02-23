@@ -1,10 +1,7 @@
-name: Deploy to Server
-
 on:
   push:
     branches:
       - dev
-
 
 jobs:
   deploy:
@@ -22,21 +19,15 @@ jobs:
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no kruts@34.34.29.241 "
-            # Переходим в каталог проекта
+
             cd /home/kruts/FreeVetbackend &&
-            
-            # Настройка удаленного репозитория на HTTPS
             git remote set-url origin https://github.com/tail-book/freevet-backend.git &&
-            
-            # Настройка аутентификации через персональный токен GitHub
             echo 'https://yourusername:${{ secrets.GIT_TOKEN}}@github.com/tail-book/freevet-backend.git' > ~/.git-credentials &&
             git config --global credential.helper store &&
-            
-            # Получаем последние изменения с ветки dev
+        
             git fetch origin dev &&
             git reset --hard origin/dev &&
             
-            # Останавливаем и пересоздаем контейнеры Docker
             docker-compose down &&
             docker-compose up -d --build
           "
