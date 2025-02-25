@@ -89,6 +89,13 @@ class ClinicalExamination(models.Model):
     files_ids = models.JSONField(blank=True, null=True)  # Файлы
 
 
+class ClinicalExaminationFile(models.Model):
+    path = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, related_name="user_clinical_examination_files", on_delete=models.CASCADE)
+    examination = models.ManyToManyField(ClinicalExamination, related_name="examination_files", blank=True)
+
+
 class Registration(models.Model):
     vetpass = models.ForeignKey(Vetpass, on_delete=models.CASCADE, related_name="vetpass_registration")  # Ветпаспорт
     clinic = models.CharField(max_length=20, blank=True, null=True)  # Название клиники
@@ -118,4 +125,4 @@ class AppointmentFile(models.Model):
     path = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, related_name="user_appointment_files", on_delete=models.CASCADE)
-    vetbooks = models.ManyToManyField(Appointment, related_name="appointment_related_files", blank=True)
+    appointment = models.ManyToManyField(Appointment, related_name="appointment_related_files", blank=True)

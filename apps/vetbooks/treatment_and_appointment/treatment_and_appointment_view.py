@@ -9,8 +9,8 @@ from rest_framework.views import APIView
 from apps.auth.authentication import CookieJWTAuthentication
 from FreeVet.utils import save_files_to_storage
 
-from .models import Appointment, AppointmentFile, Treatment, Vetbook
-from .validators import validate_appointment_data, validate_treatment_data
+from ..models import Appointment, AppointmentFile, Treatment, Vetbook
+from ..validators import validate_appointment_data, validate_treatment_data
 
 """Создание лечения в веткнижке"""
 
@@ -246,6 +246,7 @@ class AddFileToAppointment(APIView):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
+                "appointment_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Appointment ID"),
                 "files": openapi.Schema(
                     type=openapi.TYPE_ARRAY,
                     items=openapi.Items(type=openapi.TYPE_STRING, format="binary"),
@@ -279,12 +280,20 @@ class AddFileToAppointment(APIView):
         except ValidationError as e:
 
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
+        appointment = Appointment.objects.get(id=request.data.get("appointment_id"))
         appointment_files = [AppointmentFile(path=path, user_id=user_id) for path in file_paths]
 
         AppointmentFile.objects.bulk_create(appointment_files)
 
-        created_ids = list(AppointmentFile.objects.filter(user_id=user_id).order_by("-id")[:len(file_paths)].values_list("id", flat=True))
+        appointment_files_instances = AppointmentFile.objects.filter(path__in=file_paths)
+
+        appointment.appointment_related_files.set(appointment_files_instances)
+
+        created_ids = list(
+            AppointmentFile.objects.filter(user_id=user_id)
+            .order_by("-id")[: len(file_paths)]
+            .values_list("id", flat=True)
+        )
 
         return Response({"message": "Successfully created", "file(s) ids": created_ids}, status=201)
 

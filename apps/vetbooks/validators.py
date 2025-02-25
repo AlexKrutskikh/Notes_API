@@ -49,15 +49,19 @@ def validate_create_data(data):
 
 def validate_additional_description(data):
     vetbook_id = data.get("vetbook_id")
+    additional_information_id = data.get("additional_information_id")
     breed = data.get("breed", "")
     color = data.get("color", "")
     birth_date = data.get("birth_date", "")
     special_marks = data.get("special_marks", "")
 
     # Validate vetbook id
-
     if not isinstance(vetbook_id, int):
         raise ValidationError("InvalidVetbookId")
+
+    # Validate additional information id
+    if not isinstance(additional_information_id, int):
+        raise ValidationError("InvalidAdditionalInformationId")
 
     # Validate breed
     if breed and len(breed) > 20:
@@ -93,6 +97,10 @@ def validate_identification(data):
     vetbook_id = data.get("vetbook_id")
     if not isinstance(vetbook_id, int):
         raise ValidationError("InvalidVetbookId")
+    # Validate identification id
+    identification_id = data.get("identification_id")
+    if identification_id and not isinstance(identification_id, int):
+        raise ValidationError("InvalidIdentificationId")
 
     chip_number = data.get("chip_number", "")
     clinic = data.get("clinic", "")
@@ -130,6 +138,10 @@ def validate_vaccination(data):
     vetbook_id = data.get("vetbook_id")
     if not isinstance(vetbook_id, int):
         raise ValidationError("InvalidVetbookId")
+    # Validate vaccination id
+    vaccination_id = data.get("vaccination_id")
+    if vaccination_id and not isinstance(vaccination_id, int):
+        raise ValidationError("InvalidVaccinationId")
 
     type = data.get("type", "")
     vaccine = data.get("vaccine", "")
@@ -188,6 +200,10 @@ def validate_deworming(data):
     vetbook_id = data.get("vetbook_id")
     if not isinstance(vetbook_id, int):
         raise ValidationError("InvalidVetbookId")
+    # Validate deworming id
+    deworming_id = data.get("deworming_id")
+    if deworming_id and not isinstance(deworming_id, int):
+        raise ValidationError("InvalidDewormingId")
 
     deworming_drug = data.get("drug", "")
     deworming_date = data.get("date", "")
@@ -220,6 +236,10 @@ def validate_ectoparasite_treatment(data):
     vetbook_id = data.get("vetbook_id")
     if not isinstance(vetbook_id, int):
         raise ValidationError("InvalidVetbookId")
+    # Validate ectoparasite_treatment id
+    ectoparasite_treatment_id = data.get("ectoparasite_treatment_id")
+    if ectoparasite_treatment_id and not isinstance(ectoparasite_treatment_id, int):
+        raise ValidationError("InvalidEctoparasiteTreatmentId")
 
     ectoparasites_drug = data.get("drug", "")
     ectoparasites_date = data.get("date", "")
@@ -252,9 +272,14 @@ def validate_clinical_examination(data):
     vetbook_id = data.get("vetbook_id")
     if not isinstance(vetbook_id, int):
         raise ValidationError("InvalidVetbookId")
+    # Validate clinical_examination id
+    clinical_examination_id = data.get("clinical_examination_id")
+    if clinical_examination_id and not isinstance(clinical_examination_id, int):
+        raise ValidationError("InvalidClinicalExaminationId")
 
     date_value = data.get("date", "")
     result = data.get("result", "")
+    files_ids = data.get("files_ids", "")
 
     if result and len(result) > 20:
         raise ValidationError("Result cannot exceed 20 characters.")
@@ -266,6 +291,11 @@ def validate_clinical_examination(data):
                 raise ValidationError("Examination date cannot be in the future.")
         except ValueError:
             raise ValidationError("Invalid examination date format. Use YYYY-MM-DD.")
+
+    # Validate files_ids
+    if files_ids:
+        if not isinstance(data["files_ids"], list):
+            raise ValidationError("files_ids must be a list of file IDs.")
 
     return data
 
@@ -280,6 +310,10 @@ def validate_registration(data):
     vetbook_id = data.get("vetbook_id")
     if not isinstance(vetbook_id, int):
         raise ValidationError("InvalidVetbookId")
+    # Validate registration id
+    registration_id = data.get("registration_id")
+    if registration_id and not isinstance(registration_id, int):
+        raise ValidationError("InvalidRegistrationId")
 
     clinic = data.get("clinic", "")
     registration_number = data.get("registration_number", "")
@@ -309,7 +343,7 @@ def validate_treatment_data(data):
     # Validate vetbook_id
     if "vetbook_id" in data and not isinstance(data["vetbook_id"], int):
         raise ValidationError("vetbook_id must be an integer.")
-    
+
     # Validate treatment_id
     if "treatment_id" in data and not isinstance(data["treatment_id"], int):
         raise ValidationError("treatment_id must be an integer.")
@@ -353,7 +387,7 @@ def validate_appointment_data(data):
     # Validate vetbook_id
     if "vetbook_id" in data and not isinstance(data["vetbook_id"], int):
         raise ValidationError("vetbook_id must be an integer.")
-    
+
     # Validate appointment_id
     if "appointment_id" in data and not isinstance(data["appointment_id"], int):
         raise ValidationError("appointment_id must be an integer.")
