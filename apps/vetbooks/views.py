@@ -17,7 +17,6 @@ from FreeVet.utils import save_files_to_storage
 
 from .models import (
     AppointmentFile,
-    ClinicalExaminationFile,
     Vetbook,
     VetbookFile,
     Vetpass,
