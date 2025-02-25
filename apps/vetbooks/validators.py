@@ -1,5 +1,5 @@
 import re
-from datetime import date
+from datetime import date, datetime
 
 from rest_framework.exceptions import ValidationError
 
@@ -289,5 +289,102 @@ def validate_registration(data):
 
     if registration_number and len(registration_number) > 35:
         raise ValidationError("Registration number cannot exceed 35 characters.")
+
+    return data
+
+
+"""
+Валидирует поля лечения
+"""
+
+
+def validate_treatment_data(data):
+    required_fields = ["medication", "dosage", "frequency", "start_date", "end_date"]
+
+    # Check for missing required fields
+    for field in required_fields:
+        if field not in data or not data[field]:
+            raise ValidationError(f"{field} is required.")
+
+    # Validate vetbook_id
+    if "vetbook_id" in data and not isinstance(data["vetbook_id"], int):
+        raise ValidationError("vetbook_id must be an integer.")
+    
+    # Validate treatment_id
+    if "treatment_id" in data and not isinstance(data["treatment_id"], int):
+        raise ValidationError("treatment_id must be an integer.")
+
+    # Validate field length and formats if they exist in data
+    if not isinstance(data["medication"], str) or len(data["medication"]) > 20:
+        raise ValidationError("medication must be a string with a maximum of 20 characters.")
+
+    if not isinstance(data["dosage"], str) or len(data["dosage"]) > 20:
+        raise ValidationError("dosage must be a string with a maximum of 20 characters.")
+
+    if not isinstance(data["frequency"], str) or len(data["frequency"]) > 20:
+        raise ValidationError("frequency must be a string with a maximum of 20 characters.")
+
+    try:
+        datetime.strptime(data["start_date"], "%Y-%m-%d")
+    except ValueError:
+        raise ValidationError("start_date must be in YYYY-MM-DD format.")
+
+    try:
+        datetime.strptime(data["end_date"], "%Y-%m-%d")
+    except ValueError:
+        raise ValidationError("end_date must be in YYYY-MM-DD format.")
+
+    return data
+
+
+"""
+Валидирует поля посещения в клинике
+"""
+
+
+def validate_appointment_data(data):
+    required_fields = ["clinic_name", "visit_date", "complaints"]
+
+    # Check for missing required fields
+    for field in required_fields:
+        if field not in data or not data[field]:
+            raise ValidationError(f"{field} is required.")
+
+    # Validate vetbook_id
+    if "vetbook_id" in data and not isinstance(data["vetbook_id"], int):
+        raise ValidationError("vetbook_id must be an integer.")
+    
+    # Validate appointment_id
+    if "appointment_id" in data and not isinstance(data["appointment_id"], int):
+        raise ValidationError("appointment_id must be an integer.")
+
+    # Validate clinic_name
+    if not isinstance(data["clinic_name"], str) or len(data["clinic_name"]) > 20:
+        raise ValidationError("clinic_name must be a string with a maximum of 20 characters.")
+
+    # Validate visit_date
+    try:
+        datetime.strptime(data["visit_date"], "%Y-%m-%d")
+    except ValueError:
+        raise ValidationError("visit_date must be in YYYY-MM-DD format.")
+
+    # Validate complaints
+    if not isinstance(data["complaints"], str) or len(data["complaints"]) > 35:
+        raise ValidationError("complaints must be a string with a maximum of 35 characters.")
+
+    # Validate doctor_report
+    if "doctor_report" in data and data["doctor_report"]:
+        if not isinstance(data["doctor_report"], str) or len(data["doctor_report"]) > 255:
+            raise ValidationError("doctor_report must be a string with a maximum of 255 characters.")
+
+    # Validate examination_files_ids
+    if "examination_files_ids" in data and data["examination_files_ids"]:
+        if not isinstance(data["examination_files_ids"], list):
+            raise ValidationError("examination_files_ids must be a list of file IDs.")
+
+    # Validate other_files_ids
+    if "other_files_ids" in data and data["other_files_ids"]:
+        if not isinstance(data["other_files_ids"], list):
+            raise ValidationError("other_files_ids must be a list of file IDs.")
 
     return data

@@ -93,3 +93,29 @@ class Registration(models.Model):
     vetpass = models.ForeignKey(Vetpass, on_delete=models.CASCADE, related_name="vetpass_registration")  # Ветпаспорт
     clinic = models.CharField(max_length=20, blank=True, null=True)  # Название клиники
     registration_number = models.CharField(max_length=35, blank=True, null=True)  # Номер регистрации
+
+
+class Treatment(models.Model):
+    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_treatments")  # Ветпаспорт
+    medication = models.CharField(max_length=20)  # Препарат
+    dosage = models.CharField(max_length=20)  # Дозировка
+    frequency = models.CharField(max_length=20)  # Периодичность
+    start_date = models.DateField()  # Начало приема
+    end_date = models.DateField()  # Окончание приема
+
+
+class Appointment(models.Model):
+    vetbook = models.ForeignKey(Vetbook, on_delete=models.CASCADE, related_name="vetbook_appointments")  # Ветпаспорт
+    clinic_name = models.CharField(max_length=20)  # Клиника
+    visit_date = models.DateField()  # Дата
+    complaints = models.TextField(max_length=35)  # Жалобы
+    doctor_report = models.TextField(max_length=255, blank=True, null=True)  # Заключение врача
+    examination_files_ids = models.JSONField(blank=True, null=True)  # Выписка, обследование
+    other_files_ids = models.JSONField(blank=True, null=True)  # Другие файлы
+
+
+class AppointmentFile(models.Model):
+    path = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(User, related_name="user_appointment_files", on_delete=models.CASCADE)
+    vetbooks = models.ManyToManyField(Appointment, related_name="appointment_related_files", blank=True)
