@@ -20,7 +20,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no kruts@34.34.29.241 "
 
-            cd /home/kruts/FreeVetbackend &&
+            cd /home/kruts/FreevetProd/Backend &&
             git remote set-url origin https://github.com/tail-book/freevet-backend.git &&
             echo 'https://yourusername:${{ secrets.GIT_TOKEN}}@github.com/tail-book/freevet-backend.git' > ~/.git-credentials &&
             git config --global credential.helper store &&

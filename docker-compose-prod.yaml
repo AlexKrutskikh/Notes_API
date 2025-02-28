@@ -1,0 +1,48 @@
+version: "3.7"
+services:
+
+  web:
+    container_name: "web"
+    image: nginx:alpine
+    depends_on:
+      - backend-prod
+      - frontend-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx_conf/conf.d:/etc/nginx/conf.d
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    networks:
+      - prod
+
+  backend-prod:
+    container_name: "backend-prod"
+    image: backend-prod
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - prod
+
+  frontend-prod:
+    container_name: "frontend-prod"
+    image: frontend-prod
+    build:
+      context: ../../FreeVet-front/freevet-frontend
+      dockerfile: Dockerfile
+    networks:
+      - prod
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+networks:
+  prod:
+    driver: bridge
