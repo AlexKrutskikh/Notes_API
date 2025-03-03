@@ -44,7 +44,6 @@ jobs:
     
             cd /home/krutskikh_ay/prod/Backend || { git clone https://github.com/tail-book/freevet-backend.git /home/krutskikh_ay/prod/Backend; cd /home/krutskikh_ay/prod/Backend; }
 
-
             git remote set-url origin https://github.com/tail-book/freevet-backend.git
             echo 'https://yourusername:${{ secrets.GIT_TOKEN }}@github.com/tail-book/freevet-backend.git' > ~/.git-credentials
             git config --global credential.helper store
