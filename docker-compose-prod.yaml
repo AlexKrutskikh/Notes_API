@@ -30,7 +30,7 @@ services:
     container_name: "frontend-prod"
     image: frontend-prod
     build:
-      context: ../../FreeVet-front/freevet-frontend
+      context: ../Frontend
       dockerfile: Dockerfile
     networks:
       - prod
