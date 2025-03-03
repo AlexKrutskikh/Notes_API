@@ -1,16 +1,32 @@
-name: Deploy Backend
+name: CI/CD Pipeline
 
 on:
-  workflow_run:
-    workflows: ["Checks Source Code"]
-    types:
-      - completed
+  push:
+    branches:
+      - dev
 
 jobs:
+  checks-source-code:
+    timeout-minutes: 15
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: make deps
+
+      - name: Run linters
+        run: make lint
+
   deploy:
-    if: > 
-      github.event.workflow_run.conclusion == 'success' && 
-      github.event.workflow_run.head_branch == 'dev'
+    needs: checks-source-code
     runs-on: ubuntu-latest
 
     steps:
