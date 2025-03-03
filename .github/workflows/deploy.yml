@@ -1,10 +1,16 @@
+name: Deploy Backend
+
 on:
-  push:
-    branches:
-      - dev
+  workflow_run:
+    workflows: ["Checks Source Code"]
+    types:
+      - completed
 
 jobs:
   deploy:
+    if: > 
+      github.event.workflow_run.conclusion == 'success' && 
+      github.event.workflow_run.head_branch == 'dev'
     runs-on: ubuntu-latest
 
     steps:
@@ -18,16 +24,15 @@ jobs:
 
       - name: Deploy to Server
         run: |
-          ssh -o StrictHostKeyChecking=no kruts@34.34.29.241 "
-
-            cd /home/kruts/FreevetProd/Backend &&
+          ssh -o StrictHostKeyChecking=no krutskikh_ay@109.73.207.142 << 'EOF'
+            cd /home/krutskikh_ay/prod/Backend &&
             git remote set-url origin https://github.com/tail-book/freevet-backend.git &&
-            echo 'https://yourusername:${{ secrets.GIT_TOKEN}}@github.com/tail-book/freevet-backend.git' > ~/.git-credentials &&
+            echo 'https://yourusername:${{ secrets.GIT_TOKEN }}@github.com/tail-book/freevet-backend.git' > ~/.git-credentials &&
             git config --global credential.helper store &&
         
             git fetch origin dev &&
             git reset --hard origin/dev &&
             
             docker-compose down &&
-            docker-compose up -d --build
-          "
+            docker-compose -f docker-compose-prod.yaml up --build -d
+          EOF
