@@ -5,7 +5,6 @@ on:
     branches:
       - dev
 
-
 jobs:
   checks-source-code:
     timeout-minutes: 15
@@ -42,14 +41,19 @@ jobs:
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no krutskikh_ay@109.73.207.142 << 'EOF'
-            cd /home/krutskikh_ay/prod/Backend &&
-            git remote set-url origin https://github.com/tail-book/freevet-backend.git &&
-            echo 'https://yourusername:${{ secrets.GIT_TOKEN }}@github.com/tail-book/freevet-backend.git' > ~/.git-credentials &&
-            git config --global credential.helper store &&
-        
-            git fetch origin dev &&
-            git reset --hard origin/dev &&
-            
-            docker-compose down &&
+    
+            cd /home/krutskikh_ay/prod/Backend || { git clone https://github.com/tail-book/freevet-backend.git /home/krutskikh_ay/prod/Backend; cd /home/krutskikh_ay/prod/Backend; }
+
+
+            git remote set-url origin https://github.com/tail-book/freevet-backend.git
+            echo 'https://yourusername:${{ secrets.GIT_TOKEN }}@github.com/tail-book/freevet-backend.git' > ~/.git-credentials
+            git config --global credential.helper store
+
+
+            git fetch origin dev
+            git reset --hard origin/dev
+
+ 
+            docker-compose down
             docker-compose -f docker-compose-prod.yaml up --build -d
           EOF
