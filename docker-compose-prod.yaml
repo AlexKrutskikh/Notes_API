@@ -53,6 +53,8 @@ services:
         sleep 12h & wait $${!};
       done;
       "
+    networks:
+      - prod
 
 networks:
   prod:
