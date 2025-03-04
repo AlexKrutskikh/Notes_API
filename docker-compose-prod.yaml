@@ -45,7 +45,7 @@ services:
       /bin/sh -c "
       mkdir -p /var/www/certbot/.well-known/acme-challenge && 
       if [ ! -f /etc/letsencrypt/live/freevet.ru/fullchain.pem ]; then
-        certbot certonly --webroot -w /var/www/certbot --email your-email@example.com --agree-tos --no-eff-email --force-renewal -d freevet.ru -d www.freevet.ru;
+        certbot certonly --webroot -w /var/www/certbot --email krutskikh_ay@rambler.ru --agree-tos --no-eff-email --force-renewal -d freevet.ru -d www.freevet.ru;
       fi;
       trap exit TERM;
       while :; do
