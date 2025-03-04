@@ -16,23 +16,27 @@ services:
       - prod
 
   backend-prod:
-    container_name: "backend-prod:8000"
+    container_name: "backend-prod"
     image: backend-prod
     build:
       context: .
       dockerfile: Dockerfile
+    expose:
+      - "8000" 
     networks:
       - prod
 
   frontend-prod:
-    container_name: "frontend-prod:5173"
+    container_name: "frontend-prod"
     image: frontend-prod
     build:
       context: ../Frontend
       dockerfile: Dockerfile
+    expose:
+      - "5173"  
     networks:
       - prod
-      
+
 networks:
   prod:
     driver: bridge
