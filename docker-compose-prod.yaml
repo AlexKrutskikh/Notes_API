@@ -7,6 +7,7 @@ services:
     depends_on:
       - backend-prod
       - frontend-prod
+      - certbot
     ports:
       - "80:80"
       - "443:443"
