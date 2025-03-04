@@ -12,8 +12,6 @@ services:
       - "443:443"
     volumes:
       - ./nginx_conf/conf.d:/etc/nginx/conf.d
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
     networks:
       - prod
 
@@ -34,27 +32,7 @@ services:
       dockerfile: Dockerfile
     networks:
       - prod
-
-  certbot:
-    image: certbot/certbot
-    container_name: certbot
-    volumes:
-      - ./data/certbot/conf:/etc/letsencrypt
-      - ./data/certbot/www:/var/www/certbot
-    entrypoint: >
-      /bin/sh -c "
-      if [ ! -f /etc/letsencrypt/live/freevet.ru/fullchain.pem ]; then
-        certbot certonly --webroot -w /var/www/certbot --email krutskikh_ay@rambler.ru --agree-tos --no-eff-email --force-renewal -d freevet.ru -d www.freevet.ru;
-      fi;
-      trap exit TERM;
-      while :; do
-        certbot renew;
-        sleep 12h & wait $${!};
-      done;
-      "
-    networks:
-      - prod
-
+      
 networks:
   prod:
     driver: bridge
