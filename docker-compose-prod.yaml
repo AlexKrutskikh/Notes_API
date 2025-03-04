@@ -55,8 +55,6 @@ services:
         sleep 12h & wait $${!};
       done;
       "
-    expose:
-      - "5174"
     networks:
       - prod
 
