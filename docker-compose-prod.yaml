@@ -16,7 +16,7 @@ services:
       - prod
 
   backend-prod:
-    container_name: "backend-prod"
+    container_name: "backend-prod:8000"
     image: backend-prod
     build:
       context: .
@@ -25,7 +25,7 @@ services:
       - prod
 
   frontend-prod:
-    container_name: "frontend-prod"
+    container_name: "frontend-prod:5173"
     image: frontend-prod
     build:
       context: ../Frontend
