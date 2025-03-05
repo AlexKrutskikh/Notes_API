@@ -40,9 +40,9 @@ jobs:
 
       - name: Deploy to Server
         run: |
-          ssh -o StrictHostKeyChecking=no krutskikh_ay@109.73.207.142 << 'EOF'
+          ssh -o StrictHostKeyChecking=no  s_makarov_de_gmail_com@34.32.159.135 << 'EOF'
     
-            cd /home/krutskikh_ay/prod/Backend || { git clone https://github.com/tail-book/freevet-backend.git /home/krutskikh_ay/prod/Backend; cd /home/krutskikh_ay/prod/Backend; }
+            cd /home/app/prod/back || { git clone https://github.com/tail-book/freevet-backend.git /home/app/prod/back; cd /home/app/prod/back; }
 
             git remote set-url origin https://github.com/tail-book/freevet-backend.git
             echo 'https://AlexKrutskikh:${{ secrets.GIT_TOKEN }}@github.com/tail-book/freevet-backend.git' > ~/.git-credentials
