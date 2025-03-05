@@ -38,9 +38,13 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.DEPLOY_KEY }}
 
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
       - name: Deploy to Server
         run: |
-          ssh -o StrictHostKeyChecking=no  s_makarov_de_gmail_com@34.32.159.135 << 'EOF'
+
+            sshpass -p "${{ secrets.ssh_password }}" ssh -o StrictHostKeyChecking=no  s_makarov_de_gmail_com@34.32.159.135 << 'EOF'
     
             cd /home/app/prod/back || { git clone https://github.com/tail-book/freevet-backend.git /home/app/prod/back; cd /home/app/prod/back; }
 
