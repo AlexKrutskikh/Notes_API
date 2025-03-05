@@ -33,24 +33,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.5.4
-        with:
-          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
 
       - name: Deploy to Server
         run: |
-          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no freevet@34.32.159.135 << 'EOF'ssh -o StrictHostKeyChecking=no s_makarov_de_gmail_com@34.32.159.135 << 'EOF'
-    
-            cd /home/app/prod/back || { git clone https://github.com/tail-book/freevet-backend.git cd /home/app/prod/back; cd /home/app/prod/back; }
-
+            sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no s_makarov_de_gmail_com@34.32.159.135 << 'EOF'
+        
+            cd /home/app/prod/back || { git clone https://github.com/tail-book/freevet-backend.git /home/app/prod/back; cd /home/app/prod/back; }
+          
             git remote set-url origin https://github.com/tail-book/freevet-backend.git
             echo 'https://AlexKrutskikh:${{ secrets.GIT_TOKEN }}@github.com/tail-book/freevet-backend.git' > ~/.git-credentials
             git config --global credential.helper store
 
-
+      
             git fetch origin dev
             git reset --hard origin/dev
+
 
             docker-compose down
             docker-compose -f docker-compose-prod.yaml up --build -d
