@@ -48,14 +48,12 @@ services:
       - ./data/certbot/www:/var/www/certbot
     entrypoint: >
       /bin/sh -c "
-      certbot certonly --webroot -w /var/www/certbot --email krutskikh_ay@rambler.ru --agree-tos --no-eff-email --force-renewal -d freevet.ru -d www.freevet.ru;
       trap exit TERM;
       while :; do
-        certbot renew;
+        certbot renew --quiet;
         sleep 12h & wait $${!};
       done;
       "
-
     networks:
       - prod
 
