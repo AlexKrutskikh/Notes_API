@@ -40,7 +40,7 @@ jobs:
 
       - name: Deploy to Server
         run: |
-          ssh -o StrictHostKeyChecking=no s_makarov_de_gmail_com@34.32.159.135 << 'EOF'
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" ssh -o StrictHostKeyChecking=no freevet@34.32.159.135 << 'EOF'ssh -o StrictHostKeyChecking=no s_makarov_de_gmail_com@34.32.159.135 << 'EOF'
     
             cd /home/app/prod/back || { git clone https://github.com/tail-book/freevet-backend.git cd /home/app/prod/back; cd /home/app/prod/back; }
 
