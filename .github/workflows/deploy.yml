@@ -51,7 +51,6 @@ jobs:
             git fetch origin dev
             git reset --hard origin/dev
           
-          
             docker-compose down
             docker-compose -f docker-compose-prod.yaml up --build -d
           EOF
