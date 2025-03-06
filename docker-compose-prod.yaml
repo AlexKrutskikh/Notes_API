@@ -33,7 +33,7 @@ services:
     container_name: "frontend-prod"
     image: frontend-prod
     build:
-      context: ../frontend
+      context: ../front
       dockerfile: Dockerfile
     expose:
       - "5173"  
