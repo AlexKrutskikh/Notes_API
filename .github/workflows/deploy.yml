@@ -17,7 +17,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.13'
 
       - name: Install dependencies
         run: make deps
@@ -34,28 +34,28 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_KEY }}
 
-          eval "$(ssh-agent -s)"
-          echo "${{ secrets.SSH_PASSWORD }}" | ssh-add ~/.ssh/id_rsa
-
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
 
       - name: Deploy to Server
         run: |
-          ssh -o StrictHostKeyChecking=no s_makarov_de_gmail_com@34.32.159.135 << 'EOF'
 
-          cd /home/app/prod/back || { git clone https://github.com/tail-book/freevet-backend.git /home/app/prod/back; cd /home/app/prod/back; }
+            sshpass -p "${{secrets.SSH_PASSWORD}}" ssh -o StrictHostKeyChecking=no freevet@34.32.159.135 << 'EOF'
+    
+            cd /home/app/prod/back || { git clone https://github.com/tail-book/freevet-backend.git /home/app/prod/back; cd /home/app/prod/back; }
 
-          git remote set-url origin https://github.com/tail-book/freevet-backend.git
-          export GIT_TOKEN="${{ secrets.GIT_TOKEN }}"
-          git config --global credential.helper '!f() { echo "username=AlexKrutskikh"; echo "password=$GIT_TOKEN"; }; f'
+            git remote set-url origin https://github.com/tail-book/freevet-backend.git
+            echo 'https://AlexKrutskikh:${{ secrets.GIT_TOKEN }}@github.com/tail-book/freevet-backend.git' > ~/.git-credentials
+            git config --global credential.helper store
 
-          git fetch origin dev
-          git reset --hard origin/dev
 
-          docker-compose pull
-          docker-compose -f docker-compose-prod.yaml up -d --build
+            git fetch origin dev
+            git reset --hard origin/dev
+
+            docker-compose down
+            docker-compose -f docker-compose-prod.yaml up --build -d
           EOF
