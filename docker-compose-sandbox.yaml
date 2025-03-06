@@ -1,48 +1,48 @@
 version: "3.7"
 services:
 
-  web-prod:
-    container_name: web-prod
+  web-sandbox:
+    container_name: web-sandbox
     image: nginx:alpine
     depends_on:
-      - backend-prod
-      - frontend-prod
-      - certbot-prod
+      - backend-sandbox
+      - frontend-sandbox
+      - certbot-sandbox
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx_conf/conf.d:/etc/nginx/conf.d
+      - ./nginx_conf/conf.sand:/etc/nginx/conf.d
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
     networks:
-      - prod
+      - sandbox
 
-  backend-prod:
-    container_name: backend-prod
-    image: backend-prod
+  backend-sandbox:
+    container_name: backend-sandbox
+    image: backend-sandbox
     build:
       context: .
       dockerfile: Dockerfile
     expose:
-      - "8000" 
+      - "8000"
     networks:
-      - prod
+      - sandbox
 
-  frontend-prod:
-    container_name: frontend-prod
-    image: frontend-prod
+  frontend-sandbox:
+    container_name: frontend-sandbox
+    image: frontend-sandbox
     build:
       context: ../front
       dockerfile: Dockerfile
     expose:
-      - "5173"  
+      - "5173"
     networks:
-      - prod
+      - sandbox
 
-  certbot-prod:
+  certbot-sandbox:
     image: certbot/certbot
-    container_name: certbot-prod
+    container_name: certbot-sandbox
     volumes:
       - ./data/certbot/conf:/etc/letsencrypt
       - ./data/certbot/www:/var/www/certbot
@@ -55,9 +55,8 @@ services:
       done;
       "
     networks:
-      - prod
-
+      - sandbox
 
 networks:
-  prod:
+  sandbox:
     driver: bridge
