@@ -48,6 +48,7 @@ jobs:
             echo 'https://AlexKrutskikh:${{ secrets.GIT_TOKEN }}@github.com/tail-book/freevet-backend.git' > ~/.git-credentials
             git config --global credential.helper store
 
+
             git fetch origin dev
             git reset --hard origin/dev
 
