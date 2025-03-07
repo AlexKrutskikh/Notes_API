@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - dev
-      
+
+
 jobs:
   checks-source-code:
     timeout-minutes: 15
