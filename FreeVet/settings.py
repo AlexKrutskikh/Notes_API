@@ -91,6 +91,8 @@ SEND_SMS = config('SendSMS', cast=bool, default=False)
 
 BASE_URL = env('BASE_URL')
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',
