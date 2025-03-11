@@ -52,6 +52,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = Env()
 Env.read_env(BASE_DIR / '.env')
 
+SECURE_SSL_REDIRECT = False
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 
 # CORS settings
 CORS_ALLOW_CREDENTIALS = True
