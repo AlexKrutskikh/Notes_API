@@ -14,6 +14,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app/
 
-CMD ["gunicorn", "-w", "1", "-k", "uvicorn.workers.UvicornWorker", "FreeVet.asgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "-w", "1", "FreeVet.wsgi:application", "--bind", "0.0.0.0:8000"]
+
 
 
