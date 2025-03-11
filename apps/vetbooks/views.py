@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
@@ -160,7 +162,6 @@ class AddPhotoToVetbook(APIView):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                "vetbook_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Vetbook ID"),
                 "photos": openapi.Schema(
                     type=openapi.TYPE_ARRAY,
                     items=openapi.Items(type=openapi.TYPE_STRING, format="binary"),
@@ -194,19 +195,13 @@ class AddPhotoToVetbook(APIView):
         except ValidationError as e:
 
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        vetbook = Vetbook.objects.get(id=request.data.get("vetbook_id"))
         vetbook_files = [VetbookFile(path=path, user_id=user_id) for path in file_paths]
 
         VetbookFile.objects.bulk_create(vetbook_files)
-
         vetbook_files_instances = VetbookFile.objects.filter(path__in=file_paths)
+        logging.warning(vetbook_files_instances)
 
-        vetbook.vetbook_related_files.set(vetbook_files_instances)
-
-        created_ids = list(
-            VetbookFile.objects.filter(user_id=user_id).order_by("-id")[: len(file_paths)].values_list("id", flat=True)
-        )
-
+        created_ids = [obj.id for obj in vetbook_files_instances]
         return Response({"message": "Successfully created", "file(s) ids": created_ids}, status=201)
 
 
