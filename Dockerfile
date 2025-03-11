@@ -14,6 +14,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . /app/
 
+RUN python manage.py collectstatic --noinput
+
 CMD ["gunicorn", "-w", "1", "FreeVet.wsgi:application", "--bind", "0.0.0.0:8000"]
 
 
