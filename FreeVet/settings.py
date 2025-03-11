@@ -91,13 +91,6 @@ SEND_SMS = config('SendSMS', cast=bool, default=False)
 
 BASE_URL = env('BASE_URL')
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = True
-
-SWAGGER_SETTINGS = {
-    'USE_SESSION_AUTH': False,
-    'SECURITY_DEFINITIONS': None,
-}
 
 INSTALLED_APPS = [
     'corsheaders',
