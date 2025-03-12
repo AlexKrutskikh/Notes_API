@@ -4,6 +4,8 @@ from pathlib import Path
 from decouple import config
 from django.urls import reverse_lazy
 from environ import Env
+from datetime import timedelta
+
 
 LOGGING = {
     'version': 1,
@@ -100,6 +102,12 @@ SWAGGER_SETTINGS = {
     'USE_SESSION_AUTH': False,
     'SECURITY_DEFINITIONS': None,
 }
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+}
+
 
 INSTALLED_APPS = [
     'corsheaders',
