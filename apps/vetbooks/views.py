@@ -195,8 +195,8 @@ class AddPhotoToVetbook(APIView):
         except ValidationError as e:
 
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-        vetbook_files = [VetbookFile(path=path, user_id=user_id) for path in file_paths]
 
+        vetbook_files = [VetbookFile(path=path, user_id=user_id) for path in file_paths]
         VetbookFile.objects.bulk_create(vetbook_files)
         vetbook_files_instances = VetbookFile.objects.filter(path__in=file_paths)
         logging.warning(vetbook_files_instances)

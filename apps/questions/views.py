@@ -143,8 +143,10 @@ class AddPhotoQuestion(APIView):
 
         question_files = [QuestionFile(path=path, user_id=user_id) for path in file_paths]
 
-        created_objects = QuestionFile.objects.bulk_create(question_files)
+        QuestionFile.objects.bulk_create(question_files)
 
-        created_ids = [obj.id for obj in created_objects]
+        question_files_instances = QuestionFile.objects.filter(path__in=file_paths)
+
+        created_ids = [obj.id for obj in question_files_instances]
 
         return Response({"message": "Successfully created", "ids file(s)": created_ids}, status=201)
