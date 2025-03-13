@@ -32,13 +32,12 @@ def validate_documents(file):
     if file.size > max_size_mb * 1024 * 1024:
         raise ValidationError("FileTooLarge")
 
-extension_validator = FileExtensionValidator(
-    allowed_extensions=["jpg", "jpeg", "png", "pdf"], message="InvalidFileExtension"
-)
-extension_validator(file)
+    extension_validator = FileExtensionValidator(
+        allowed_extensions=["jpg", "jpeg", "png", "pdf"], message="InvalidFileExtension"
+    )
+    extension_validator(file)
 
-return file
-
+    return file
 
 
 def save_files_to_storage(request, upload_path):
