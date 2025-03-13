@@ -14,6 +14,7 @@ class Specialist(models.Model):
     additional_info = models.TextField(blank=True)
     telegram = models.CharField(max_length=50, unique=True)
     user = models.OneToOneField(User, related_name="specialist", on_delete=models.CASCADE)
+    file_ids = models.JSONField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.name} {self.last_name} - {self.specialization}"
@@ -26,7 +27,7 @@ class SpecialistDocument(models.Model):
     path = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(User, related_name="specialist_file_user", on_delete=models.CASCADE)
-    specialist = models.ForeignKey(Specialist, related_name="related_documents", null=True, on_delete=models.CASCADE)
+    specialist = models.ManyToManyField(Specialist, related_name="related_documents", blank=True)
 
     def __str__(self):
         return f"Document for {self.specialist}"

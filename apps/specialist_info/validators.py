@@ -7,9 +7,11 @@ def validate_specialist_data(data):
     name = data.get("name", "").strip()
     last_name = data.get("last_name", "").strip()
     specialization = data.get("specialization", "").strip()
-    animals = data.get("animals", "").strip()
+    animals = data.get("animals", "")
     additional_info = data.get("additional_info", "").strip()
     telegram = data.get("telegram", "").strip()
+    file_ids = data.get("file_ids")
+
     # Проверка имени
     if not name:
         raise ValidationError("Name is required.")
@@ -44,6 +46,10 @@ def validate_specialist_data(data):
     if additional_info and len(additional_info) > 500:
         raise ValidationError("Additional info must be 500 characters or less.")
 
+    # Проверка file_ids
+    if not isinstance(file_ids, list):
+        raise ValidationError("InvalidFile_ids")
+
     return {
         "name": name,
         "last_name": last_name,
@@ -51,4 +57,5 @@ def validate_specialist_data(data):
         "animals": animals,
         "additional_info": additional_info,
         "telegram": telegram,
+        "file_ids": file_ids,
     }
