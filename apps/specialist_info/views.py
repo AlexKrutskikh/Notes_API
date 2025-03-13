@@ -100,7 +100,7 @@ class CreateSpecialist(APIView):
                 ),
                 "animals": openapi.Schema(
                     type=openapi.TYPE_ARRAY,
-                    items=openapi.Items(type=openapi.TYPE_ARRAY),
+                    items=openapi.Items(type=openapi.TYPE_STRING),
                     description="Список животных, с которыми работает специалист (обязательное)",
                 ),
                 "telegram": openapi.Schema(type=openapi.TYPE_STRING, description="Контакт в Telegram (необязательное)"),
@@ -109,7 +109,7 @@ class CreateSpecialist(APIView):
                 ),
                 "file_ids": openapi.Schema(
                     type=openapi.TYPE_ARRAY,
-                    items=openapi.Items(type=openapi.TYPE_ARRAY),
+                    items=openapi.Items(type=openapi.TYPE_INTEGER),
                     description="Список идентификаторов загруженных файлов (необязательное)",
                 ),
             },
