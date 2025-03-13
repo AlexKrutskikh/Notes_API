@@ -6,10 +6,6 @@ from django.core.exceptions import ValidationError
 
 
 def validate_animal_data(data):
-
-    if re.search(r"\d", data.get("name", "")):
-        raise ValidationError("InvalidName")
-
     if re.search(r"\d", data.get("species", "")):
         raise ValidationError("InvalidSpecies")
 

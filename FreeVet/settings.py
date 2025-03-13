@@ -4,6 +4,8 @@ from pathlib import Path
 from decouple import config
 from django.urls import reverse_lazy
 from environ import Env
+from datetime import timedelta
+
 
 LOGGING = {
     'version': 1,
@@ -52,6 +54,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 env = Env()
 Env.read_env(BASE_DIR / '.env')
 
+SECURE_SSL_REDIRECT = False
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+
 # CORS settings
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
@@ -91,6 +97,18 @@ SEND_SMS = config('SendSMS', cast=bool, default=False)
 
 BASE_URL = env('BASE_URL')
 
+
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    'SECURITY_DEFINITIONS': None,
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=3),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+}
+
+
 INSTALLED_APPS = [
     'corsheaders',
     'django_extensions',
@@ -115,8 +133,7 @@ INSTALLED_APPS = [
     'apps.profiles',
     'apps.chats',
     'apps.specialist_info',
-    'apps.animals',
-
+    'apps.animals'
 ]
 
 AUTHENTICATION_BACKENDS = [
@@ -233,7 +250,13 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+if not DEBUG:
+    STATICFILES_DIRS = [
+        os.path.join(BASE_DIR, "static"),
+    ]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

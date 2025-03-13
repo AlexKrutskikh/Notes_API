@@ -1,0 +1,62 @@
+version: "3.7"
+services:
+
+  web-sandbox:
+    container_name: web-sandbox
+    image: nginx:alpine
+    depends_on:
+      - backend-sandbox
+      - frontend-sandbox
+      - certbot-sandbox
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx_conf/conf.sand:/etc/nginx/conf.d
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    networks:
+      - sandbox
+
+  backend-sandbox:
+    container_name: backend-sandbox
+    image: backend-sandbox
+    build:
+      context: .
+      dockerfile: Dockerfile
+    expose:
+      - "8000"
+    networks:
+      - sandbox
+
+  frontend-sandbox:
+    container_name: frontend-sandbox
+    image: frontend-sandbox
+    build:
+      context: ../front
+      dockerfile: Dockerfile
+    expose:
+      - "5173"
+    networks:
+      - sandbox
+
+  certbot-sandbox:
+    image: certbot/certbot
+    container_name: certbot-sandbox
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: >
+      /bin/sh -c "
+      trap exit TERM;
+      while :; do
+        certbot renew --quiet;
+        sleep 12h & wait $${!};
+      done;
+      "
+    networks:
+      - sandbox
+
+networks:
+  sandbox:
+    driver: bridge

@@ -1,0 +1,65 @@
+version: "3.7"
+services:
+
+  web-prod:
+    container_name: web-prod
+    image: nginx:alpine
+    depends_on:
+      - backend-prod
+      - frontend-prod
+      - certbot-prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./staticfiles:/app/staticfiles
+      - ./nginx_conf/conf.d:/etc/nginx/conf.d
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    networks:
+      - prod
+
+  backend-prod:
+    container_name: backend-prod
+    image: backend-prod
+    build:
+      context: .
+      dockerfile: Dockerfile
+    expose:
+      - "8000"
+    volumes:
+      - ./staticfiles:/app/staticfiles
+    networks:
+      - prod
+
+  frontend-prod:
+    container_name: frontend-prod
+    image: frontend-prod
+    build:
+      context: ../front
+      dockerfile: Dockerfile
+    expose:
+      - "5173"  
+    networks:
+      - prod
+
+  certbot-prod:
+    image: certbot/certbot
+    container_name: certbot-prod
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    entrypoint: >
+      /bin/sh -c "
+      trap exit TERM;
+      while :; do
+        certbot renew --quiet;
+        sleep 12h & wait $${!};
+      done;
+      "
+    networks:
+      - prod
+
+networks:
+  prod:
+    driver: bridge
