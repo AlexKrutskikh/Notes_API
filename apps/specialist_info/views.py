@@ -5,13 +5,13 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .validators import validate_specialist_data
 
 from apps.auth.authentication import CookieJWTAuthentication
 from apps.auth.models import User
 from FreeVet.utils import save_files_to_storage
 
 from .models import Specialist, SpecialistDocument
+from .validators import validate_specialist_data
 
 """Загрузка документов специалиста """
 
@@ -95,20 +95,22 @@ class CreateSpecialist(APIView):
             properties={
                 "name": openapi.Schema(type=openapi.TYPE_STRING, description="Имя специалиста (обязательное)"),
                 "last_name": openapi.Schema(type=openapi.TYPE_STRING, description="Фамилия специалиста (обязательное)"),
-                "specialization": openapi.Schema(type=openapi.TYPE_STRING,
-                                                 description="Специализация специалиста (обязательное)"),
+                "specialization": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Специализация специалиста (обязательное)"
+                ),
                 "animals": openapi.Schema(
                     type=openapi.TYPE_ARRAY,
                     items=openapi.Items(type=openapi.TYPE_ARRAY),
-                    description="Список животных, с которыми работает специалист (обязательное)"
+                    description="Список животных, с которыми работает специалист (обязательное)",
                 ),
                 "telegram": openapi.Schema(type=openapi.TYPE_STRING, description="Контакт в Telegram (необязательное)"),
-                "additional_info": openapi.Schema(type=openapi.TYPE_STRING,
-                                                  description="Дополнительная информация (необязательное)"),
+                "additional_info": openapi.Schema(
+                    type=openapi.TYPE_STRING, description="Дополнительная информация (необязательное)"
+                ),
                 "file_ids": openapi.Schema(
                     type=openapi.TYPE_ARRAY,
                     items=openapi.Items(type=openapi.TYPE_ARRAY),
-                    description="Список идентификаторов загруженных файлов (необязательное)"
+                    description="Список идентификаторов загруженных файлов (необязательное)",
                 ),
             },
             required=["name", "last_name", "specialization", "animals"],
@@ -127,8 +129,6 @@ class CreateSpecialist(APIView):
             400: "Bad Request - Validation Error",
         },
     )
-
-
     def post(self, request):
         user_id = request.user.id
         user = User.objects.get(id=user_id)
