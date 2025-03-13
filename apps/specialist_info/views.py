@@ -25,19 +25,12 @@ class UploadSpecialistDocuments(APIView):
         except ValidationError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Создание документов в базе данных
-        document_objects = [SpecialistDocument(path=path, user_id=user_id) for path in file_paths]
-        created_objects = SpecialistDocument.objects.bulk_create(document_objects)
+        specialist_documents = [SpecialistDocument(path=path, user_id=user_id) for path in file_paths]
+        SpecialistDocument.objects.bulk_create(specialist_documents)
 
-        created_ids = [obj.id for obj in created_objects]
-
-        return Response(
-            {
-                "message": "Documents uploaded successfully",
-                "document_ids": created_ids,
-            },
-            status=status.HTTP_201_CREATED,
-        )
+        specialist_documents_instances = SpecialistDocument.objects.filter(path__in=file_paths)
+        created_ids = [obj.id for obj in specialist_documents_instances]
+        return Response({"message": "Successfully created", "ids file(s)": created_ids}, status=201)
 
 
 """Создание специалиста и привязка документов """
