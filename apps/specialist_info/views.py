@@ -1,4 +1,5 @@
 from django.core.exceptions import ValidationError
+from drf_yasg import openapi
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -17,6 +18,36 @@ class UploadSpecialistDocuments(APIView):
     authentication_classes = [CookieJWTAuthentication]
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Upload file(s) related to a specialist and get their IDs.",
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                "photos": openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Items(type=openapi.TYPE_STRING, format="binary"),
+                    description="List of image files to upload",
+                ),
+            },
+        ),
+        responses={
+            201: openapi.Response(
+                "Files successfully uploaded",
+                openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "message": openapi.Schema(type=openapi.TYPE_STRING),
+                        "ids file(s)": openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Items(type=openapi.TYPE_INTEGER),
+                            description="List of uploaded file IDs",
+                        ),
+                    },
+                ),
+            ),
+            400: "Bad Request - File Upload Error",
+        },
+    )
     def post(self, request):
         user_id = request.user.id
 
