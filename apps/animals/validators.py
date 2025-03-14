@@ -10,7 +10,7 @@ def validate_animal_data(data):
         raise ValidationError("InvalidSpecies")
 
     gender = data.get("gender")
-    if gender not in ["male", "female"]:
+    if gender not in ["male", "female","unknown"]:
         raise ValidationError("InvalidGender")
 
     weight_str = data.get("weight", "")
