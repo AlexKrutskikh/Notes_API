@@ -1,4 +1,4 @@
-from django.urls import include, path
+from django.urls import path
 
 from .treatment_and_appointment_view import (
     AddFileToAppointment,
