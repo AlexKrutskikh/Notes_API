@@ -9,9 +9,7 @@ from rest_framework.views import APIView
 
 from apps.auth.authentication import CookieJWTAuthentication
 from apps.auth.models import User
-from FreeVet.utils import save_files_to_storage
-
-from ..models import (
+from apps.vetbooks.models import (
     AdditionalDescription,
     ClinicalExamination,
     ClinicalExaminationFile,
@@ -23,7 +21,7 @@ from ..models import (
     VaccinationOthers,
     Vetbook,
 )
-from ..validators import (
+from apps.vetbooks.validators import (
     validate_additional_description,
     validate_clinical_examination,
     validate_deworming,
@@ -32,6 +30,7 @@ from ..validators import (
     validate_registration,
     validate_vaccination,
 )
+from FreeVet.utils import save_files_to_storage
 
 """ Переиспользуемая функция для получения веткнижки и ветпаспорта """
 

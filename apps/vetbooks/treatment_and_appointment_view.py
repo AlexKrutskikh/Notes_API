@@ -7,10 +7,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.auth.authentication import CookieJWTAuthentication
+from apps.vetbooks.models import Appointment, AppointmentFile, Treatment, Vetbook
+from apps.vetbooks.validators import validate_appointment_data, validate_treatment_data
 from FreeVet.utils import save_files_to_storage
-
-from ..models import Appointment, AppointmentFile, Treatment, Vetbook
-from ..validators import validate_appointment_data, validate_treatment_data
 
 """Создание лечения в веткнижке"""
 
