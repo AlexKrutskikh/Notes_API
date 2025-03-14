@@ -151,7 +151,9 @@ class AddPhotoQuestion(APIView):
 
         return Response({"message": "Successfully created", "ids file(s)": created_ids}, status=201)
 
+
 """Получение всех вопросов"""
+
 
 class GetAllQuestions(APIView):
     authentication_classes = [CookieJWTAuthentication]
@@ -189,17 +191,20 @@ class GetAllQuestions(APIView):
         questions = Question.objects.all()
         result = []
         for question in questions:
-            result.append({
-                "id": question.id,
-                "text": question.text,
-                "animal_id": question.animal.id,
-                "user_id": question.user.id,
-                "file_ids": question.file_ids if hasattr(question, "file_ids") else [],
-            })
+            result.append(
+                {
+                    "id": question.id,
+                    "text": question.text,
+                    "animal_id": question.animal.id,
+                    "user_id": question.user.id,
+                    "file_ids": question.file_ids if hasattr(question, "file_ids") else [],
+                }
+            )
         return Response(result, status=status.HTTP_200_OK)
 
 
 """Получение вопроса по ID"""
+
 
 class GetQuestionById(APIView):
     authentication_classes = [CookieJWTAuthentication]
@@ -244,4 +249,3 @@ class GetQuestionById(APIView):
             return Response(result, status=status.HTTP_200_OK)
         except Question.DoesNotExist:
             return Response({"error": "Question not found"}, status=status.HTTP_404_NOT_FOUND)
-
