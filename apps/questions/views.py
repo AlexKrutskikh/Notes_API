@@ -150,3 +150,98 @@ class AddPhotoQuestion(APIView):
         created_ids = [obj.id for obj in question_files_instances]
 
         return Response({"message": "Successfully created", "ids file(s)": created_ids}, status=201)
+
+"""Получение всех вопросов"""
+
+class GetAllQuestions(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="""
+        Get a list of all questions.
+        """,
+        responses={
+            200: openapi.Response(
+                "List of questions",
+                openapi.Schema(
+                    type=openapi.TYPE_ARRAY,
+                    items=openapi.Schema(
+                        type=openapi.TYPE_OBJECT,
+                        properties={
+                            "id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Question ID"),
+                            "text": openapi.Schema(type=openapi.TYPE_STRING, description="Question text"),
+                            "animal_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Animal ID"),
+                            "user_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="User ID"),
+                            "file_ids": openapi.Schema(
+                                type=openapi.TYPE_ARRAY,
+                                items=openapi.Items(type=openapi.TYPE_INTEGER),
+                                description="List of file IDs",
+                            ),
+                        },
+                    ),
+                ),
+            ),
+            401: "Unauthorized",
+        },
+    )
+    def get(self, request):
+        questions = Question.objects.all()
+        result = []
+        for question in questions:
+            result.append({
+                "id": question.id,
+                "text": question.text,
+                "animal_id": question.animal.id,
+                "user_id": question.user.id,
+                "file_ids": question.file_ids if hasattr(question, "file_ids") else [],
+            })
+        return Response(result, status=status.HTTP_200_OK)
+
+
+"""Получение вопроса по ID"""
+
+class GetQuestionById(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="""
+        Get a question by ID.
+        """,
+        responses={
+            200: openapi.Response(
+                "Question details",
+                openapi.Schema(
+                    type=openapi.TYPE_OBJECT,
+                    properties={
+                        "id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Question ID"),
+                        "text": openapi.Schema(type=openapi.TYPE_STRING, description="Question text"),
+                        "animal_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="Animal ID"),
+                        "user_id": openapi.Schema(type=openapi.TYPE_INTEGER, description="User ID"),
+                        "file_ids": openapi.Schema(
+                            type=openapi.TYPE_ARRAY,
+                            items=openapi.Items(type=openapi.TYPE_INTEGER),
+                            description="List of file IDs",
+                        ),
+                    },
+                ),
+            ),
+            404: "Not Found",
+            401: "Unauthorized",
+        },
+    )
+    def get(self, request, question_id):
+        try:
+            question = Question.objects.get(id=question_id)
+            result = {
+                "id": question.id,
+                "text": question.text,
+                "animal_id": question.animal.id,
+                "user_id": question.user.id,
+                "file_ids": question.file_ids if hasattr(question, "file_ids") else [],
+            }
+            return Response(result, status=status.HTTP_200_OK)
+        except Question.DoesNotExist:
+            return Response({"error": "Question not found"}, status=status.HTTP_404_NOT_FOUND)
+
