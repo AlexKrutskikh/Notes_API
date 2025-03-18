@@ -1,12 +1,12 @@
 from django.core.exceptions import ValidationError
-from .models import User
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from .models import User
 from .utils import generate_token_and_set_cookie
 from .validators import validate_user_data
-from django.utils import timezone
-
 
 """Регистрация пользователя"""
 

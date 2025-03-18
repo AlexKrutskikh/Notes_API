@@ -1,6 +1,6 @@
-from .auth_view import AuthorizationUser, RegistrationUser
 from django.urls import include, path
 
+from .auth_view import AuthorizationUser, RegistrationUser
 from .authentication import CustomTokenRefreshView
 from .social_view import google_oauth_redirect
 

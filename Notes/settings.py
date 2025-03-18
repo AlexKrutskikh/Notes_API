@@ -124,6 +124,7 @@ INSTALLED_APPS = [
     'modeltranslation',
 
     'apps.auth',
+    'apps.notes',
 
 ]
 

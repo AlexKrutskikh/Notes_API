@@ -1,5 +1,7 @@
 import re
+
 from django.core.exceptions import ValidationError
+
 
 def validate_user_data(data):
     phone = data.get("phone", "")
@@ -26,6 +28,8 @@ def validate_user_data(data):
 
     password_pattern = r"^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{8,20}$"
     if not re.match(password_pattern, password):
-        raise ValidationError("Password must be 8-20 characters long and include uppercase, lowercase, a digit, and a special character.")
+        raise ValidationError(
+            "Password must be 8-20 characters long and include uppercase, lowercase, a digit, and a special character."
+        )
 
     return data
