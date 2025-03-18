@@ -36,36 +36,11 @@ class UserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
 
-    class UserType(models.TextChoices):
-        CLIENT = "Client"
-        SPECIALIST = "Specialist"
+    class UserRole(models.TextChoices):
+        ADMIN = "Admin"
+        USER = "User"
 
-    class UserStatus(models.TextChoices):
-        PROFILE_PREFILL = "Profile_prefill"
-        STATUS_SELECT = "Status_select"
-        VETBOOK_CREATION = "Vetbook_creation"
-        SPECIALIST_INFO_FILL = "Specialist_info_fill"
-        SPECIALIST_VERIFICATION = "Specialist_verification"
-        DONE = "Done"
-
-    USER_TYPE_STATUS_MAPPING = {
-        UserType.CLIENT: [
-            UserStatus.PROFILE_PREFILL,
-            UserStatus.STATUS_SELECT,
-            UserStatus.VETBOOK_CREATION,
-            UserStatus.DONE,
-        ],
-        UserType.SPECIALIST: [
-            UserStatus.PROFILE_PREFILL,
-            UserStatus.STATUS_SELECT,
-            UserStatus.SPECIALIST_INFO_FILL,
-            UserStatus.SPECIALIST_VERIFICATION,
-            UserStatus.DONE,
-        ],
-    }
-
-    password = None
-    auth_provider = models.CharField(max_length=50, default="Twilio")
+    auth_provider = models.CharField(max_length=50, default="RegistrationUser")
     registration_time = models.DateTimeField(auto_now_add=True)
     email = models.EmailField(unique=True, blank=True, null=True)
     first_name = models.CharField(max_length=100, blank=True)
@@ -73,15 +48,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     username = models.CharField(max_length=100, blank=True)
     phone = models.CharField(max_length=50, blank=True, null=True, unique=True)
 
-    type = models.CharField(
+    role = models.CharField(
         max_length=10,
-        choices=UserType.choices,
-        default=UserType.CLIENT,
-    )
-    status = models.CharField(
-        max_length=25,
-        choices=UserStatus.choices,
-        default=UserStatus.PROFILE_PREFILL,
+        choices=UserRole.choices,
+        default=UserRole.USER,
     )
 
     is_active = models.BooleanField(default=True)
@@ -94,17 +64,3 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-
-
-"""Модель используется для хранения SMS-кодов, связанных с телефонными номерами.
-Она также включает информацию о времени отправки кода."""
-
-
-class SmsCode(models.Model):
-    code = models.CharField(max_length=6, blank=False, null=False)
-    sent_time = models.DateTimeField(blank=False, null=False)
-    phone = models.CharField(max_length=50, blank=False, null=False)
-    ip = models.GenericIPAddressField(blank=False, null=False)
-
-    def __str__(self):
-        return self.code
