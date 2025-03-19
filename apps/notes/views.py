@@ -5,38 +5,51 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from apps.auth.authentication import CookieJWTAuthentication
-from apps.auth.models import User
 from Notes.settings import logger
 
 from .models import Notes
-from .permissions import IsOwnerOrAdminOrReadOnly
+from .permissions import EditorReadOnly, IsOwnerOrAdminOrReadOnly
 
 """Создание заметки"""
 
 
 class CreateNote(APIView):
-
     authentication_classes = [CookieJWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, EditorReadOnly]
 
     def post(self, request):
 
-        user_id = request.user.id
         data = request.data
+
+        title = data.get("title")
+        body = data.get("body")
+        if not title or not body:
+            logger.warning(f"User {request.user.username} failed to create note: title or body is missing")
+            return Response({"error": "Title and body are required"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
 
             note = Notes.objects.create(
-                user=User.objects.get(id=user_id),
-                title=data.get("title"),
-                body=data.get("body"),
+                user=request.user,
+                title=title,
+                body=body,
             )
 
-            logger.info(f"User {request.user.username} create note")
+            logger.info(f"User {request.user.username} created note with ID {note.id}")
 
-            return Response({"message": "Successfully created", "id_note": note.id}, status=status.HTTP_201_CREATED)
+            return Response(
+                {"message": "Successfully created", "id_note": note.id},
+                status=status.HTTP_201_CREATED,
+            )
+
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+            logger.error(f"Error creating note for user {request.user.username}: {str(e)}")
+
+            return Response(
+                {"error": "An error occurred while creating the note"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 """Обновление заметки"""
@@ -44,10 +57,7 @@ class CreateNote(APIView):
 
 class UpdateNote(APIView):
     authentication_classes = [CookieJWTAuthentication]
-    permission_classes = (
-        IsAuthenticated,
-        IsOwnerOrAdminOrReadOnly,
-    )
+    permission_classes = (IsAuthenticated, IsOwnerOrAdminOrReadOnly, EditorReadOnly)
 
     def post(self, request):
         note_id = request.data.get("note_id")
@@ -74,10 +84,7 @@ class UpdateNote(APIView):
 
 class DeleteNote(APIView):
     authentication_classes = [CookieJWTAuthentication]
-    permission_classes = (
-        IsAuthenticated,
-        IsOwnerOrAdminOrReadOnly,
-    )
+    permission_classes = (IsAuthenticated, IsOwnerOrAdminOrReadOnly, EditorReadOnly)
 
     def post(self, request):
         note_id = request.data.get("note_id")
@@ -111,15 +118,12 @@ class DeleteNote(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-"""Восстанволение заметки"""
+"""Восстановление заметки"""
 
 
 class RestoreNote(APIView):
     authentication_classes = [CookieJWTAuthentication]
-    permission_classes = (
-        IsAuthenticated,
-        IsAdminUser,
-    )
+    permission_classes = (IsAuthenticated, IsAdminUser, EditorReadOnly)
 
     def post(self, request):
         note_id = request.data.get("note_id")
@@ -149,3 +153,99 @@ class RestoreNote(APIView):
         except Exception as e:
             logger.error(f"Error restoring note ID {note_id}: {str(e)}")
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+""""Получение всех заметок"  """
+
+
+class GetAllNotes(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated, IsAdminUser]
+
+    def get(self, request):
+        try:
+
+            notes = Notes.objects.all()
+
+            notes_data = [
+                {
+                    "id": note.id,
+                    "title": note.title,
+                    "body": note.body,
+                    "user_id": note.user.id,
+                    "created_at": note.created_at,
+                    "updated_at": note.updated_at,
+                    "is_deleted": note.is_deleted,
+                }
+                for note in notes
+            ]
+            logger.info(f"Admin {request.user.username} retrieved all notes.")
+            return Response(notes_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving all notes: {str(e)}")
+            return Response(
+                {"error": "An error occurred while retrieving notes"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+"""Получение своих заметок"""
+
+
+class GetMyNotes(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+
+            notes = Notes.objects.filter(user=request.user)
+
+            notes_data = [
+                {
+                    "id": note.id,
+                    "title": note.title,
+                    "body": note.body,
+                    "created_at": note.created_at,
+                    "updated_at": note.updated_at,
+                    "is_deleted": note.is_deleted,
+                }
+                for note in notes
+            ]
+            logger.info(f"User {request.user.username} retrieved their notes.")
+            return Response(notes_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            logger.error(f"Error retrieving notes for user {request.user.username}: {str(e)}")
+            return Response(
+                {"error": "An error occurred while retrieving notes"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+"""Получение заметки по id"""
+
+
+class GetNoteById(APIView):
+    authentication_classes = [CookieJWTAuthentication]
+    permission_classes = [IsAuthenticated, IsOwnerOrAdminOrReadOnly]
+
+    def get(self, request, note_id):
+        try:
+
+            note = Notes.objects.get(id=note_id)
+        except Notes.DoesNotExist:
+            logger.error(f"Note with ID {note_id} not found.")
+            return Response({"error": "Note not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        self.check_object_permissions(request, note)
+
+        note_data = {
+            "id": note.id,
+            "title": note.title,
+            "body": note.body,
+            "user_id": note.user.id,
+            "created_at": note.created_at,
+            "updated_at": note.updated_at,
+            "is_deleted": note.is_deleted,
+        }
+
+        logger.info(f"User {request.user.username} retrieved note ID {note_id}.")
+        return Response(note_data, status=status.HTTP_200_OK)
