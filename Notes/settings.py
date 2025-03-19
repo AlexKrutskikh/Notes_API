@@ -2,10 +2,25 @@ import os
 from pathlib import Path
 
 from decouple import config
-from django.urls import reverse_lazy
 from environ import Env
 from datetime import timedelta
+import logging
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+log_file_path = config('LOG_FILE', default='logs/django.log')
+
+os.makedirs(os.path.dirname(log_file_path), exist_ok=True)
+
+
+if not os.path.exists(log_file_path):
+    with open(log_file_path, 'w'):
+        pass
+
+file_handler = logging.FileHandler(log_file_path)
+file_handler.setFormatter(logging.Formatter('%(levelname)s - %(asctime)s - %(message)s'))
+logger.addHandler(file_handler)
 
 LOGGING = {
     'version': 1,
@@ -27,7 +42,7 @@ LOGGING = {
         },
         'file': {
             'class': 'logging.FileHandler',
-            'filename': config('LOG_FILE', default='logs/default.log'),
+            'filename': log_file_path,
             'formatter': 'verbose',
         },
     },
@@ -44,9 +59,6 @@ LOGGING = {
         },
     },
 }
-
-os.makedirs(os.path.dirname(config('LOG_FILE', default='logs/default.log')), exist_ok=True)
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -159,7 +171,8 @@ SOCIAL_AUTH_STRATEGY = 'social_django.strategy.DjangoStrategy'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
+    )
+
 }
 
 MIDDLEWARE = [

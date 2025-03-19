@@ -4,6 +4,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from Notes.settings import logger
+
 from .models import User
 from .utils import generate_token_and_set_cookie
 from .validators import validate_user_data
@@ -38,6 +40,7 @@ class RegistrationUser(APIView):
             errors["email"] = "This email is already in use"
 
         if errors:
+            logger.warning(f"Registration errors for user data: {errors}")
             return Response({"errors": errors}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
@@ -50,6 +53,8 @@ class RegistrationUser(APIView):
             )
             user.set_password(validate_data.get("password", ""))
             user.save()
+
+            logger.info(f"User {user.username} successfully registered")
 
             return Response({"message": "Successfully created"}, status=status.HTTP_201_CREATED)
 
@@ -70,9 +75,11 @@ class AuthorizationUser(APIView):
         try:
             user = User.objects.get(username=user_name)
         except User.DoesNotExist:
+            logger.warning(f"Failed login attempt: User {user_name} does not exist")
             return Response({"error": "User does not exist"}, status=status.HTTP_404_NOT_FOUND)
 
         if not user.check_password(password):
+            logger.warning(f"Failed login attempt: Incorrect password for user {user_name}")
             return Response({"error": "Incorrect password"}, status=status.HTTP_400_BAD_REQUEST)
 
         user.last_login = timezone.now()
@@ -80,5 +87,7 @@ class AuthorizationUser(APIView):
 
         response = generate_token_and_set_cookie(user)
         response.data = {"message": "Successfully logged in"}
+
+        logger.info(f"User {user.username} successfully logged in")
 
         return response

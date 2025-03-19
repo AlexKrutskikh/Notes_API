@@ -37,8 +37,9 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
 
     class UserRole(models.TextChoices):
-        ADMIN = "Admin"
+
         USER = "User"
+        EDITOR = "Editor"
 
     auth_provider = models.CharField(max_length=50, default="RegistrationUser")
     registration_time = models.DateTimeField(auto_now_add=True)
