@@ -200,6 +200,10 @@ class GetMyNotes(APIView):
 
             notes = Notes.objects.filter(user=request.user)
 
+            if not notes.exists():
+                logger.info(f"User {request.user.username} has no notes.")
+                return Response({"message": "Notes not found"}, status=status.HTTP_200_OK)
+
             notes_data = [
                 {
                     "id": note.id,
