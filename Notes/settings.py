@@ -5,6 +5,7 @@ from decouple import config
 from environ import Env
 from datetime import timedelta
 import logging
+import redis
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -223,6 +224,20 @@ else:
     }
 
 # Redis
+REDIS_HOST = env("REDIS_HOST", default="redis")
+REDIS_PORT = env.int("REDIS_PORT", default=6379)
+REDIS_BLACKLIST_DB = env.int("REDIS_BLACKLIST_DB", default=1)
+REDIS_WHITELIST_DB = env.int("REDIS_WHITELIST_DB", default=2)
+
+
+blacklist_db = redis.StrictRedis(
+    host=REDIS_HOST, port=REDIS_PORT, db=REDIS_BLACKLIST_DB, decode_responses=True
+)
+
+whitelist_db = redis.StrictRedis(
+    host=REDIS_HOST, port=REDIS_PORT, db=REDIS_WHITELIST_DB, decode_responses=True
+)
+
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
@@ -232,7 +247,6 @@ CACHES = {
         }
     }
 }
-
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

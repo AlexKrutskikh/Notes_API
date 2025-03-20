@@ -1,6 +1,6 @@
 from django.urls import include, path
 
-from .auth_view import AuthorizationUser, RegistrationUser
+from .auth_view import AuthorizationUser, LogoutView, RegistrationUser
 from .authentication import CustomTokenRefreshView
 from .social_view import google_oauth_redirect
 
@@ -14,4 +14,6 @@ urlpatterns = [
     path("v1/registration/user/", RegistrationUser.as_view(), name="RegistrationUser"),
     # вход
     path("v1/authorization/user/", AuthorizationUser.as_view(), name="AuthorizationUser"),
+    # выход
+    path("logout/", LogoutView.as_view(), name="logout"),
 ]

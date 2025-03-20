@@ -6,6 +6,14 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
+from .utils import get_client_ip
+
+from .redis_token import (
+    add_token_to_blacklist,
+    get_whitelist_data,
+    is_token_blacklisted,
+    is_token_whitelisted,
+)
 
 User = get_user_model()
 
@@ -18,9 +26,24 @@ class CookieJWTAuthentication(BaseAuthentication):
         if not token:
             return None
 
+        if is_token_blacklisted(token):
+            raise AuthenticationFailed("Token is blacklisted")
+
         try:
             access_token = AccessToken(token)
             user = User.objects.get(id=access_token["user_id"])
+
+            if not is_token_whitelisted(token):
+                raise AuthenticationFailed("Token is not whitelisted")
+
+            stored_data = get_whitelist_data(token)
+            request_ip = get_client_ip(request)
+            request_ua = request.headers.get("User-Agent")
+
+            if stored_data["ip"] != request_ip or stored_data["ua"] != request_ua:
+                add_token_to_blacklist(token, access_token.lifetime.total_seconds())
+                raise AuthenticationFailed("Token may be stolen")
+
         except Exception:
             raise AuthenticationFailed("InvalidToken")
 

@@ -1,12 +1,15 @@
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import AccessToken
 
 from Notes.settings import logger
 
 from .models import User
+from .redis_token import add_token_to_blacklist, remove_token_from_whitelist
 from .utils import generate_token_and_set_cookie
 from .validators import validate_user_data
 
@@ -85,9 +88,28 @@ class AuthorizationUser(APIView):
         user.last_login = timezone.now()
         user.save()
 
-        response = generate_token_and_set_cookie(user)
+        response = generate_token_and_set_cookie(user,request)
         response.data = {"message": "Successfully logged in"}
 
         logger.info(f"User {user.username} successfully logged in")
 
+        return response
+
+
+"""Выход пользователя"""
+
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        token = request.COOKIES.get("access_token")
+        if token:
+            access_token = AccessToken(token)
+            add_token_to_blacklist(token, access_token.lifetime.total_seconds())
+            remove_token_from_whitelist(token)
+
+        response = Response({"message": "Logged out"})
+        response.delete_cookie("access_token")
+        response.delete_cookie("refresh_token")
         return response
