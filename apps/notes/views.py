@@ -165,7 +165,7 @@ class GetAllNotes(APIView):
     def get(self, request):
         try:
 
-            notes = Notes.objects.all()
+            notes = Notes.objects.filter(is_deleted=False)
 
             notes_data = [
                 {
@@ -198,7 +198,7 @@ class GetMyNotes(APIView):
     def get(self, request):
         try:
 
-            notes = Notes.objects.filter(user=request.user)
+            notes = Notes.objects.filter(user=request.user, is_deleted=False)
 
             if not notes.exists():
                 logger.info(f"User {request.user.username} has no notes.")
@@ -233,8 +233,12 @@ class GetNoteById(APIView):
 
     def get(self, request, note_id):
         try:
-
             note = Notes.objects.get(id=note_id)
+
+            if note.is_deleted:
+                logger.warning(f"Attempt to access deleted note {note_id}.")
+                return Response({"error": "This note has been deleted."}, status=status.HTTP_410_GONE)
+
         except Notes.DoesNotExist:
             logger.error(f"Note with ID {note_id} not found.")
             return Response({"error": "Note not found."}, status=status.HTTP_404_NOT_FOUND)
