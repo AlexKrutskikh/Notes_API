@@ -88,7 +88,7 @@ class AuthorizationUser(APIView):
         user.last_login = timezone.now()
         user.save()
 
-        response = generate_token_and_set_cookie(user,request)
+        response = generate_token_and_set_cookie(user, request)
         response.data = {"message": "Successfully logged in"}
 
         logger.info(f"User {user.username} successfully logged in")

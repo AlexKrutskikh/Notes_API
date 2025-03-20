@@ -3,6 +3,7 @@ from datetime import timedelta
 
 from Notes.settings import blacklist_db, whitelist_db
 
+
 def add_token_to_blacklist(token, exp):
     """Добавляет токен в черный список (например, при logout или подозрительной активности)"""
     blacklist_db.setex(token, timedelta(seconds=exp), "blacklisted")

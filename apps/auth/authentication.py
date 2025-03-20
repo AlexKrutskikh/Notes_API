@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
-from .utils import get_client_ip
 
 from .redis_token import (
     add_token_to_blacklist,
@@ -14,6 +13,7 @@ from .redis_token import (
     is_token_blacklisted,
     is_token_whitelisted,
 )
+from .utils import get_client_ip
 
 User = get_user_model()
 
