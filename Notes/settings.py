@@ -141,12 +141,6 @@ AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
 ]
 
-SITE_ID = 1
-SOCIAL_AUTH_URL_NAMESPACE = 'social'
-
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
-
 
 AUTH_USER_MODEL = 'notes_auth.User'
 
@@ -247,6 +241,7 @@ CACHES = {
         }
     }
 }
+
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
